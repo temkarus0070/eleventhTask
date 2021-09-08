@@ -12,17 +12,19 @@ public class ChatServiceImpl<T extends Chat> implements ChatService {
 
     @Override
     public void sendMessage(Message message,Chat chat) throws UserBannedException{
-        checkBan(message.getSender(), chat);
+        if(hasBan(message.getSender(), chat)){
+            throw new UserBannedException();
+        }
         chat.getMessages().add(message);
     }
 
     @Override
     public void banUser(User user,Chat chat) {
-        chat.get
+        chat.getBanUser().add(user);
     }
 
     @Override
-    public void addUserToChat(User user,Chat chat) throws ChatUsersOverflowException, UserBannedException {
+    public void addUserToChat(User user,Chat chat) throws ChatUsersOverflowException{
         String chatType=chat.getClass().getSimpleName();
         switch (chatType){
             case "PrivateChat":
@@ -46,9 +48,7 @@ public class ChatServiceImpl<T extends Chat> implements ChatService {
         }
     }
 
-    private void checkBan(User user,Chat chat)throws UserBannedException {
-        if(chat.getUserList().contains(user)){
-            throw new UserBannedException();
-        }
+    private boolean hasBan(User user,Chat chat){
+        return chat.getUserList().contains(user);
     }
 }

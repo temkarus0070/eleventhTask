@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/chatApp/chatApp.iml" filepath="$PROJECT_DIR$/chatApp/chatApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/eleventhTask.iml" filepath="$PROJECT_DIR$/eleventhTask.iml" />
+      <module fileurl="file://$PROJECT_DIR$/userInterface/userInterface.iml" filepath="$PROJECT_DIR$/userInterface/userInterface.iml" />
     </modules>
   </component>
 </project>

@@ -7,7 +7,7 @@ import chatApp.domain.exceptions.ChatUsersOverflowException;
 import chatApp.domain.exceptions.UserBannedException;
 
 public interface ChatService {
-    public void sendMessage(Message message, Chat chat);
+    public void sendMessage(Message message, Chat chat)throws UserBannedException;
 
     public void banUser(User user,Chat chat);
 
