@@ -3,5 +3,6 @@ module chatApp {
     exports chatApp.domain.chat;
     exports chatApp.domain.exceptions;
     exports chatApp.services.chat;
-    exports chatApp.services.persistence;
+    exports chatApp.services.persistence.implementation;
+    exports chatApp.services.persistence.interfaces;
 }
