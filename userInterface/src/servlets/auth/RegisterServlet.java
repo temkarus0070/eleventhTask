@@ -1,4 +1,4 @@
-package servlets;
+package servlets.auth;
 
 import chatApp.domain.User;
 import chatApp.domain.exceptions.UsernameAlreadyExistException;

@@ -23,6 +23,7 @@
     <textarea name="message" id="message">
 
     </textarea>
+    <br/>
     <input type="submit" value="sendMessage" />
 </form>
 <ul>
@@ -34,7 +35,10 @@
 
 
 
-    <li><%= chat.getMessages().get(i).getContent() %></li>
+    <li>
+    <p><%=chat.getMessages().get(i).getSender().getName()%></p>
+        <p><%= chat.getMessages().get(i).getContent() %></p>
+    </li>
     <%}%>
 </ul>
 </body>

@@ -1,4 +1,4 @@
-package servlets;
+package servlets.auth;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;

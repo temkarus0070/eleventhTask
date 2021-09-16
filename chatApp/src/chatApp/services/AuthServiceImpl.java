@@ -23,21 +23,23 @@ public class AuthServiceImpl implements AuthService {
     public boolean isAuthorized(Cookie[] cookies) {
         String username="";
         String password="";
-        for(Cookie cookie:cookies){
-                if(cookie.getName().equals("username")){
-                    username=cookie.getValue();
+        if(cookies!=null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("username")) {
+                    username = cookie.getValue();
+                } else if (cookie.getName().equals("password")) {
+                    password = cookie.getValue();
                 }
-                else if(cookie.getName().equals("password")){
-                    password=cookie.getValue();
-                }
+            }
+            try {
+                login(username, password);
+                return true;
+            } catch (Exception ex) {
+                return false;
+            }
         }
-        try {
-            login(username, password);
-            return true;
-        }
-        catch (Exception ex){
+        else
             return false;
-        }
     }
 
     private String getHashFromPassword(String password){

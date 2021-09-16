@@ -16,16 +16,16 @@
     </servlet>
     <servlet>
         <servlet-name>registerServlet</servlet-name>
-        <servlet-class>servlets.RegisterServlet</servlet-class>
+        <servlet-class>servlets.auth.RegisterServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>loginServlet</servlet-name>
-        <servlet-class>servlets.LoginServlet</servlet-class>
+        <servlet-class>servlets.auth.LoginServlet</servlet-class>
     </servlet>
     
     <servlet>
         <servlet-name>logoutServlet</servlet-name>
-        <servlet-class>servlets.LogoutServlet</servlet-class>
+        <servlet-class>servlets.auth.LogoutServlet</servlet-class>
     </servlet>
     
     <servlet-mapping>
