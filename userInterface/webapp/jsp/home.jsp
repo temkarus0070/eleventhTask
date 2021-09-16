@@ -15,6 +15,7 @@
 <nav>
     <a href="${pageContext.request.contextPath}/jsp/createChat.jsp">create new chat</a>
     <a href="${pageContext.request.contextPath}/jsp/getChat.jsp">enter in existed chat</a>
+    <a href="${pageContext.request.contextPath}/logout">logout</a>
 </nav>
 </body>
 </html>

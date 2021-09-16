@@ -15,10 +15,25 @@
 <h2>messages</h2>
 <%
     Chat chat=(Chat) request.getAttribute("chat");
-    if(chat!=null)
-for(int i=0;i<chat.getMessages().size();i++){
-    %>
+%>
+<form action="../messages" method="post">
+    <input type="hidden" value="<%=chat.getClass().getSimpleName()%>" name="chatType" id="chatType" />
+    <input type="hidden" value="<%=chat.getId()%>" name="chatId" id="chatId" />
+    <label for="message">text</label>
+    <textarea name="message" id="message">
+
+    </textarea>
+    <input type="submit" value="sendMessage" />
+</form>
 <ul>
+<%
+
+    if(chat!=null)
+        for(int i=0;i<chat.getMessages().size();i++){
+%>
+
+
+
     <li><%= chat.getMessages().get(i).getContent() %></li>
     <%}%>
 </ul>

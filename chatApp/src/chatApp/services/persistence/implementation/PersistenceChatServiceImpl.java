@@ -8,7 +8,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class PersistenceChatServiceImpl implements PersistenceChatService {
-    private final Set<Chat> chats = new HashSet<>();
+    private static int maxId=0;
+    private final static Set<Chat> chats = new HashSet<>();
 
     public PersistenceChatServiceImpl() {
     }
@@ -59,6 +60,7 @@ public class PersistenceChatServiceImpl implements PersistenceChatService {
     }
 
     private void mockAddChat(Chat chat) {
+        chat.setId(maxId++);
         chats.add(chat);
     }
 

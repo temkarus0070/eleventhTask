@@ -9,15 +9,20 @@ import java.util.Optional;
 import java.util.Set;
 
 public class PersistenceUserServiceImpl implements PersistenceUserService {
-    private Set<User> users;
+    private static Set<User> users=new HashSet<>();
 
     public PersistenceUserServiceImpl() {
-        users = new HashSet<>();
+
     }
 
     @Override
-    public Optional<User> getUser(int userId) {
-        return users.stream().filter(user -> user.getId() == userId).findFirst();
+    public void addUser(User user) {
+        users.add(user);
+    }
+
+    @Override
+    public Optional<User> getUser(String userName) {
+        return users.stream().filter(user -> user.getName().equals(userName)).findFirst();
     }
 
     @Override
@@ -36,8 +41,8 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
     }
 
     @Override
-    public void deleteUser(int userId) {
-        getUser(userId).ifPresent(user -> users.remove(user));
+    public void deleteUser(String username) {
+        getUser(username).ifPresent(user -> users.remove(user));
     }
 
     @Override

@@ -8,22 +8,21 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-
+<link rel="stylesheet" href="../css/style.css"/>
     <script type="text/javascript" src="./../js/jquery-3.6.0.js"></script>
     <script type="module" src="./../js/createChat.js" ></script>
     <title>Title</title>
 </head>
 <body>
-<form>
+<form method="post" action="../chat">
     <fieldset>
         <select id="chatType" name="chatType">
-            <option selected value="privateChat">private chat</option>
-            <option value="groupChat">group chat</option>
-            <option value="roomChat">room chat</option>
+            <option selected value="PrivateChat">private chat</option>
+            <option value="GroupChat">group chat</option>
+            <option value="RoomChat">room chat</option>
         </select>
-        <label for="chatId">chat identifier</label>
-        <input type="number" id="chatId" name="chatId" />
     </fieldset>
+    <input type="submit" value="create"/>
 </form>
 </body>
 </html>

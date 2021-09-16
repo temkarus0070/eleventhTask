@@ -1,12 +1,14 @@
 package chatApp.services.persistence.interfaces;
 
 import chatApp.domain.User;
+import chatApp.domain.exceptions.UsernameAlreadyExistException;
 
 import java.util.Collection;
 import java.util.Optional;
 
 public interface PersistenceUserService {
-    public Optional<User> getUser(int userId);
+    public void addUser(User user)throws UsernameAlreadyExistException;
+    public Optional<User> getUser(String userName);
 
     public Optional<User> getUserByName(String name);
 
@@ -14,7 +16,7 @@ public interface PersistenceUserService {
 
     public void updateUser(User user);
 
-    public void deleteUser(int userId);
+    public void deleteUser(String username);
 
     public void deleteUserByName(String name);
 }

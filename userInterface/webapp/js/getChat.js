@@ -16,7 +16,7 @@ $(document).ready(function (){
     function setFormFields(chatType){
         console.log(JSON.stringify(mainFieldSet));
         switch (chatType){
-            case "privateChat":
+            case "PrivateChat":
                 $("input[name='chatName']").remove();
                 $("label[for='chatName']").remove();
                 $('<label>').attr({

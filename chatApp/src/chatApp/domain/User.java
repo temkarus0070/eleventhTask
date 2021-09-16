@@ -3,7 +3,6 @@ package chatApp.domain;
 import java.util.Objects;
 
 public class User {
-    private int id;
     private String name;
     private String password;
 
@@ -15,20 +14,13 @@ public class User {
         this.password = password;
     }
 
-    public User(int id, String name, String password){
-        this.id=id;
+    public User(String name, String password){
         this.name=name;
         this.password=password;
     }
 
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -43,11 +35,11 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && Objects.equals(name, user.name);
+        return name.equals(user.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(name);
     }
 }
