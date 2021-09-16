@@ -66,6 +66,7 @@ public class ChatServlet extends HttpServlet {
         try {
             String type = req.getParameterMap().get("chatType")[0];
             Optional<Chat> chat;
+
             switch (type) {
                 case "PrivateChat":
                     int id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);

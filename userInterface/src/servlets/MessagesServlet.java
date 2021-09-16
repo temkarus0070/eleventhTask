@@ -3,6 +3,7 @@ package servlets;
 import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.Message;
+import chatApp.domain.chat.Nameable;
 import chatApp.services.chat.ChatService;
 import chatApp.services.chat.ChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
@@ -64,7 +65,11 @@ public class MessagesServlet extends HttpServlet {
             else{
                 resp.getOutputStream().print("chat not found exception");
             }
-            resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chat.get().getClass().getSimpleName(),chat.get().getId()));
+            String chatType=chat.get().getClass().getSimpleName();
+            if(chatType.equals("PrivateChat"))
+                resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chatType,chat.get().getId()));
+            else
+                resp.sendRedirect(String.format("/chat?chatType=%s&chatName=%s",chatType,((Nameable)chat.get()).getName()));
         }
         catch (Exception ex){
             resp.getOutputStream().print("chat id exception");
