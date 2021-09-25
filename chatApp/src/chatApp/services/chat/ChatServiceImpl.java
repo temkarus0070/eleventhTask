@@ -4,23 +4,27 @@ import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.GroupChat;
 import chatApp.domain.chat.Message;
-import chatApp.domain.chat.PrivateChat;
 import chatApp.domain.exceptions.ChatUsersOverflowException;
+import chatApp.domain.exceptions.MessageSenderNotFoundException;
 import chatApp.domain.exceptions.UserBannedException;
 
-public class ChatServiceImpl<T extends Chat> implements ChatService {
+public class ChatServiceImpl implements ChatService {
 
     @Override
-    public void sendMessage(Message message,Chat chat) throws UserBannedException{
+    public void sendMessage(Message message,Chat chat) throws UserBannedException, MessageSenderNotFoundException {
         if(hasBan(message.getSender(), chat)){
             throw new UserBannedException();
         }
+        if(message.getSender()==null)
+            throw new MessageSenderNotFoundException();
         chat.getMessages().add(message);
     }
 
+
+
     @Override
     public void banUser(User user,Chat chat) {
-        chat.getBanUser().add(user);
+        chat.getBannedUsers().add(user);
     }
 
     @Override

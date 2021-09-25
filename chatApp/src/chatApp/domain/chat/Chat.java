@@ -2,21 +2,23 @@ package chatApp.domain.chat;
 
 import chatApp.domain.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public abstract class Chat {
     private int id;
-    private List<User> userList;
-    private List<User> banUser;
-    private  List<Message> messages;
+    private List<User> userList=new ArrayList<>();
+    private List<User> bannedUsers=new ArrayList<>();
+    private  List<Message> messages=new ArrayList<>();
 
-    public List<User> getBanUser() {
-        return banUser;
+
+    public List<User> getBannedUsers() {
+        return bannedUsers;
     }
 
-    public void setBanUser(List<User> banUser) {
-        this.banUser = banUser;
+    public void setBannedUsers(List<User> bannedUsers) {
+        this.bannedUsers = bannedUsers;
     }
 
     public List<Message> getMessages() {
@@ -49,7 +51,7 @@ public abstract class Chat {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userList, banUser, messages);
+        return Objects.hash(id, userList, bannedUsers, messages);
     }
 
     public void setId(int id) {

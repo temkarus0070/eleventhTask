@@ -9,7 +9,6 @@
         <webroots>
           <root url="file://$MODULE_DIR$/webapp" relative="/" />
         </webroots>
-        <sourceRoots />
       </configuration>
     </facet>
   </component>
@@ -21,6 +20,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="chatApp" />
+    <orderEntry type="library" name="javax.servlet-api-4.0.1" level="project" />
     <orderEntry type="library" name="javax.servlet-api-4.0.1" level="project" />
   </component>
 </module>
