@@ -7,7 +7,6 @@ import chatApp.domain.chat.Nameable;
 import chatApp.services.chat.ChatService;
 import chatApp.services.chat.ChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceNameableChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 import chatApp.services.persistence.interfaces.PersistenceNameableChatService;

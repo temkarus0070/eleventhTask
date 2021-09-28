@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PersistenceChatService {
+
     public Optional<Chat> getChat(int id);
 
     public void removeChat(int id);

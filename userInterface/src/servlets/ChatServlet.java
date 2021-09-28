@@ -3,14 +3,16 @@ package servlets;
 import chatApp.domain.chat.*;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
+import chatApp.services.ChatServiceSelector;
+import chatApp.services.PersistenceChatServiceSelector;
 import chatApp.services.chat.ChatService;
 import chatApp.services.chat.ChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
+import chatApp.services.chat.GroupChatServiceImpl;
+import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
+import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceNameableChatService;
-import chatApp.services.persistence.implementation.PersistenceNameableChatServiceImpl;
-import chatApp.services.persistence.interfaces.PersistenceUserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,6 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ChatServlet extends HttpServlet {
+    private ChatServiceSelector chatServiceSelector;
+    private PersistenceChatServiceSelector persistenceChatServiceSelector;
 
     private ChatService chatService;
     private PersistenceChatService persistenceChatService;
@@ -63,18 +67,29 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        PersistenceChatService persistenceChatService=null;
+        try{
+         persistenceChatService=persistenceChatServiceSelector.getPersistenceChatService(req.getParameterMap());
+        }
+        catch (ClassNotFoundException classNotFoundException){
+            resp.getOutputStream().print("invalid chat type");
+        }
         try {
             String type = req.getParameterMap().get("chatType")[0];
-            Optional<Chat> chat;
+            Optional<Chat> chat=Optional.empty();
 
             switch (type) {
+                case "GroupChat":
+                    PersistenceGroupChatServiceImpl groupChatService=(PersistenceGroupChatServiceImpl) persistenceChatService;
+                    chat=groupChatService.getChatByName(req.getParameterMap().get("chatName")[0]);
+                    break;
                 case "PrivateChat":
                     int id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);
                     chat = persistenceChatService.getChat(id);
                     break;
-                default:
-                    String chatName = req.getParameterMap().get("chatName")[0];
-                    chat = persistenceNameableChatService.getChatByName(chatName);
+                case "RoomChat":
+                    PersistenceRoomChatServiceImpl persistenceRoomChatService=(PersistenceRoomChatServiceImpl) persistenceChatService;
+                    chat=persistenceRoomChatService.getChatByName(req.getParameterMap().get("chatName")[0]);
                     break;
             }
             chat.ifPresent(value -> req.setAttribute("chat", value));
@@ -88,17 +103,14 @@ public class ChatServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameters=req.getParameterMap();
+        PersistenceChatService persistenceChatService=null;
+        try{
+            persistenceChatService=persistenceChatServiceSelector.getPersistenceChatService(parameters);
+        }
+        catch (ClassNotFoundException exception){
+            resp.getOutputStream().print("invalid chat type");
+        }
         String chatType=parameters.get("chatType")[0];
-        String chatName="";
-        try {
-            chatName=parameters.get("chatName")[0];
-        }
-        catch (Exception ex){
-            if(chatType.equals("roomChat")||chatType.equals("groupChat")){
-                resp.getOutputStream().print("chat name is required");
-                return;
-            }
-        }
         Chat chat=null;
         switch (chatType){
             case "PrivateChat":

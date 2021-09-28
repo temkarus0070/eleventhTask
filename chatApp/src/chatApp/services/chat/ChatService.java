@@ -13,5 +13,5 @@ public interface ChatService {
     public void banUser(User user, Chat chat);
 
 
-    public void addUserToChat(User user, Chat chat) throws ChatUsersOverflowException, UserBannedException;
+    public void addUser(User user, Chat chat) throws ChatUsersOverflowException, UserBannedException;
 }

@@ -7,7 +7,7 @@ import chatApp.services.persistence.interfaces.PersistenceChatService;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class PersistenceChatServiceImpl implements PersistenceChatService {
+public abstract class PersistenceChatServiceImpl implements PersistenceChatService {
     private static int maxId=0;
     private final static Set<Chat> chats = new HashSet<>();
 
@@ -59,6 +59,6 @@ public class PersistenceChatServiceImpl implements PersistenceChatService {
 
     private void mockRemove(int id) {
         Optional<Chat> chat = getChat(id);
-        chat.ifPresent(value -> chats.remove(value));
+        chat.ifPresent(chats::remove);
     }
 }

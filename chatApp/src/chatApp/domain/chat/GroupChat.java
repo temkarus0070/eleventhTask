@@ -1,8 +1,12 @@
 package chatApp.domain.chat;
 
-public class GroupChat extends Chat implements Nameable{
+public class GroupChat extends Chat {
 private String name;
 private int usersCount;
+
+public GroupChat(){
+    this.type=ChatType.GROUP;
+}
 
     public int getUsersCount() {
         return usersCount;

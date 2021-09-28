@@ -7,11 +7,16 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class Chat {
+    protected ChatType type;
     private int id;
     private List<User> userList=new ArrayList<>();
     private List<User> bannedUsers=new ArrayList<>();
     private  List<Message> messages=new ArrayList<>();
 
+
+    public ChatType getType() {
+        return type;
+    }
 
     public List<User> getBannedUsers() {
         return bannedUsers;

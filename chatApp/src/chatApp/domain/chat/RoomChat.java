@@ -1,6 +1,10 @@
 package chatApp.domain.chat;
 
-public class RoomChat extends Chat implements Nameable{
+public class RoomChat extends Chat{
+    public RoomChat() {
+        this.type=ChatType.ROOM;
+    }
+
     private String name;
 
     public String getName() {
