@@ -2,22 +2,27 @@ package chatApp.services.persistence.implementation;
 
 import chatApp.domain.chat.Chat;
 import chatApp.domain.exceptions.ChatUpdateException;
+import chatApp.services.persistence.InMemoryStorage;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
-public abstract class PersistenceChatServiceImpl implements PersistenceChatService {
+public abstract class PersistenceChatServiceImpl<T extends Chat> implements PersistenceChatService<T> {
+    private InMemoryStorage inMemoryStorage;
     private static int maxId=0;
-    private final static Set<Chat> chats = new HashSet<>();
+    private final static Set chats = new HashSet<T>();
 
     public PersistenceChatServiceImpl() {
     }
 
+    public void setInMemoryStorage(InMemoryStorage inMemoryStorage) {
+        this.inMemoryStorage = inMemoryStorage;
+    }
 
     @Override
-    public Optional<Chat> getChat(int id) {
-        return chats.stream().filter(chat -> chat.getId() == id).findFirst();
+    public Optional<T> getChat(int id) {
+        return inMemoryStorage.getChats().stream().filter(chat -> chat.getId() == id).findFirst();
     }
 
     @Override
@@ -26,7 +31,7 @@ public abstract class PersistenceChatServiceImpl implements PersistenceChatServi
     }
 
     @Override
-    public Collection<Chat> get() {
+    public Collection<T> get() {
         return mockGet();
     }
 

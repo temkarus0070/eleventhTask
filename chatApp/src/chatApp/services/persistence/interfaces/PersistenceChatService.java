@@ -7,15 +7,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface PersistenceChatService {
+public interface PersistenceChatService<T extends Chat> {
 
-    public Optional<Chat> getChat(int id);
+    public Optional<T> getChat(int id);
 
     public void removeChat(int id);
 
-    public Collection<Chat> get();
+    public Collection<T> get();
 
-    public void updateChat(Chat chat) throws ChatUpdateException;
+    public void updateChat(T chat) throws ChatUpdateException;
 
-    public void addChat(Chat chat);
+    public void addChat(T chat);
 }
