@@ -43,20 +43,8 @@ public class PersistenceChatServiceImpl implements PersistenceChatService {
 
 
     private void mockUpdateChat(Chat chat) throws ChatUpdateException {
-        Field[] fields = chat.getClass().getFields();
-        Optional<Chat> existedChat = getChat(chat.getId());
-        if (existedChat.isPresent()) {
-            Chat existedChatRef = existedChat.get();
-            for (Field field : fields) {
-                Class<? extends Chat> existedClassChat = existedChatRef.getClass();
-                try {
-                    Field usedField = existedClassChat.getDeclaredField(field.getName());
-                    usedField.set(existedChatRef, field.get(chat));
-                } catch (Exception ex) {
-                    throw new ChatUpdateException();
-                }
-            }
-        }
+        removeChat(chat.getId());
+        addChat(chat);
     }
 
     private void mockAddChat(Chat chat) {

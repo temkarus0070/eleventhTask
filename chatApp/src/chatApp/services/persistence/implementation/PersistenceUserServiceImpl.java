@@ -25,10 +25,7 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
         return users.stream().filter(user -> user.getName().equals(userName)).findFirst();
     }
 
-    @Override
-    public Optional<User> getUserByName(String name) {
-        return users.stream().filter(user -> user.getName().equals(name)).findFirst();
-    }
+
 
     @Override
     public Collection<User> get() {
@@ -45,8 +42,4 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
         getUser(username).ifPresent(user -> users.remove(user));
     }
 
-    @Override
-    public void deleteUserByName(String name) {
-        getUserByName(name).ifPresent(user -> users.remove(user));
-    }
 }

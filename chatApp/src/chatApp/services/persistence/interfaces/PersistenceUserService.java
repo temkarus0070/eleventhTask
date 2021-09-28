@@ -10,7 +10,7 @@ public interface PersistenceUserService {
     public void addUser(User user)throws UsernameAlreadyExistException;
     public Optional<User> getUser(String userName);
 
-    public Optional<User> getUserByName(String name);
+
 
     public Collection<User> get();
 
@@ -18,5 +18,4 @@ public interface PersistenceUserService {
 
     public void deleteUser(String username);
 
-    public void deleteUserByName(String name);
 }
