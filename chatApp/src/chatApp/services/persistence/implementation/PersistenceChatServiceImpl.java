@@ -21,7 +21,7 @@ public abstract class PersistenceChatServiceImpl<T extends Chat> implements Pers
     }
 
     @Override
-    public Optional<T> getChat(int id) {
+    public Optional<T extends Chat> getChat(int id) {
         return inMemoryStorage.getChats().stream().filter(chat -> chat.getId() == id).findFirst();
     }
 
