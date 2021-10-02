@@ -1,28 +1,38 @@
 package chatApp.services.persistence;
 
-import chatApp.domain.chat.Chat;
 
+
+import chatApp.services.persistence.interfaces.Repository;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class InMemoryStorage {
+public class InMemoryStorage<T> implements Repository<T> {
     private static InMemoryStorage inMemoryStorage;
 
     public InMemoryStorage getInstance(){
         if(inMemoryStorage==null){
             inMemoryStorage=new InMemoryStorage();
-            chats=new HashSet<>();
+            chats=new HashSet<T>();
         }
         return inMemoryStorage;
     }
 
-    private Set<Chat> chats;
+    private Set<T> chats;
 
-    public Set<Chat> getChats() {
+    @Override
+    public Collection<T> get() {
         return chats;
     }
 
-    public void add(Chat chat){
+    @Override
+    public void add(T chat){
         chats.add(chat);
+    }
+
+    @Override
+    public void delete(T chat) {
+        chats.remove(chat);
     }
 }

@@ -17,7 +17,7 @@
     Chat chat=(Chat) request.getAttribute("chat");
 %>
 <form action="../messages" method="post">
-    <input type="hidden" value="<%=chat.getClass().getSimpleName()%>" name="chatType" id="chatType" />
+    <input type="hidden" value="<%=chat.getType()%>" name="chatType" id="chatType" />
     <input type="hidden" value="<%=chat.getId()%>" name="chatId" id="chatId" />
     <label for="message">text</label>
     <textarea name="message" id="message">

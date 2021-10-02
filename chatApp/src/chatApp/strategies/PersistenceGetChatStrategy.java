@@ -2,19 +2,14 @@ package chatApp.strategies;
 
 import chatApp.domain.chat.Chat;
 import chatApp.services.chat.PrivateChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
-import chatApp.services.persistence.interfaces.PersistenceChatService;
-
+import chatApp.services.persistence.implementation.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
 public class PersistenceGetChatStrategy {
-    public Function<Map<String, String[]>,Optional<Chat>> takeGetMethod(Map<String, String[]> parameterMap) throws ClassNotFoundException {
+    public <T extends Chat> Function<Map<String, String[]>,Optional<T>> takeGetMethod(Map<String, String[]> parameterMap) throws ClassNotFoundException {
             String type = parameterMap.get("chatType")[0];
-            Optional<Chat> chat;
             switch (type) {
                 case "PrivateChat":
                     return e->{

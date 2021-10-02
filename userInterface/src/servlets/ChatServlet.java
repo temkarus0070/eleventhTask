@@ -51,41 +51,16 @@ public class ChatServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameters = req.getParameterMap();
-        Chat chat=persistenceAddChatStrategy.getAddMethod(parameters).apply(parameters);
-        PersistenceChatService persistenceChatService = null;
         try {
-            persistenceChatService = persistenceGetStrategy.takeGetMethod(parameters);
-        } catch (ClassNotFoundException exception) {
-            resp.getOutputStream().print("invalid chat type");
+            Chat chat=persistenceAddChatStrategy.getAddMethod(parameters).apply(parameters);
+            if (chat != null) {
+                req.setAttribute("chat", chat);
+                req.setAttribute("chatType", chat.getType());
+            }
+            req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
+        } catch (ClassNotFoundException e) {
+            resp.getOutputStream().print(e.getMessage());
         }
-        String chatType = parameters.get("chatType")[0];
-        Chat chat = null;
-        switch (chatType) {
-            case "PrivateChat":
-                chat = new PrivateChat();
-                persistenceChatService.addChat(chat);
-                break;
-            case "RoomChat":
-                chat = new RoomChat();
-                ((RoomChat) chat).setName(chatName);
-                persistenceChatService.addChat(chat);
-                break;
-            case "GroupChat":
-                chat = new GroupChat();
-                ((GroupChat) chat).setName(chatName);
-                try {
-                    ((GroupChat) chat).setUsersCount(Integer.parseInt(parameters.get("usersCount")[0]));
-                } catch (Exception ex) {
-                    resp.getOutputStream().print("users count is required");
-                    return;
-                }
-                persistenceChatService.addChat(chat);
-                break;
-        }
-        if (chat != null) {
-            req.setAttribute("chat", chat);
-            req.setAttribute("chatType", chatType);
-        }
-        req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
+
     }
 }
