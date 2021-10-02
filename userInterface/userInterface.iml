@@ -23,5 +23,6 @@
     <orderEntry type="module" module-name="chatApp" />
     <orderEntry type="library" name="javax.servlet-api-4.0.1" level="project" />
     <orderEntry type="library" name="javax.servlet-api-4.0.1" level="project" />
+    <orderEntry type="module" module-name="di" />
   </component>
 </module>

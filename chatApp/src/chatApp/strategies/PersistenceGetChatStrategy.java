@@ -15,17 +15,17 @@ public class PersistenceGetChatStrategy {
                     return e->{
                        PersistencePrivateChatServiceImpl privateChatService=new PersistencePrivateChatServiceImpl();
                         int id = Integer.parseInt(e.get("chatId")[0]);
-                        return privateChatService.getChat(id);
+                        return (Optional<T>) privateChatService.getChat(id);
                     };
                 case "GroupChat":
                     return e->{
                        PersistenceGroupChatServiceImpl persistenceGroupChatService= new PersistenceGroupChatServiceImpl();
-                        return persistenceGroupChatService.getChatByName(e.get("chatName")[0]);
+                        return (Optional<T>) persistenceGroupChatService.getChatByName(e.get("chatName")[0]);
                     };
                 case "RoomChat":
                     return e->{
                         PersistenceRoomChatServiceImpl persistenceRoomChatService=new PersistenceRoomChatServiceImpl();
-                        return persistenceRoomChatService.getChatByName(e.get("chatName")[0]);
+                        return (Optional<T>) persistenceRoomChatService.getChatByName(e.get("chatName")[0]);
                     };
             }
             throw new ClassNotFoundException();

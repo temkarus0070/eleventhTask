@@ -11,6 +11,8 @@ import chatApp.services.chat.ChatServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceNameableChatService;
+import di.IoCContainer;
+import di.configuration.JavaBeanConfigurationImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,6 +29,7 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+
         persistenceAddChatStrategy=new PersistenceAddChatStrategy();
         persistenceGetStrategy=new PersistenceGetChatStrategy();
     }
@@ -36,6 +39,7 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        IoCContainer ioCContainer=new IoCContainer(new JavaBeanConfigurationImpl("servlets"));
         Optional<Chat> chat = Optional.empty();
         try {
             Function<Map<String, String[]>, Optional<Chat>> getFunction = persistenceGetStrategy.takeGetMethod(req.getParameterMap());
