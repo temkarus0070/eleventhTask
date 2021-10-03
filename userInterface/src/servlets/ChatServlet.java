@@ -60,6 +60,7 @@ public class ChatServlet extends HttpServlet {
         }
         String chatType = parameters.get("chatType")[0];
         Chat chat = null;
+
         switch (chatType) {
             case "PrivateChat":
                 chat = new PrivateChat();
