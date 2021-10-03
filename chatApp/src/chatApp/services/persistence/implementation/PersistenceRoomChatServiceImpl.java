@@ -7,13 +7,13 @@ import chatApp.domain.chat.RoomChat;
 
 import java.util.Optional;
 
-public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl{
-    public Optional<Chat> getChatByName(String name) {
+public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<RoomChat>{
+    public Optional<RoomChat> getChatByName(String name) {
         return mockGetChatByName(name);
     }
 
 
-    private Optional<Chat> mockGetChatByName(String name){
+    private Optional<RoomChat> mockGetChatByName(String name){
         return get().stream().filter(e->{
             if(e.getType()== ChatType.ROOM){
                 RoomChat roomChat=(RoomChat) e;

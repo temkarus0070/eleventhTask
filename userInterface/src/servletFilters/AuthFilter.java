@@ -2,6 +2,8 @@ package servletFilters;
 
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
+import chatApp.services.PasswordEncoderImpl;
+import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,7 +18,7 @@ public class AuthFilter extends HttpFilter {
 
     @Override
     public void init() throws ServletException {
-        authService=new AuthServiceImpl();
+        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(),new PasswordEncoderImpl());
         super.init();
     }
 

@@ -1,5 +1,7 @@
 package chatApp.services.persistence.implementation;
 
-public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImpl{
+import chatApp.domain.chat.PrivateChat;
+
+public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImpl<PrivateChat> {
 
 }

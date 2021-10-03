@@ -1,21 +1,20 @@
 package chatApp.services.persistence.implementation;
 
-import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
-import chatApp.domain.chat.RoomChat;
+import chatApp.domain.chat.GroupChat;
 
 import java.util.Optional;
 
-public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl{
-    public Optional<Chat> getChatByName(String name) {
+public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<GroupChat> {
+    public Optional<GroupChat> getChatByName(String name) {
         return mockGetChatByName(name);
     }
 
 
-    private Optional<Chat> mockGetChatByName(String name){
+    private Optional<GroupChat> mockGetChatByName(String name){
         return get().stream().filter(e->{
-            if(e.getType()== ChatType.GROUP){
-                RoomChat roomChat=(RoomChat) e;
+            if(e.getType()== ChatType.GROUP ){
+                GroupChat roomChat=(GroupChat) e;
                 return roomChat.getName().equals(name);
             }
             else

@@ -16,10 +16,8 @@ public class ChatServiceSelector {
         switch (chatType){
             case "RoomChat":
                 return new RoomCharServiceImpl();
-                break;
             case "GroupChat":
                 return new GroupChatServiceImpl();
-              break;
             default:
                 return new PrivateChatServiceImpl();
 

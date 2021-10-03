@@ -8,4 +8,5 @@ module chatApp {
     exports chatApp.services.persistence.interfaces;
     exports chatApp.services;
     exports chatApp.strategies;
+    exports chatApp.factories;
 }

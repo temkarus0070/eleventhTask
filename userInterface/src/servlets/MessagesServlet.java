@@ -3,7 +3,8 @@ package servlets;
 import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.Message;
-import chatApp.domain.chat.Nameable;
+import chatApp.factories.ChatServiceFactory;
+import chatApp.factories.PersistenceChatServiceFactory;
 import chatApp.services.chat.ChatService;
 import chatApp.services.chat.ChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
@@ -29,9 +30,6 @@ public class MessagesServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        chatService=new ChatServiceImpl();
-        persistenceChatService=new PersistenceChatServiceImpl();
-        persistenceNameableChatService=new PersistenceNameableChatServiceImpl();
         persistenceUserService=new PersistenceUserServiceImpl();
     }
 
@@ -41,38 +39,30 @@ public class MessagesServlet extends HttpServlet {
         try {
             int id=Integer.parseInt(params.get("chatId")[0]);
             Optional<Chat> chat=persistenceChatService.getChat(id);
-            String messageText="";
-            try {
-                messageText = params.get("message")[0];
-            }
-            catch (Exception ex){
-                resp.getOutputStream().print("message text not found exception");
-            }
             if(chat.isPresent()){
-                req.setAttribute("chat",chat.get());
-                Message message=new Message();
-                message.setContent(messageText);
                 Optional<User> userOptional=persistenceUserService.getUser(Arrays.stream(req.getCookies()).filter(e->e.getName().equals("username")).findFirst().get().getValue());
-                if(userOptional.isPresent()) {
-                    message.setSender(userOptional.get());
-                    chatService.sendMessage(message, chat.get());
-                }
-                else{
-                    resp.getOutputStream().print("user not found exception");
-                }
+               if(userOptional.isPresent()){
+                   String messageText = params.get("message")[0];
+                   persistenceChatService=PersistenceChatServiceFactory.create(chat.get().getType());
+                   ChatService chatService= ChatServiceFactory.create(chat.get().getType());
+                   req.setAttribute("chat",chat.get());
+                   Message message=new Message(messageText, userOptional.get());
+                   chatService.sendMessage(message,chat.get());
+                   persistenceChatService.updateChat(chat.get());
+               }
+               else{
+                   resp.getOutputStream().print("user not found exception");
+               }
+
             }
-            else{
+            else {
                 resp.getOutputStream().print("chat not found exception");
             }
             String chatType=chat.get().getClass().getSimpleName();
-            if(chatType.equals("PrivateChat"))
                 resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chatType,chat.get().getId()));
-            else
-                resp.sendRedirect(String.format("/chat?chatType=%s&chatName=%s",chatType,((Nameable)chat.get()).getName()));
         }
         catch (Exception ex){
             resp.getOutputStream().print("chat id exception");
-            return;
         }
 
     }

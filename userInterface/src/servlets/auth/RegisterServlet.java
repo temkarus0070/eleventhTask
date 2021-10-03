@@ -4,6 +4,8 @@ import chatApp.domain.User;
 import chatApp.domain.exceptions.UsernameAlreadyExistException;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
+import chatApp.services.PasswordEncoderImpl;
+import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -17,7 +19,7 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        authService=new AuthServiceImpl();
+        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(),new PasswordEncoderImpl());
     }
 
     @Override
