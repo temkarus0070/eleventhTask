@@ -1,8 +1,8 @@
 package chatApp.domain.chat;
 
-public class RoomChat extends Chat{
+public class RoomChat extends Chat {
     public RoomChat() {
-        this.type=ChatType.ROOM;
+        this.type = ChatType.ROOM;
     }
 
     private String name;
@@ -10,7 +10,6 @@ public class RoomChat extends Chat{
     public String getName() {
         return name;
     }
-
 
 
     public void setName(String name) {

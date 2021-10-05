@@ -13,9 +13,9 @@
 <body>
 <form action="../register" method="post">
     <label for="username">username</label>
-    <input type="text" name="username" id="username"/>
+    <input required type="text" name="username" id="username"/>
     <label for="password">password</label>
-    <input type="password" id="password" name="password"/>
+    <input required type="password" id="password" name="password"/>
     <p><%=request.getAttribute("usernameExixtedException")%></p>
     <p><%=request.getAttribute("registerException")%></p>
     <input type="submit" value="register" />

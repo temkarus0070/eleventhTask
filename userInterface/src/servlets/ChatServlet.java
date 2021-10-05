@@ -32,23 +32,24 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         String chatName;
         Chat anyChat=null;
         try {
-            String type = req.getParameterMap().get("chatType")[0];
+            ChatType type = ChatType.valueOf(req.getParameterMap().get("chatType")[0]);
             switch (type) {
-                case "PrivateChat":
+                case PRIVATE:
                     Optional<PrivateChat> chat;
                     int id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);
                     chat = persistencePrivateChatService.getChat(id);
                     anyChat=chat.get();
                     break;
-                case "GroupChat":
+                case GROUP:
                     chatName = req.getParameterMap().get("chatName")[0];
                     Optional<GroupChat> groupChat= persistenceGroupChatService.getChatByName(chatName);
                     anyChat=groupChat.get();
                     break;
-                case "RoomChat":
+                case ROOM:
                     chatName = req.getParameterMap().get("chatName")[0];
                     Optional<RoomChat> roomChat= persistenceRoomChatService.getChatByName(chatName);
                     anyChat=roomChat.get();
@@ -57,8 +58,13 @@ public class ChatServlet extends HttpServlet {
             if(anyChat!=null){
                 req.setAttribute("chat",anyChat);
             }
+            else {
+                resp.getOutputStream().print("chat not found exception");
+                return;
+            }
         } catch (Exception exception) {
             resp.getOutputStream().print("invalid chat identifier or name");
+            return;
         }
         req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
 
@@ -67,7 +73,7 @@ public class ChatServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameters=req.getParameterMap();
-        String chatType=parameters.get("chatType")[0];
+        ChatType chatType=ChatType.valueOf(parameters.get("chatType")[0]);
         String chatName="";
         try {
             chatName=parameters.get("chatName")[0];
@@ -80,22 +86,23 @@ public class ChatServlet extends HttpServlet {
         }
         Chat anyChat=null;
         switch (chatType){
-            case "PrivateChat":
+            case PRIVATE:
                 PrivateChat privateChat=new PrivateChat();
                 persistencePrivateChatService.addChat(privateChat);
                 anyChat=privateChat;
                 break;
-            case "RoomChat":
+            case ROOM:
                 RoomChat roomChat=new RoomChat();
                 roomChat.setName(chatName);
                 try {
                     persistenceRoomChatService.addChat(roomChat);
                 } catch (ChatAlreadyExistsException e) {
                     resp.getOutputStream().print("chat with that name  already exists");
+                    return;
                 }
                 anyChat=roomChat;
                 break;
-            case "GroupChat":
+            case GROUP:
 
                 GroupChat groupChat=new GroupChat();
                 groupChat.setName(chatName);
@@ -106,13 +113,22 @@ public class ChatServlet extends HttpServlet {
                     resp.getOutputStream().print("users count is required");
                     return;
                 }
-                persistenceGroupChatService.addChat(groupChat);
+                try {
+                    persistenceGroupChatService.addChat(groupChat);
+                } catch (ChatAlreadyExistsException e) {
+                    resp.getOutputStream().print("chat with that name  already exists");
+                    return;
+                }
                 anyChat=groupChat;
                 break;
         }
         if(anyChat!=null) {
             req.setAttribute("chat", anyChat);
             req.setAttribute("chatType",chatType);
+        }
+        else {
+            resp.getOutputStream().print("chat creation error");
+            return;
         }
         req.getRequestDispatcher("/jsp/chat.jsp").forward(req,resp);
 

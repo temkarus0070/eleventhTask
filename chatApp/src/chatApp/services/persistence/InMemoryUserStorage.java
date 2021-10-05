@@ -1,9 +1,11 @@
 package chatApp.services.persistence;
 
 import chatApp.domain.User;
+import chatApp.services.PasswordEncoderImpl;
 import chatApp.services.persistence.interfaces.UserRepository;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 public class InMemoryUserStorage implements UserRepository {
@@ -17,7 +19,17 @@ public class InMemoryUserStorage implements UserRepository {
         if(inMemoryUserStorage==null){
             inMemoryUserStorage=new InMemoryUserStorage();
         }
+        if(userSet==null) {
+            userSet = new HashSet<>();
+            initialize();
+        }
+
         return inMemoryUserStorage;
+    }
+
+    private static void initialize(){
+        userSet.add(new User("temkarus0070",new PasswordEncoderImpl().getHashFromPassword("1234")));
+
     }
 
     @Override
@@ -33,5 +45,14 @@ public class InMemoryUserStorage implements UserRepository {
     @Override
     public void delete(User entity) {
         userSet.remove(entity);
+    }
+
+    @Override
+    public void update(User entity) {
+        User user=get().stream().filter(e->e.getName().equals(entity.getName())).findFirst().get();
+        if(user!=null){
+            userSet.remove(user);
+            userSet.add(entity);
+        }
     }
 }

@@ -7,10 +7,9 @@ import chatApp.domain.exceptions.ChatUsersOverflowException;
 public class PrivateChatServiceImpl extends ChatServiceImpl {
     @Override
     public void addUser(User user, Chat chat) throws ChatUsersOverflowException {
-        if(chat.getUserList().size()==2){
+        if (chat.getUserList().size() == 2) {
             throw new ChatUsersOverflowException();
-        }
-        else{
+        } else {
             chat.getUserList().add(user);
         }
 

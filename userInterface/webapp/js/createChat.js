@@ -13,13 +13,13 @@ $(document).ready(function (){
 
    function changeFields(chatType){
        switch (chatType){
-           case "PrivateChat":
+           case "PRIVATE":
                addFieldsToPrivateChat();
                break;
-           case "GroupChat":
+           case "GROUP":
                addFieldToGroupChat();
                break;
-           case "RoomChat":
+           case "ROOM":
                addFieldsToNameableChat();
                break;
        }
@@ -50,7 +50,8 @@ $(document).ready(function (){
            $('<input>').attr({
                type: type,
                id: id,
-               name: name
+               name: name,
+               required:true
            }).appendTo(formFieldSet);
     }
 

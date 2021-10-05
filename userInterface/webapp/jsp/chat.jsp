@@ -20,7 +20,7 @@
     <input type="hidden" value="<%=chat.getType()%>" name="chatType" id="chatType" />
     <input type="hidden" value="<%=chat.getId()%>" name="chatId" id="chatId" />
     <label for="message">text</label>
-    <textarea name="message" id="message">
+    <textarea name="message" id="message" required>
 
     </textarea>
     <br/>
