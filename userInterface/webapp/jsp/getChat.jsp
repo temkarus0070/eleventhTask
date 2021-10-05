@@ -18,9 +18,9 @@
 <form method="get" action="../chat">
     <fieldset>
     <select id="chatType" name="chatType">
-        <option selected value="PrivateChat">private chat</option>
-        <option value="GroupChat">group chat</option>
-        <option value="RoomChat">room chat</option>
+        <option selected value="PRIVATE">private chat</option>
+        <option value="GROUP">group chat</option>
+        <option value="ROOM">room chat</option>
     </select>
     <label for="chatId">chat identifier</label>
     <input type="number" id="chatId" name="chatId" />

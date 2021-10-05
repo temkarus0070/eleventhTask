@@ -35,20 +35,20 @@ public class ChatServlet extends HttpServlet {
         String chatName;
         Chat anyChat=null;
         try {
-            String type = req.getParameterMap().get("chatType")[0];
+            ChatType type =ChatType.valueOf(req.getParameterMap().get("chatType")[0]);
             switch (type) {
-                case "PrivateChat":
+                case PRIVATE:
                     Optional<PrivateChat> chat;
                     int id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);
                     chat = persistencePrivateChatService.getChat(id);
                     anyChat=chat.get();
                     break;
-                case "GroupChat":
+                case GROUP:
                     chatName = req.getParameterMap().get("chatName")[0];
                     Optional<GroupChat> groupChat= persistenceGroupChatService.getChatByName(chatName);
                     anyChat=groupChat.get();
                     break;
-                case "RoomChat":
+                case ROOM:
                     chatName = req.getParameterMap().get("chatName")[0];
                     Optional<RoomChat> roomChat= persistenceRoomChatService.getChatByName(chatName);
                     anyChat=roomChat.get();
@@ -67,25 +67,25 @@ public class ChatServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameters=req.getParameterMap();
-        String chatType=parameters.get("chatType")[0];
+        ChatType chatType=ChatType.valueOf(parameters.get("chatType")[0]);
         String chatName="";
         try {
             chatName=parameters.get("chatName")[0];
         }
         catch (Exception ex){
-            if(chatType.equals("roomChat")||chatType.equals("groupChat")){
+            if(chatType==ChatType.ROOM||chatType==ChatType.GROUP){
                 resp.getOutputStream().print("chat name is required");
                 return;
             }
         }
         Chat anyChat=null;
         switch (chatType){
-            case "PrivateChat":
+            case PRIVATE:
                 PrivateChat privateChat=new PrivateChat();
                 persistencePrivateChatService.addChat(privateChat);
                 anyChat=privateChat;
                 break;
-            case "RoomChat":
+            case ROOM:
                 RoomChat roomChat=new RoomChat();
                 roomChat.setName(chatName);
                 try {
@@ -95,7 +95,7 @@ public class ChatServlet extends HttpServlet {
                 }
                 anyChat=roomChat;
                 break;
-            case "GroupChat":
+            case GROUP:
 
                 GroupChat groupChat=new GroupChat();
                 groupChat.setName(chatName);

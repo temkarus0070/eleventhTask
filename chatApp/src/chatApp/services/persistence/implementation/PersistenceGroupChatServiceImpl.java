@@ -46,8 +46,7 @@ public class PersistenceGroupChatServiceImpl implements PersistenceChatService<G
 
     @Override
     public void updateChat(GroupChat chat)  {
-        this.repository.delete(chat);
-        this.repository.add(chat);
+        this.repository.update(chat);
     }
 
     @Override

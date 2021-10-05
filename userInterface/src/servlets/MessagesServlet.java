@@ -2,6 +2,7 @@ package servlets;
 
 import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
+import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.Message;
 import chatApp.factories.ChatServiceFactory;
 import chatApp.factories.PersistenceChatServiceFactory;
@@ -33,20 +34,25 @@ public class MessagesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         Map<String,String[]> params=req.getParameterMap();
+        ChatType chatType=null;
         try {
+            chatType=ChatType.valueOf(params.get("chatType")[0]);
             int id=Integer.parseInt(params.get("chatId")[0]);
-            Optional<Chat> chat=persistenceChatService.getChat(id);
-            if(chat.isPresent()){
+
+            if(chatType!=null){
                 Optional<User> userOptional=persistenceUserService.getUser(Arrays.stream(req.getCookies()).filter(e->e.getName().equals("username")).findFirst().get().getValue());
                if(userOptional.isPresent()){
                    String messageText = params.get("message")[0];
-                   persistenceChatService= PersistenceChatServiceFactory.create(chat.get().getType(), InMemoryChatStorage.getInstance());
-                   ChatService chatService= ChatServiceFactory.create(chat.get().getType());
+                   persistenceChatService= PersistenceChatServiceFactory.create(chatType, InMemoryChatStorage.getInstance());
+                   Optional<Chat> chat=persistenceChatService.getChat(id);
+                   ChatService chatService= ChatServiceFactory.create(chatType);
                    req.setAttribute("chat",chat.get());
                    Message message=new Message(messageText, userOptional.get());
                    chatService.sendMessage(message,chat.get());
                    persistenceChatService.updateChat(chat.get());
+                   resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chatType,chat.get().getId()));
                }
                else{
                    resp.getOutputStream().print("user not found exception");
@@ -54,10 +60,9 @@ public class MessagesServlet extends HttpServlet {
 
             }
             else {
-                resp.getOutputStream().print("chat not found exception");
+                resp.getOutputStream().print("chat type not found exception");
             }
-            String chatType=chat.get().getType().toString();
-                resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chatType,chat.get().getId()));
+
         }
         catch (Exception ex){
             resp.getOutputStream().print("chat id exception");

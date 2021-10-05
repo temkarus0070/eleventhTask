@@ -31,6 +31,17 @@ public class InMemoryChatStorage implements ChatRepository {
         return chats;
     }
 
+
+    @Override
+    public void update(Chat entity) {
+        Chat chat=get().stream().filter(chat1 -> chat1.getId()==entity.getId()).findFirst().get();
+        if(chat!=null) {
+            chats.remove(chat);
+            chats.add(entity);
+        }
+
+    }
+
     @Override
     public void add(Chat chat){
         chat.setId(maxId);

@@ -41,8 +41,7 @@ public class PersistencePrivateChatServiceImpl implements PersistenceChatService
 
     @Override
     public void updateChat(PrivateChat chat) {
-        chatRepository.delete(chat);
-        chatRepository.add(chat);
+        chatRepository.update(chat);
     }
 
     @Override

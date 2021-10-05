@@ -35,7 +35,7 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
 
     @Override
     public void updateUser(User user) {
-        userRepository.add(user);
+        userRepository.update(user);
     }
 
     @Override
