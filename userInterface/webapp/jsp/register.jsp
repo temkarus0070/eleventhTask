@@ -16,8 +16,6 @@
     <input required type="text" name="username" id="username"/>
     <label for="password">password</label>
     <input required type="password" id="password" name="password"/>
-    <p><%=request.getAttribute("usernameExixtedException")%></p>
-    <p><%=request.getAttribute("registerException")%></p>
     <input type="submit" value="register" />
 </form>
 </body>

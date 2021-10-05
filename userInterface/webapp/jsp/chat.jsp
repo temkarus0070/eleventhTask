@@ -10,6 +10,7 @@
 <html>
 <head>
     <title>Chat ${chat.getId()}</title>
+    <meta charset="UTF-8" />
 </head>
 <body>
 <h2>messages</h2>

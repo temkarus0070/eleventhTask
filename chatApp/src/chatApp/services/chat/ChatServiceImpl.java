@@ -16,7 +16,7 @@ public abstract class ChatServiceImpl implements ChatService {
         if (hasBan(message.getSender(), chat)) {
             throw new UserBannedException();
         }
-        if (message.getSender() == null) //переместить наверх
+        if (message.getSender() == null) //переместить наверх (вынести из этой функции)
             throw new MessageSenderNotFoundException();
         chat.getMessages().add(message);
     }
@@ -30,6 +30,10 @@ public abstract class ChatServiceImpl implements ChatService {
         chat.getBannedUsers().add(user);
     }
 
+    @Override
+    public boolean hasPermissions(User user, Chat chat) {
+        return chat.getUserList().contains(user);
+    }
 
     private boolean hasBan(User user, Chat chat) {
         return chat.getUserList().contains(user);

@@ -2,6 +2,8 @@ package servlets;
 
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
+import chatApp.factories.ChatServiceFactory;
+import chatApp.services.chat.ChatService;
 import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
@@ -55,7 +57,8 @@ public class ChatServlet extends HttpServlet {
                     anyChat=roomChat.get();
                     break;
             }
-            if(anyChat!=null){
+            ChatService chatService= ChatServiceFactory.create(type);
+            if(anyChat!=null ){
                 req.setAttribute("chat",anyChat);
             }
             else {
