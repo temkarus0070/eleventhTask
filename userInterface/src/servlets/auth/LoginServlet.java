@@ -5,6 +5,7 @@ import chatApp.domain.exceptions.InvalidAuthDataException;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
 import chatApp.services.PasswordEncoderImpl;
+import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
 
@@ -21,8 +22,8 @@ public class LoginServlet extends HttpServlet {
     private PersistenceUserService persistenceUserService;
     @Override
     public void init() throws ServletException {
-        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(),new PasswordEncoderImpl());
-        persistenceUserService=new PersistenceUserServiceImpl();
+        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(InMemoryUserStorage.getInstance()),new PasswordEncoderImpl());
+        persistenceUserService=new PersistenceUserServiceImpl(InMemoryUserStorage.getInstance());
         super.init();
     }
 

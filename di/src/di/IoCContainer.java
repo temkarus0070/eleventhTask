@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class IoCContainer {
 
     private static   Map<Class,Class> instancesMap;
+    private Object scanObject;
     private JavaBeanConfiguration javaBeanConfiguration;
     public IoCContainer(JavaBeanConfiguration javaBeanConfiguration){
         this.javaBeanConfiguration=javaBeanConfiguration;
@@ -23,6 +24,25 @@ public class IoCContainer {
     }
 
     private void scan(){
+        List<File> urls = new ArrayList<File>();
+        String javaClassPath = System.getProperty("java.class.path");
+        if (javaClassPath != null) {
+            for (String path : javaClassPath.split(File.pathSeparator)) {
+                urls.add(new File(path));
+            }
+        }
+        ClassLoader classLoader=ClassLoader.getPlatformClassLoader();
+        Package[] packages=classLoader.getDefinedPackages();
+        try {
+            for (Iterator<URL> it = classLoader.getResources("di").asIterator(); it.hasNext(); ) {
+                URL url = it.next();
+
+
+            }
+        }
+        catch (Exception ex){
+
+        }
         Arrays.stream(Package.getPackages()).forEach(e-> scanPackage(e.getName()));
 
     }

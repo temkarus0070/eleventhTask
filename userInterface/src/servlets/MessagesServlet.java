@@ -6,11 +6,10 @@ import chatApp.domain.chat.Message;
 import chatApp.factories.ChatServiceFactory;
 import chatApp.factories.PersistenceChatServiceFactory;
 import chatApp.services.chat.ChatService;
-import chatApp.services.chat.ChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
+import chatApp.services.persistence.InMemoryChatStorage;
+import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
-import chatApp.services.persistence.interfaces.PersistenceNameableChatService;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
 
 import javax.servlet.ServletException;
@@ -25,12 +24,11 @@ import java.util.Optional;
 public class MessagesServlet extends HttpServlet {
     private ChatService chatService;
     private PersistenceChatService persistenceChatService;
-    private PersistenceNameableChatService persistenceNameableChatService;
     private PersistenceUserService persistenceUserService;
 
     @Override
     public void init() throws ServletException {
-        persistenceUserService=new PersistenceUserServiceImpl();
+        persistenceUserService=new PersistenceUserServiceImpl(InMemoryUserStorage.getInstance());
     }
 
     @Override
@@ -43,7 +41,7 @@ public class MessagesServlet extends HttpServlet {
                 Optional<User> userOptional=persistenceUserService.getUser(Arrays.stream(req.getCookies()).filter(e->e.getName().equals("username")).findFirst().get().getValue());
                if(userOptional.isPresent()){
                    String messageText = params.get("message")[0];
-                   persistenceChatService=PersistenceChatServiceFactory.create(chat.get().getType());
+                   persistenceChatService= PersistenceChatServiceFactory.create(chat.get().getType(), InMemoryChatStorage.getInstance());
                    ChatService chatService= ChatServiceFactory.create(chat.get().getType());
                    req.setAttribute("chat",chat.get());
                    Message message=new Message(messageText, userOptional.get());
@@ -58,7 +56,7 @@ public class MessagesServlet extends HttpServlet {
             else {
                 resp.getOutputStream().print("chat not found exception");
             }
-            String chatType=chat.get().getClass().getSimpleName();
+            String chatType=chat.get().getType().toString();
                 resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chatType,chat.get().getId()));
         }
         catch (Exception ex){

@@ -1,24 +1,57 @@
 package chatApp.services.persistence.implementation;
 
+import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.GroupChat;
+import chatApp.services.persistence.interfaces.ChatRepository;
+import chatApp.services.persistence.interfaces.PersistenceChatService;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<GroupChat> {
+public class PersistenceGroupChatServiceImpl implements PersistenceChatService<GroupChat> {
+    private final ChatRepository repository;
+    public PersistenceGroupChatServiceImpl(ChatRepository repository) {
+        this.repository=repository;
+    }
+
     public Optional<GroupChat> getChatByName(String name) {
-        return mockGetChatByName(name);
+        return get().stream().filter(e->e.getName().equals(name)).findFirst();
     }
 
 
-    private Optional<GroupChat> mockGetChatByName(String name){
-        return get().stream().filter(e->{
-            if(e.getType()== ChatType.GROUP ){
-                GroupChat roomChat=(GroupChat) e;
-                return roomChat.getName().equals(name);
-            }
-            else
-                return false;
-        }).findFirst();
+
+
+    @Override
+    public Optional<GroupChat> getChat(int id) {
+        return    this.repository.get().stream()
+                .filter(chat->chat.getId()==id && chat.getType()==ChatType.GROUP)
+                .map(chat->(GroupChat)chat)
+                .findFirst();
+    }
+
+    @Override
+    public void removeChat(int id) {
+        Optional<Chat> chatOptional=this.repository.get().stream().filter(chat->chat.getId()==id).findFirst();
+        chatOptional.ifPresent(this.repository::delete);
+    }
+
+    @Override
+    public Collection<GroupChat> get() {
+        return this.repository.get().stream().filter(chat->chat.getType()==ChatType.GROUP)
+                .map(chat->(GroupChat)chat)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void updateChat(GroupChat chat)  {
+        this.repository.delete(chat);
+        this.repository.add(chat);
+    }
+
+    @Override
+    public void addChat(GroupChat chat) {
+        this.repository.add(chat);
     }
 }

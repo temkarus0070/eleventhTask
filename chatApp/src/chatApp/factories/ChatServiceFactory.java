@@ -9,16 +9,16 @@ import chatApp.services.chat.RoomCharServiceImpl;
 public class ChatServiceFactory {
     public static ChatService create(ChatType chatType) throws ClassNotFoundException{
         switch (chatType){
-            case PRIVATE -> {
+            case PRIVATE:
                 return new PrivateChatServiceImpl();
-            }
-            case ROOM -> {
+
+        case ROOM:
                 return new RoomCharServiceImpl();
-            }
-            case GROUP -> {
+
+            case GROUP :
                 return new GroupChatServiceImpl();
-            }
-            default -> throw new ClassNotFoundException();
+
+            default : throw new ClassNotFoundException();
         }
     }
 }

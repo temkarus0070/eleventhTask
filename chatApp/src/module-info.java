@@ -7,6 +7,6 @@ module chatApp {
     exports chatApp.services.persistence.implementation;
     exports chatApp.services.persistence.interfaces;
     exports chatApp.services;
-    exports chatApp.strategies;
     exports chatApp.factories;
+    exports chatApp.services.persistence;
 }

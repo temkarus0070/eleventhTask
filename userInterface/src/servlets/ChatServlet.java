@@ -1,18 +1,11 @@
 package servlets;
 
 import chatApp.domain.chat.*;
-import chatApp.services.AuthService;
-import chatApp.services.AuthServiceImpl;
-import chatApp.services.ChatServiceSelector;
-import chatApp.strategies.PersistenceAddChatStrategy;
-import chatApp.strategies.PersistenceGetChatStrategy;
-import chatApp.services.chat.ChatService;
-import chatApp.services.chat.ChatServiceImpl;
-import chatApp.services.persistence.interfaces.PersistenceChatService;
-import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
-import chatApp.services.persistence.interfaces.PersistenceNameableChatService;
-import di.IoCContainer;
-import di.configuration.JavaBeanConfigurationImpl;
+import chatApp.domain.exceptions.ChatAlreadyExistsException;
+import chatApp.services.persistence.InMemoryChatStorage;
+import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
+import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
+import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,17 +14,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class ChatServlet extends HttpServlet {
-    private PersistenceGetChatStrategy persistenceGetStrategy;
-    private PersistenceAddChatStrategy persistenceAddChatStrategy;
+    private PersistencePrivateChatServiceImpl persistencePrivateChatService;
+    private PersistenceGroupChatServiceImpl persistenceGroupChatService;
+    private PersistenceRoomChatServiceImpl persistenceRoomChatService;
 
     @Override
     public void init() throws ServletException {
-
-        persistenceAddChatStrategy=new PersistenceAddChatStrategy();
-        persistenceGetStrategy=new PersistenceGetChatStrategy();
+        persistencePrivateChatService=new PersistencePrivateChatServiceImpl(InMemoryChatStorage.getInstance());
+        persistenceGroupChatService=new PersistenceGroupChatServiceImpl(InMemoryChatStorage.getInstance());
+        persistenceRoomChatService=new PersistenceRoomChatServiceImpl(InMemoryChatStorage.getInstance());
     }
 
 
@@ -39,32 +32,94 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        IoCContainer ioCContainer=new IoCContainer(new JavaBeanConfigurationImpl("servlets"));
-        Optional<Chat> chat = Optional.empty();
+        String chatName;
+        Chat anyChat=null;
         try {
-            Function<Map<String, String[]>, Optional<Chat>> getFunction = persistenceGetStrategy.takeGetMethod(req.getParameterMap());
-            chat = getFunction.apply(req.getParameterMap());
-        } catch (ClassNotFoundException classNotFoundException) {
-            resp.getOutputStream().print("invalid chat type");
+            String type = req.getParameterMap().get("chatType")[0];
+            switch (type) {
+                case "PrivateChat":
+                    Optional<PrivateChat> chat;
+                    int id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);
+                    chat = persistencePrivateChatService.getChat(id);
+                    anyChat=chat.get();
+                    break;
+                case "GroupChat":
+                    chatName = req.getParameterMap().get("chatName")[0];
+                    Optional<GroupChat> groupChat= persistenceGroupChatService.getChatByName(chatName);
+                    anyChat=groupChat.get();
+                    break;
+                case "RoomChat":
+                    chatName = req.getParameterMap().get("chatName")[0];
+                    Optional<RoomChat> roomChat= persistenceRoomChatService.getChatByName(chatName);
+                    anyChat=roomChat.get();
+                    break;
+            }
+            if(anyChat!=null){
+                req.setAttribute("chat",anyChat);
+            }
+        } catch (Exception exception) {
+            resp.getOutputStream().print("invalid chat identifier or name");
         }
-        chat.ifPresent(value -> req.setAttribute("chat", value));
         req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
 
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<String, String[]> parameters = req.getParameterMap();
+        Map<String, String[]> parameters=req.getParameterMap();
+        String chatType=parameters.get("chatType")[0];
+        String chatName="";
         try {
-            Chat chat=persistenceAddChatStrategy.getAddMethod(parameters).apply(parameters);
-            if (chat != null) {
-                req.setAttribute("chat", chat);
-                req.setAttribute("chatType", chat.getType());
-            }
-            req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
-        } catch (ClassNotFoundException e) {
-            resp.getOutputStream().print(e.getMessage());
+            chatName=parameters.get("chatName")[0];
         }
+        catch (Exception ex){
+            if(chatType.equals("roomChat")||chatType.equals("groupChat")){
+                resp.getOutputStream().print("chat name is required");
+                return;
+            }
+        }
+        Chat anyChat=null;
+        switch (chatType){
+            case "PrivateChat":
+                PrivateChat privateChat=new PrivateChat();
+                persistencePrivateChatService.addChat(privateChat);
+                anyChat=privateChat;
+                break;
+            case "RoomChat":
+                RoomChat roomChat=new RoomChat();
+                roomChat.setName(chatName);
+                try {
+                    persistenceRoomChatService.addChat(roomChat);
+                } catch (ChatAlreadyExistsException e) {
+                    resp.getOutputStream().print("chat with that name  already exists");
+                }
+                anyChat=roomChat;
+                break;
+            case "GroupChat":
+
+                GroupChat groupChat=new GroupChat();
+                groupChat.setName(chatName);
+                try {
+                    groupChat.setUsersCount(Integer.parseInt(parameters.get("usersCount")[0]));
+                }
+                catch (Exception ex){
+                    resp.getOutputStream().print("users count is required");
+                    return;
+                }
+                persistenceGroupChatService.addChat(groupChat);
+                anyChat=groupChat;
+                break;
+        }
+        if(anyChat!=null) {
+            req.setAttribute("chat", anyChat);
+            req.setAttribute("chatType",chatType);
+        }
+        req.getRequestDispatcher("/jsp/chat.jsp").forward(req,resp);
+
+
+
+
+
 
     }
 }

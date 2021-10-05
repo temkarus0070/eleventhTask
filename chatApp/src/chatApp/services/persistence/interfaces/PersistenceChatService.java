@@ -1,10 +1,9 @@
 package chatApp.services.persistence.interfaces;
 
 import chatApp.domain.chat.Chat;
-import chatApp.domain.exceptions.ChatUpdateException;
+import chatApp.domain.exceptions.ChatAlreadyExistsException;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public interface PersistenceChatService<T extends Chat> {
@@ -15,7 +14,7 @@ public interface PersistenceChatService<T extends Chat> {
 
     public  Collection<T> get();
 
-    public  void updateChat(T chat) throws ChatUpdateException;
+    public  void updateChat(T chat);
 
-    public  void addChat(T chat);
+    public  void addChat(T chat)throws ChatAlreadyExistsException;
 }

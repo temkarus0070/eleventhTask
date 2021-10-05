@@ -2,6 +2,7 @@ package chatApp.services.persistence.implementation;
 
 import chatApp.domain.User;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
+import chatApp.services.persistence.interfaces.UserRepository;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,37 +10,37 @@ import java.util.Optional;
 import java.util.Set;
 
 public class PersistenceUserServiceImpl implements PersistenceUserService {
-    private static Set<User> users=new HashSet<>();
+    private UserRepository userRepository;
 
-    public PersistenceUserServiceImpl() {
-
+    public PersistenceUserServiceImpl(UserRepository userRepository) {
+        this.userRepository=userRepository;
     }
 
     @Override
     public void addUser(User user) {
-        users.add(user);
+        userRepository.add(user);
     }
 
     @Override
     public Optional<User> getUser(String userName) {
-        return users.stream().filter(user -> user.getName().equals(userName)).findFirst();
+        return userRepository.get().stream().filter(user -> user.getName().equals(userName)).findFirst();
     }
 
 
 
     @Override
     public Collection<User> get() {
-        return users;
+        return userRepository.get();
     }
 
     @Override
     public void updateUser(User user) {
-        users.add(user);
+        userRepository.add(user);
     }
 
     @Override
     public void deleteUser(String username) {
-        getUser(username).ifPresent(user -> users.remove(user));
+        getUser(username).ifPresent(user -> userRepository.delete(user));
     }
 
 }
