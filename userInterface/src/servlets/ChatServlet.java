@@ -91,7 +91,7 @@ public class ChatServlet extends HttpServlet {
             chatName=parameters.get("chatName")[0];
         }
         catch (Exception ex){
-            if(chatType.equals("roomChat")||chatType.equals("groupChat")){
+            if(chatType==ChatType.ROOM||chatType==ChatType.GROUP){
                 resp.getOutputStream().print("chat name is required");
                 return;
             }
