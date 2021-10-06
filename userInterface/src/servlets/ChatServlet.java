@@ -140,7 +140,7 @@ public class ChatServlet extends HttpServlet {
                 User current = authService.getCurrentUser(req.getCookies());
             }
             catch (Exception ex){
-                resp.getOutputStream()
+                resp.getOutputStream().print("chat type not found exception");
             }
             req.setAttribute("chat", anyChat);
             req.setAttribute("chatType",chatType);
