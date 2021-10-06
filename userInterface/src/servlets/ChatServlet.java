@@ -1,13 +1,19 @@
 package servlets;
 
+import chatApp.domain.User;
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
 import chatApp.factories.ChatServiceFactory;
+import chatApp.services.AuthService;
+import chatApp.services.AuthServiceImpl;
+import chatApp.services.PasswordEncoderImpl;
 import chatApp.services.chat.ChatService;
 import chatApp.services.persistence.InMemoryChatStorage;
+import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
+import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,12 +27,14 @@ public class ChatServlet extends HttpServlet {
     private PersistencePrivateChatServiceImpl persistencePrivateChatService;
     private PersistenceGroupChatServiceImpl persistenceGroupChatService;
     private PersistenceRoomChatServiceImpl persistenceRoomChatService;
+    private AuthService authService;
 
     @Override
     public void init() throws ServletException {
         persistencePrivateChatService=new PersistencePrivateChatServiceImpl(InMemoryChatStorage.getInstance());
         persistenceGroupChatService=new PersistenceGroupChatServiceImpl(InMemoryChatStorage.getInstance());
         persistenceRoomChatService=new PersistenceRoomChatServiceImpl(InMemoryChatStorage.getInstance());
+        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(InMemoryUserStorage.getInstance()),new PasswordEncoderImpl());
     }
 
 
@@ -58,7 +66,8 @@ public class ChatServlet extends HttpServlet {
                     break;
             }
             ChatService chatService= ChatServiceFactory.create(type);
-            if(anyChat!=null ){
+            User current= authService.getCurrentUser(req.getCookies());
+            if(anyChat!=null && chatService.hasPermissions(current,anyChat) ){
                 req.setAttribute("chat",anyChat);
             }
             else {
@@ -126,6 +135,13 @@ public class ChatServlet extends HttpServlet {
                 break;
         }
         if(anyChat!=null) {
+            try {
+                ChatService chatService = ChatServiceFactory.create(chatType);
+                User current = authService.getCurrentUser(req.getCookies());
+            }
+            catch (Exception ex){
+                resp.getOutputStream()
+            }
             req.setAttribute("chat", anyChat);
             req.setAttribute("chatType",chatType);
         }
