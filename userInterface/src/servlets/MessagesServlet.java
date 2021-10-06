@@ -4,6 +4,7 @@ import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.Message;
+import chatApp.domain.exceptions.MessageSenderNotFoundException;
 import chatApp.factories.ChatServiceFactory;
 import chatApp.factories.PersistenceChatServiceFactory;
 import chatApp.services.chat.ChatService;
