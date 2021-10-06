@@ -71,7 +71,7 @@ public class ChatServlet extends HttpServlet {
                 req.setAttribute("chat",anyChat);
             }
             else {
-                resp.getOutputStream().print("chat not found exception");
+                resp.getOutputStream().print(" you dont have permissions to participate at that chat");
                 return;
             }
         } catch (Exception exception) {
@@ -136,8 +136,8 @@ public class ChatServlet extends HttpServlet {
         }
         if(anyChat!=null) {
             try {
-                ChatService chatService = ChatServiceFactory.create(chatType);
                 User current = authService.getCurrentUser(req.getCookies());
+                anyChat.getUserList().add(current);
             }
             catch (Exception ex){
                 resp.getOutputStream().print("chat type not found exception");

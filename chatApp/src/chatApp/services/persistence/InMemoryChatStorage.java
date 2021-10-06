@@ -23,17 +23,13 @@ public class InMemoryChatStorage implements ChatRepository {
         if(inMemoryChatStorage ==null){
             inMemoryChatStorage =new InMemoryChatStorage();
             chats= new HashSet<>();
-            initialize();
         }
         return inMemoryChatStorage;
     }
 
     private static Collection<Chat> chats;
 
-    private static void initialize(){
-        chats.add(new PrivateChat());
 
-    }
 
     @Override
     public Collection<Chat> get() {
