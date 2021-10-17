@@ -1,5 +1,6 @@
 module chatApp {
     requires javax.servlet.api;
+    requires java.sql;
     exports chatApp.domain;
     exports chatApp.domain.chat;
     exports chatApp.domain.exceptions;
