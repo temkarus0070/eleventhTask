@@ -19,6 +19,14 @@ public class User {
         this.password=password;
     }
 
+    public User() {
+
+    }
+
+    public User(String name){
+        this.name=name;
+    }
+
 
 
 

@@ -2,14 +2,12 @@ package chatApp.services.persistence;
 
 
 
-import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
-import chatApp.domain.chat.PrivateChat;
-import chatApp.services.PasswordEncoderImpl;
 import chatApp.services.persistence.interfaces.ChatRepository;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 public class InMemoryChatStorage implements ChatRepository {
     private static int maxId=0;
@@ -36,6 +34,26 @@ public class InMemoryChatStorage implements ChatRepository {
         return chats;
     }
 
+    @Override
+    public Collection<Chat> getChatsByUser(String username) {
+        return null;
+    }
+
+    @Override
+    public Optional<Chat> getChatByName(String name) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void removeUserFromChat(String user, Integer chatId) throws Exception {
+
+    }
+
+    @Override
+    public Chat get(Integer integer) {
+        return null;
+    }
+
 
     @Override
     public void update(Chat entity) {
@@ -55,16 +73,9 @@ public class InMemoryChatStorage implements ChatRepository {
     }
 
     @Override
-    public void delete(Chat chat) {
+    public void delete(Integer chat) {
         chats.remove(chat);
     }
 
-    @Override
-    public void update(Chat entity) {
-        Chat chat=get().stream().filter(chat1 -> chat1.getId()==entity.getId()).findFirst().get();
-        if(chat!=null){
-            chats.remove(chat);
-            chats.add(entity);
-        }
-    }
+
 }

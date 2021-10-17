@@ -8,11 +8,19 @@ import java.util.Objects;
 
 public abstract class Chat {
     protected ChatType type;
+    private User chatOwner;
     private int id;
     private List<User> userList=new ArrayList<>();
     private List<User> bannedUsers=new ArrayList<>();
     private  List<Message> messages=new ArrayList<>();
 
+    public User getChatOwner() {
+        return chatOwner;
+    }
+
+    public void setChatOwner(User chatOwner) {
+        this.chatOwner = chatOwner;
+    }
 
     public ChatType getType() {
         return type;

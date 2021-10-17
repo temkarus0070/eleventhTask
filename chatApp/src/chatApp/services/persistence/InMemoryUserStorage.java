@@ -38,12 +38,17 @@ public class InMemoryUserStorage implements UserRepository {
     }
 
     @Override
+    public User get(String s) {
+        return null;
+    }
+
+    @Override
     public void add(User entity) {
         userSet.add(entity);
     }
 
     @Override
-    public void delete(User entity) {
+    public void delete(String entity) {
         userSet.remove(entity);
     }
 

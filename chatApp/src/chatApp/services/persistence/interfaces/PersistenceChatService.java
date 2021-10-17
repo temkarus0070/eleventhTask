@@ -8,13 +8,15 @@ import java.util.Optional;
 
 public interface PersistenceChatService<T extends Chat> {
 
-    public  Optional<T> getChat(int id);
+    public  Optional<T> getChat(int id)throws Exception;
 
-    public void removeChat(int id);
+    public void removeChat(int id)throws Exception;
 
-    public  Collection<T> get();
+    public  Collection<T> get()throws Exception;
 
-    public  void updateChat(T chat);
+    public  void updateChat(T chat)throws Exception;
 
-    public  void addChat(T chat)throws ChatAlreadyExistsException;
+    public Collection<T> getChatsByName(String username)throws Exception;
+
+    public  void addChat(T chat)throws ChatAlreadyExistsException, Exception;
 }

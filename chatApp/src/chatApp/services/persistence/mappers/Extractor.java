@@ -6,5 +6,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface Extractor<T> {
-    public T extract(ResultSet resultSet) throws SQLException, ClassNotFoundException;
+    public T extract(ResultSet resultSet) throws SQLException;
 }

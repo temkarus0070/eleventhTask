@@ -39,7 +39,7 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
     }
 
     @Override
-    public void deleteUser(String username) {
+    public void deleteUser(String username)throws Exception {
         getUser(username).ifPresent(user -> userRepository.delete(user));
     }
 

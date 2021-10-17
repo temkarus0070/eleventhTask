@@ -21,7 +21,7 @@ public abstract class ChatServiceImpl implements ChatService {
 
 
     @Override
-    public abstract void addUser(User user, Chat chat) throws ChatUsersOverflowException, UserBannedException;
+    public abstract void addUser(User user, Chat chat) throws ChatUsersOverflowException;
 
     @Override
     public void banUser(User user, Chat chat) {

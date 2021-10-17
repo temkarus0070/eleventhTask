@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public User login(String username, String password) throws InvalidAuthDataException {
+    public User login(String username, String password) throws Exception {
         User user=null;
         Optional<User> userOptional=persistenceUserService.getUser(username);
         if(userOptional.isPresent()){
@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public User register(String username, String password) throws UsernameAlreadyExistException {
+    public User register(String username, String password) throws Exception {
         String hashPassword=passwordEncoder.getHashFromPassword(password);
         User user=new User(username,hashPassword);
         try {
@@ -74,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public User getCurrentUser(Cookie[] cookies)throws UserNotExistsException {
+    public User getCurrentUser(Cookie[] cookies)throws Exception {
         Cookie cookie= Arrays.stream(cookies).filter(cookie1 -> cookie1.getName().equals("username")).findFirst().get();
         if(cookie!=null){
            return persistenceUserService.getUser(cookie.getValue()).get();

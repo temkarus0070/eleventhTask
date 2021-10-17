@@ -24,5 +24,7 @@
     <orderEntry type="library" name="javax.servlet-api-4.0.1" level="project" />
     <orderEntry type="library" name="javax.servlet-api-4.0.1" level="project" />
     <orderEntry type="module" module-name="di" />
+    <orderEntry type="library" name="apache.taglibs.standard.spec" level="project" />
+    <orderEntry type="library" name="apache.taglibs.standard.impl" level="project" />
   </component>
 </module>

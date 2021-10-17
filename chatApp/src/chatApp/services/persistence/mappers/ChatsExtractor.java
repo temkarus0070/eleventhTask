@@ -20,7 +20,7 @@ public class ChatsExtractor implements Extractor<List<Chat>> {
     }
 
     @Override
-    public List<Chat> extract(ResultSet resultSet) throws SQLException,ClassNotFoundException {
+    public List<Chat> extract(ResultSet resultSet) throws SQLException {
         List<Chat> chatList=new ArrayList<>();
         while (resultSet.next()){
             ChatType chatType=ChatType.valueOf(resultSet.getString("chat_type"));
@@ -44,8 +44,6 @@ public class ChatsExtractor implements Extractor<List<Chat>> {
                     groupChat.setUsersCount(resultSet.getInt("users_count"));
                     chatList.add(groupChat);
                     break;
-                default:
-                    throw new ClassNotFoundException();
             }
         }
         return chatList;

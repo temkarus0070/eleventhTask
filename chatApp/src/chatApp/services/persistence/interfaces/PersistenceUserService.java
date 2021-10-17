@@ -7,15 +7,15 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface PersistenceUserService {
-    public void addUser(User user)throws UsernameAlreadyExistException;
-    public Optional<User> getUser(String userName);
+    public void addUser(User user)throws UsernameAlreadyExistException,Exception;
+    public Optional<User> getUser(String userName)throws Exception;
 
 
 
-    public Collection<User> get();
+    public Collection<User> get()throws Exception;
 
-    public void updateUser(User user);
+    public void updateUser(User user)throws Exception;
 
-    public void deleteUser(String username);
+    public void deleteUser(String username)throws Exception;
 
 }

@@ -10,6 +10,7 @@ import chatApp.factories.PersistenceChatServiceFactory;
 import chatApp.services.chat.ChatService;
 import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.InMemoryUserStorage;
+import chatApp.services.persistence.UserStorage;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
@@ -30,7 +31,7 @@ public class MessagesServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        persistenceUserService=new PersistenceUserServiceImpl(InMemoryUserStorage.getInstance());
+        persistenceUserService=new PersistenceUserServiceImpl(new UserStorage());
     }
 
     @Override

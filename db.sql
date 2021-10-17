@@ -2,6 +2,7 @@ CREATE TYPE chatType AS ENUM ('PRIVATE','GROUP','ROOM');
 
 CREATE table Chats(
     id integer primary key not null ,
+    owner varchar(100) not null,
     chat_type chatType not null,
     name varchar(100),
     users_count integer

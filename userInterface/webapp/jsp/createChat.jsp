@@ -10,7 +10,7 @@
 <head>
 <link rel="stylesheet" href="../css/style.css"/>
     <script type="text/javascript" src="./../js/jquery-3.6.0.js"></script>
-    <script type="module" src="./../js/createChat.js" ></script>
+    <script type="text/javascript" src="./../js/createChat.js" ></script>
     <title>Title</title>
 </head>
 <body>

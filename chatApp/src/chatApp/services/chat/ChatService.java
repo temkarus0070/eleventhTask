@@ -13,6 +13,6 @@ public interface ChatService {
     public void banUser(User user, Chat chat);
 
 
-    public void addUser(User user, Chat chat) throws ChatUsersOverflowException, UserBannedException;
+    public void addUser(User user, Chat chat) throws ChatUsersOverflowException;
     public boolean hasPermissions(User user,Chat chat);
 }

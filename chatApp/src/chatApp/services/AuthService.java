@@ -9,7 +9,7 @@ import javax.servlet.http.Cookie;
 
 public interface AuthService {
     public boolean isAuthorized(Cookie[] cookies);
-    public User login(String username, String password) throws InvalidAuthDataException;
-    public User register(String username, String password) throws UsernameAlreadyExistException;
-    public User getCurrentUser(Cookie[] cookies) throws UserNotExistsException;
+    public User login(String username, String password) throws InvalidAuthDataException, Exception;
+    public User register(String username, String password) throws UsernameAlreadyExistException, Exception;
+    public User getCurrentUser(Cookie[] cookies) throws UserNotExistsException, Exception;
 }

@@ -2,7 +2,7 @@ package chatApp.services.persistence;
 import java.sql.*;
 
 public class ConnectionManager {
-    private final static String DB_URL="jdbc:postgresql://localhost:5432/chatBase";
+    private final static String DB_URL="jdbc:postgresql://localhost:5432/chat";
 
     private static ConnectionManager connectionManager;
 
@@ -25,11 +25,12 @@ public class ConnectionManager {
 
     public Connection getConnection(){
         try {
-            return DriverManager.getConnection(DB_URL);
+            return DriverManager.getConnection(DB_URL,"postgres","postgres");
         }
         catch (Exception ex){
             ex.printStackTrace();
         }
+        return null;
     }
 
 
