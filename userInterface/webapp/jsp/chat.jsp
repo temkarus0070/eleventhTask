@@ -10,6 +10,7 @@
 <html>
 <head>
     <title>Chat ${chat.getId()}</title>
+    <meta charset="UTF-8" />
 </head>
 <body>
 <h2>messages</h2>
@@ -20,7 +21,7 @@
     <input type="hidden" value="<%=chat.getType()%>" name="chatType" id="chatType" />
     <input type="hidden" value="<%=chat.getId()%>" name="chatId" id="chatId" />
     <label for="message">text</label>
-    <textarea name="message" id="message">
+    <textarea name="message" id="message" required>
 
     </textarea>
     <br/>

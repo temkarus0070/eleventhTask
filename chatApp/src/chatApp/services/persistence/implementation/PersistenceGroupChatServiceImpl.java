@@ -3,6 +3,8 @@ package chatApp.services.persistence.implementation;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.GroupChat;
+import chatApp.domain.chat.RoomChat;
+import chatApp.domain.exceptions.ChatAlreadyExistsException;
 import chatApp.services.persistence.interfaces.ChatRepository;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 
@@ -50,7 +52,13 @@ public class PersistenceGroupChatServiceImpl implements PersistenceChatService<G
     }
 
     @Override
-    public void addChat(GroupChat chat) {
-        this.repository.add(chat);
+    public void addChat(GroupChat chat)throws ChatAlreadyExistsException {
+        Optional<GroupChat> chatOptional=getChatByName(chat.getName());
+        if(chatOptional.isPresent()){
+            throw new ChatAlreadyExistsException();
+        }
+        else{
+            repository.add(chat);
+        }
     }
 }

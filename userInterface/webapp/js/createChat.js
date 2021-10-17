@@ -50,7 +50,8 @@ $(document).ready(function (){
            $('<input>').attr({
                type: type,
                id: id,
-               name: name
+               name: name,
+               required:true
            }).appendTo(formFieldSet);
     }
 

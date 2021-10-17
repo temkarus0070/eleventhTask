@@ -2,6 +2,7 @@ package chatApp.services;
 
 import chatApp.domain.User;
 import chatApp.domain.exceptions.InvalidAuthDataException;
+import chatApp.domain.exceptions.UserNotExistsException;
 import chatApp.domain.exceptions.UsernameAlreadyExistException;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
@@ -70,5 +71,14 @@ public class AuthServiceImpl implements AuthService {
             throw new UsernameAlreadyExistException();
         }
         return user;
+    }
+
+    @Override
+    public User getCurrentUser(Cookie[] cookies)throws UserNotExistsException {
+        Cookie cookie= Arrays.stream(cookies).filter(cookie1 -> cookie1.getName().equals("username")).findFirst().get();
+        if(cookie!=null){
+           return persistenceUserService.getUser(cookie.getValue()).get();
+        }
+        throw new UserNotExistsException();
     }
 }

@@ -14,9 +14,9 @@
 <a href="${pageContext.request.contextPath}/register">register</a>
 <form action="${pageContext.request.contextPath}/login" method="post">
     <label for="username">username</label>
-    <input type="text" name="username" id="username"/>
+    <input required type="text" name="username" id="username"/>
     <label for="password">password</label>
-    <input type="password" id="password" name="password"/>
+    <input required type="password" id="password" name="password"/>
     <input type="submit" value="login" />
 </form>
 

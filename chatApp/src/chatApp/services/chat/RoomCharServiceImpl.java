@@ -6,7 +6,7 @@ import chatApp.domain.exceptions.ChatUsersOverflowException;
 
 public class RoomCharServiceImpl extends ChatServiceImpl{
     @Override
-    public void addUser(User user, Chat chat) throws ChatUsersOverflowException {
+    public void addUser(User user, Chat chat) {
         chat.getUserList().add(user);
     }
 }

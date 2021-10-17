@@ -13,6 +13,12 @@
 </head>
 <body>
 <nav>
+<%
+    if(pageContext.request.contextPath){
+
+    }
+%>
+    <a  href="${pageContext.request.contextPath}">${pageContext.request.requestURL}</a>
     <a href="${pageContext.request.contextPath}/jsp/createChat.jsp">create new chat</a>
     <a href="${pageContext.request.contextPath}/jsp/getChat.jsp">enter in existed chat</a>
     <a href="${pageContext.request.contextPath}/logout">logout</a>

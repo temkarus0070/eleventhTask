@@ -1,11 +1,19 @@
 package servlets;
 
+import chatApp.domain.User;
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
+import chatApp.factories.ChatServiceFactory;
+import chatApp.services.AuthService;
+import chatApp.services.AuthServiceImpl;
+import chatApp.services.PasswordEncoderImpl;
+import chatApp.services.chat.ChatService;
 import chatApp.services.persistence.InMemoryChatStorage;
+import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
+import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,12 +27,14 @@ public class ChatServlet extends HttpServlet {
     private PersistencePrivateChatServiceImpl persistencePrivateChatService;
     private PersistenceGroupChatServiceImpl persistenceGroupChatService;
     private PersistenceRoomChatServiceImpl persistenceRoomChatService;
+    private AuthService authService;
 
     @Override
     public void init() throws ServletException {
         persistencePrivateChatService=new PersistencePrivateChatServiceImpl(InMemoryChatStorage.getInstance());
         persistenceGroupChatService=new PersistenceGroupChatServiceImpl(InMemoryChatStorage.getInstance());
         persistenceRoomChatService=new PersistenceRoomChatServiceImpl(InMemoryChatStorage.getInstance());
+        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(InMemoryUserStorage.getInstance()),new PasswordEncoderImpl());
     }
 
 
@@ -32,10 +42,11 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         String chatName;
         Chat anyChat=null;
         try {
-            ChatType type =ChatType.valueOf(req.getParameterMap().get("chatType")[0]);
+            ChatType type = ChatType.valueOf(req.getParameterMap().get("chatType")[0]);
             switch (type) {
                 case PRIVATE:
                     Optional<PrivateChat> chat;
@@ -54,11 +65,18 @@ public class ChatServlet extends HttpServlet {
                     anyChat=roomChat.get();
                     break;
             }
-            if(anyChat!=null){
+            ChatService chatService= ChatServiceFactory.create(type);
+            User current= authService.getCurrentUser(req.getCookies());
+            if(anyChat!=null && chatService.hasPermissions(current,anyChat) ){
                 req.setAttribute("chat",anyChat);
+            }
+            else {
+                resp.getOutputStream().print(" you dont have permissions to participate at that chat");
+                return;
             }
         } catch (Exception exception) {
             resp.getOutputStream().print("invalid chat identifier or name");
+            return;
         }
         req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
 
@@ -92,6 +110,7 @@ public class ChatServlet extends HttpServlet {
                     persistenceRoomChatService.addChat(roomChat);
                 } catch (ChatAlreadyExistsException e) {
                     resp.getOutputStream().print("chat with that name  already exists");
+                    return;
                 }
                 anyChat=roomChat;
                 break;
@@ -106,13 +125,29 @@ public class ChatServlet extends HttpServlet {
                     resp.getOutputStream().print("users count is required");
                     return;
                 }
-                persistenceGroupChatService.addChat(groupChat);
+                try {
+                    persistenceGroupChatService.addChat(groupChat);
+                } catch (ChatAlreadyExistsException e) {
+                    resp.getOutputStream().print("chat with that name  already exists");
+                    return;
+                }
                 anyChat=groupChat;
                 break;
         }
         if(anyChat!=null) {
+            try {
+                User current = authService.getCurrentUser(req.getCookies());
+                anyChat.getUserList().add(current);
+            }
+            catch (Exception ex){
+                resp.getOutputStream().print("chat type not found exception");
+            }
             req.setAttribute("chat", anyChat);
             req.setAttribute("chatType",chatType);
+        }
+        else {
+            resp.getOutputStream().print("chat creation error");
+            return;
         }
         req.getRequestDispatcher("/jsp/chat.jsp").forward(req,resp);
 

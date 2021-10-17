@@ -23,7 +23,7 @@
         <option value="ROOM">room chat</option>
     </select>
     <label for="chatId">chat identifier</label>
-    <input type="number" id="chatId" name="chatId" />
+    <input type="number" required id="chatId" name="chatId" />
     </fieldset>
     <input type="submit" value="get"/>
 </form>

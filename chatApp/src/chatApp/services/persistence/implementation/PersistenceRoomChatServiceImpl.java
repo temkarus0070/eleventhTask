@@ -48,7 +48,7 @@ public class PersistenceRoomChatServiceImpl implements PersistenceChatService<Ro
 
     @Override
     public void updateChat(RoomChat chat){
-            this.chatRepository.update(chat);
+        this.chatRepository.update(chat);
     }
 
     @Override

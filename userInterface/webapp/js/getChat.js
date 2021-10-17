@@ -25,7 +25,8 @@ $(document).ready(function (){
                     $('<input>').attr({
                         type: "number",
                         id: "chatId",
-                        name: "chatId"
+                        name: "chatId",
+                        required:true
                     }).appendTo(mainFieldSet);
                 break;
 
@@ -41,7 +42,8 @@ $(document).ready(function (){
                     $('<input>').attr({
                         type: "text",
                         id: "chatName",
-                        name: "chatName"
+                        name: "chatName",
+                        required:true
                     }).appendTo(mainFieldSet);
                 }
                 break;

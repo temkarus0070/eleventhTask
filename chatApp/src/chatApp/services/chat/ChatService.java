@@ -14,4 +14,5 @@ public interface ChatService {
 
 
     public void addUser(User user, Chat chat) throws ChatUsersOverflowException, UserBannedException;
+    public boolean hasPermissions(User user,Chat chat);
 }
