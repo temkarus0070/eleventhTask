@@ -17,30 +17,30 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
     }
 
     @Override
-    public void addUser(User user) {
+    public void addUser(User user) throws Exception{
         userRepository.add(user);
     }
 
     @Override
-    public Optional<User> getUser(String userName) {
+    public Optional<User> getUser(String userName)throws Exception {
         return userRepository.get().stream().filter(user -> user.getName().equals(userName)).findFirst();
     }
 
 
 
     @Override
-    public Collection<User> get() {
+    public Collection<User> get()throws Exception {
         return userRepository.get();
     }
 
     @Override
-    public void updateUser(User user) {
+    public void updateUser(User user)throws Exception {
         userRepository.update(user);
     }
 
     @Override
     public void deleteUser(String username)throws Exception {
-        getUser(username).ifPresent(user -> userRepository.delete(user));
+        userRepository.delete(username);
     }
 
 }
