@@ -7,7 +7,6 @@ import chatApp.factories.ChatServiceFactory;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
 import chatApp.services.PasswordEncoderImpl;
-import chatApp.services.chat.ChatService;
 import chatApp.services.persistence.ChatStorage;
 import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.InMemoryUserStorage;
@@ -42,32 +41,43 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         String chatName;
         Chat anyChat = null;
+        int id = 0;
         try {
             ChatType type = ChatType.valueOf(req.getParameterMap().get("chatType")[0]);
+            if (req.getParameterMap().get("chatId") != null)
+                id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);
             switch (type) {
                 case PRIVATE:
-                    Optional<PrivateChat> chat;
-                    int id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);
+                    Optional<PrivateChat> chat = Optional.empty();
+
                     chat = persistencePrivateChatService.getChat(id);
                     anyChat = chat.get();
                     break;
                 case GROUP:
-                    chatName = req.getParameterMap().get("chatName")[0];
-                    Optional<GroupChat> groupChat = persistenceGroupChatService.getChatByName(chatName);
+                    Optional<GroupChat> groupChat = Optional.empty();
+                    if (req.getParameterMap().get("chatName") != null) {
+                        chatName = req.getParameterMap().get("chatName")[0];
+                        if (chatName != null)
+                            groupChat = persistenceGroupChatService.getChatByName(chatName);
+                    } else
+                        groupChat = persistenceGroupChatService.getChat(id);
                     anyChat = groupChat.get();
                     break;
                 case ROOM:
-                    chatName = req.getParameterMap().get("chatName")[0];
-                    Optional<RoomChat> roomChat = persistenceRoomChatService.getChatByName(chatName);
+                    Optional<RoomChat> roomChat = Optional.empty();
+                    if (req.getParameterMap().get("chatName") != null) {
+                        chatName = req.getParameterMap().get("chatName")[0];
+                        if (chatName != null)
+                            roomChat = persistenceRoomChatService.getChatByName(chatName);
+                    } else
+                        roomChat = persistenceRoomChatService.getChat(id);
                     anyChat = roomChat.get();
                     break;
             }
-            ChatService chatService = ChatServiceFactory.create(type);
             User current = authService.getCurrentUser(req.getCookies());
-            if (anyChat != null && chatService.hasPermissions(current, anyChat)) {
+            if (anyChat != null && hasPermissions(current, anyChat)) {
                 req.setAttribute("chat", anyChat);
             } else {
                 resp.getOutputStream().print(" you dont have permissions to participate at that chat");
@@ -81,6 +91,10 @@ public class ChatServlet extends HttpServlet {
 
     }
 
+    private boolean hasPermissions(User user, Chat chat) {
+        return chat.getUserList().contains(user);
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameters = req.getParameterMap();
@@ -90,6 +104,7 @@ public class ChatServlet extends HttpServlet {
             current = authService.getCurrentUser(req.getCookies());
         } catch (Exception ex) {
             resp.getOutputStream().print(ex.getMessage());
+            return;
         }
         String chatName = "";
         try {
@@ -105,7 +120,6 @@ public class ChatServlet extends HttpServlet {
             switch (chatType) {
                 case PRIVATE:
                     PrivateChat privateChat = new PrivateChat();
-                    privateChat.getUserList().add(current);
                     privateChat.setChatOwner(current);
                     persistencePrivateChatService.addChat(privateChat);
                     anyChat = privateChat;
@@ -113,7 +127,6 @@ public class ChatServlet extends HttpServlet {
                 case ROOM:
                     RoomChat roomChat = new RoomChat();
                     roomChat.setName(chatName);
-                    roomChat.getUserList().add(current);
                     roomChat.setChatOwner(current);
                     persistenceRoomChatService.addChat(roomChat);
                     anyChat = roomChat;
@@ -122,7 +135,6 @@ public class ChatServlet extends HttpServlet {
 
                     GroupChat groupChat = new GroupChat();
                     groupChat.setName(chatName);
-                    groupChat.getUserList().add(current);
                     groupChat.setChatOwner(current);
                     try {
                         groupChat.setUsersCount(Integer.parseInt(parameters.get("usersCount")[0]));
@@ -138,9 +150,11 @@ public class ChatServlet extends HttpServlet {
             }
         } catch (Exception ex) {
             resp.getOutputStream().print(ex.getMessage());
+            return;
         }
         req.setAttribute("chat", anyChat);
         req.setAttribute("chatType", chatType);
+        req.setAttribute("id", anyChat.getId());
         req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
     }
 }

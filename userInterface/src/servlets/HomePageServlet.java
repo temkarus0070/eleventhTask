@@ -6,8 +6,7 @@ import chatApp.domain.chat.PrivateChat;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
 import chatApp.services.PasswordEncoderImpl;
-import chatApp.services.chat.ChatService;
-import chatApp.services.chat.ChatServiceImpl;
+import chatApp.services.persistence.ChatStorage;
 import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.UserStorage;
@@ -33,9 +32,9 @@ public class HomePageServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        roomChatService=new PersistenceRoomChatServiceImpl(InMemoryChatStorage.getInstance());
-        groupChatService=new PersistenceGroupChatServiceImpl(InMemoryChatStorage.getInstance());
-        persistencePrivateChatService=new PersistencePrivateChatServiceImpl(InMemoryChatStorage.getInstance());
+        roomChatService=new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
+        groupChatService=new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
+        persistencePrivateChatService=new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
         authService=new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()),new PasswordEncoderImpl());
     }
 
@@ -46,7 +45,10 @@ public class HomePageServlet extends HttpServlet {
             Collection<PrivateChat> collection = persistencePrivateChatService.get();
             String type = req.getParameter("chatType");
             ChatType chatType = null;
-            if (type != null)
+            if(type==null){
+                chatType=ChatType.PRIVATE;
+            }
+            else
                 chatType = ChatType.valueOf(type);
             switch (chatType) {
                 case ROOM:

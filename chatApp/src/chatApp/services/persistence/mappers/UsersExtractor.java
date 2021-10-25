@@ -25,7 +25,7 @@ public class UsersExtractor implements Extractor<List<User>> {
         List<User> userList=new ArrayList<>();
         while (resultSet.next()){
             User user=new User();
-            user.setName(resultSet.getString("name"));
+            user.setName(resultSet.getString("username"));
             user.setPassword(resultSet.getString("password"));
             userList.add(user);
         }

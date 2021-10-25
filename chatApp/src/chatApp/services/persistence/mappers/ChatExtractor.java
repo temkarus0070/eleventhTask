@@ -6,7 +6,9 @@ import chatApp.domain.chat.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ChatExtractor implements Extractor<Chat>{
     private static ChatExtractor chatExtractor;
@@ -32,25 +34,38 @@ public class ChatExtractor implements Extractor<Chat>{
                 case PRIVATE:
                     chat = new PrivateChat();
                     chat.setId(resultSet.getInt("id"));
+                    break;
                 case ROOM:
                     RoomChat roomChat = new RoomChat();
                     roomChat.setId(resultSet.getInt("id"));
-                    roomChat.setName(resultSet.getString("chat_name"));
-                    chat=roomChat;
+                    roomChat.setName(resultSet.getString("name"));
+                    chat = roomChat;
+                    break;
                 case GROUP:
                     GroupChat groupChat = new GroupChat();
                     groupChat.setId(resultSet.getInt("id"));
                     groupChat.setUsersCount(resultSet.getInt("users_count"));
                     groupChat.setName(resultSet.getString("name"));
-                    chat=groupChat;
+                    chat = groupChat;
+                    break;
             }
+
+            List<User> userList = new ArrayList<>();
+            List<Message> messageList = new ArrayList<>();
+            Set<User> userSet = new HashSet<>();
+            do {
+                User user = new User(resultSet.getString("username"));
+                if (!userSet.contains(user)) {
+                    userList.add(user);
+                    userSet.add(user);
+                }
+                Message message = new Message(resultSet.getString("text"), new User(resultSet.getString("sender_name")));
+                messageList.add(message);
+            }
+            while (resultSet.next());
+            chat.setUserList(userList);
+            chat.setMessages(messageList);
         }
-        List<User> userList=new ArrayList<>();
-        while (resultSet.next()){
-            User user=new User(resultSet.getString("username"));
-            userList.add(user);
-        }
-        chat.setUserList(userList);
         return chat;
     }
 }

@@ -1,7 +1,6 @@
 package chatApp.services.persistence.implementation;
 
 import chatApp.domain.chat.ChatType;
-import chatApp.domain.chat.PrivateChat;
 import chatApp.domain.chat.RoomChat;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
 import chatApp.services.persistence.interfaces.ChatRepository;
@@ -12,66 +11,65 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PersistenceRoomChatServiceImpl implements PersistenceChatService<RoomChat> {
+public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<RoomChat>  implements PersistenceChatService<RoomChat>{
     private ChatRepository chatRepository;
+
     public PersistenceRoomChatServiceImpl(ChatRepository repository) {
-       this.chatRepository=repository;
+        super(repository);
+        this.chatRepository = repository;
     }
 
-    public Optional<RoomChat> getChatByName(String name)throws Exception {
+    public Optional<RoomChat> getChatByName(String name) throws Exception {
         return chatRepository.get().stream()
-                .filter(chat -> chat.getType()==ChatType.ROOM &&((RoomChat)chat).getName().equals(name))
-                .map(chat -> (RoomChat)chat)
+                .filter(chat -> chat.getType() == ChatType.ROOM && ((RoomChat) chat).getName().equals(name))
+                .map(chat -> (RoomChat) chat)
                 .findFirst();
-
     }
-
 
 
     @Override
-    public Optional<RoomChat> getChat(int id) throws Exception{
+    public Optional getChat(int id) throws Exception {
         return Stream.of(chatRepository.get(id))
                 .filter(chat -> chat.getId() == id && chat.getType() == ChatType.ROOM)
                 .map(chat -> (RoomChat) chat)
                 .findFirst();
     }
 
-    @Override
-    public void removeChat(int id) throws Exception{
-        Optional<RoomChat> roomChatOptional=getChat(id);
-        if(roomChatOptional.isPresent()){
-            chatRepository.delete(roomChatOptional.get().getId());
-        }
-
-    }
 
     @Override
     public Collection<RoomChat> get() throws Exception {
         return this.chatRepository.get().stream()
-                .filter(chat -> chat.getType()==ChatType.ROOM)
-                .map(chat -> (RoomChat)chat)
+                .filter(chat -> chat.getType() == ChatType.ROOM)
+                .map(chat -> (RoomChat) chat)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public void updateChat(RoomChat chat)throws Exception{
+    public void updateChat(RoomChat chat) throws Exception {
+        Optional<RoomChat> existedChat = getChat(chat.getId());
+        if (existedChat.isPresent()){
+            if (!chat.getName().equals(existedChat.get().getName())) {
+            if (getChatByName(chat.getName()).isPresent()) {
+                throw new ChatAlreadyExistsException();
+            }
+        }
         this.chatRepository.update(chat);
     }
+}
 
     @Override
-    public Collection<RoomChat> getChatsByName(String username) throws Exception {
-        return this.chatRepository.getChatsByUser(username).stream().filter(chat->chat.getType()==ChatType.ROOM)
-                .map(chat->(RoomChat)chat)
+    public Collection<RoomChat> getChatsByUserName(String username) throws Exception {
+        return this.chatRepository.getChatsByUser(username).stream().filter(chat -> chat.getType() == ChatType.ROOM)
+                .map(chat -> (RoomChat) chat)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public void addChat(RoomChat chat)throws Exception {
-        Optional<RoomChat> chatOptional=getChatByName(chat.getName());
-        if(chatOptional.isPresent()){
+    public void addChat(RoomChat chat) throws Exception {
+        Optional<RoomChat> chatOptional = getChatByName(chat.getName());
+        if (chatOptional.isPresent()) {
             throw new ChatAlreadyExistsException();
-        }
-        else{
+        } else {
             chatRepository.add(chat);
         }
     }

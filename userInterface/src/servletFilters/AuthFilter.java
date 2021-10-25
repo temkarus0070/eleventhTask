@@ -4,6 +4,7 @@ import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
 import chatApp.services.PasswordEncoderImpl;
 import chatApp.services.persistence.InMemoryUserStorage;
+import chatApp.services.persistence.UserStorage;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 
 import javax.servlet.FilterChain;
@@ -19,7 +20,7 @@ public class AuthFilter extends HttpFilter {
 
     @Override
     public void init() throws ServletException {
-        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(InMemoryUserStorage.getInstance()),new PasswordEncoderImpl());
+        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()),new PasswordEncoderImpl());
         super.init();
     }
 

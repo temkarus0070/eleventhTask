@@ -11,8 +11,6 @@ pageEncoding="UTF-8"%>
     <title>Chat ${chat.getId()}</title>
 </head>
 <body>
-
-<h2>Departments and Employees</h2>
 <form action="../messages" method="post">
     <input type="hidden" value="${chat.getType()}" name="chatType" id="chatType"/>
     <input type="hidden" value="${chat.getId()}" name="chatId" id="chatId"/>
@@ -26,7 +24,8 @@ pageEncoding="UTF-8"%>
 
 
 <c:forEach items="${chat.getMessages()}" var="message">
-    <h3>${message.getContent()}</h3>
+    <h2>${message.getSender().getName()}</h2>
+    <span>${message.getContent()}</span>
 
 
 </c:forEach>

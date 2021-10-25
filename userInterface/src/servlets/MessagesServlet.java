@@ -4,16 +4,20 @@ import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.Message;
+import chatApp.domain.chat.RoomChat;
 import chatApp.domain.exceptions.MessageSenderNotFoundException;
 import chatApp.factories.ChatServiceFactory;
 import chatApp.factories.PersistenceChatServiceFactory;
-import chatApp.services.chat.ChatService;
+import chatApp.services.persistence.ChatStorage;
 import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.UserStorage;
+import chatApp.services.persistence.implementation.PersistenceChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
+import chatApp.services.persistence.interfaces.ChatRepository;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
+import chatApp.services.persistence.interfaces.Repository;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -25,13 +29,15 @@ import java.util.Map;
 import java.util.Optional;
 
 public class MessagesServlet extends HttpServlet {
-    private ChatService chatService;
-    private PersistenceChatService persistenceChatService;
+    private PersistenceChatServiceImpl persistenceChatService;
     private PersistenceUserService persistenceUserService;
+    private ChatRepository repository;
 
     @Override
     public void init() throws ServletException {
         persistenceUserService=new PersistenceUserServiceImpl(new UserStorage());
+        repository=new ChatStorage(ChatType.ROOM);
+        persistenceChatService=new PersistenceChatServiceImpl(new ChatStorage());
     }
 
     @Override
@@ -47,14 +53,14 @@ public class MessagesServlet extends HttpServlet {
                 Optional<User> userOptional=persistenceUserService.getUser(Arrays.stream(req.getCookies()).filter(e->e.getName().equals("username")).findFirst().get().getValue());
                if(userOptional.isPresent()){
                    String messageText = params.get("message")[0];
-                   persistenceChatService= PersistenceChatServiceFactory.create(chatType, InMemoryChatStorage.getInstance());
                    Optional<Chat> chatOptional=persistenceChatService.getChat(id);
-                   ChatService chatService= ChatServiceFactory.create(chatOptional.get().getType());
-                   req.setAttribute("chat",chatOptional.get());
-                   Message message=new Message(messageText, userOptional.get());
-                   chatService.sendMessage(message,chatOptional.get());
-                   persistenceChatService.updateChat(chatOptional.get());
-                   chat=chatOptional.get();
+                   if(chatOptional.isPresent()) {
+                       chat=chatOptional.get();
+                       Message message = new Message(messageText, userOptional.get());
+                       persistenceChatService.addMessage(message,chat.getId());
+                       req.setAttribute("chat", chat);
+                       chat = chatOptional.get();
+                   }
                }
                else{
                    resp.getOutputStream().print("user not found exception");
@@ -67,7 +73,7 @@ public class MessagesServlet extends HttpServlet {
                 resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chatType,chat.getId()));
         }
         catch (Exception ex){
-            resp.getOutputStream().print("chat id exception");
+            resp.getOutputStream().print(ex.getMessage());
         }
 
     }
