@@ -12,7 +12,6 @@
 <body>
 
 <nav>
-
     <a href="${pageContext.request.contextPath}/jsp/createChat.jsp">create new chat</a>
     <a href="${pageContext.request.contextPath}/jsp/getChat.jsp">enter in existed chat</a>
     <a href="${pageContext.request.contextPath}/logout">logout</a>
@@ -27,8 +26,11 @@
 </select>
 <input type="submit" value="update chat list" />
 </form>
+<ul>
 <c:forEach items="${chats}" var="chat">
-    <a>chat ${chat.getId()}</a>
+    <li><a href="../chat?chatType=${chat.getType()}&chatId=${chat.getId()}" >chat ${chat.getId()}</a></li>
+
 </c:forEach>
+</ul>
 </body>
 </html>

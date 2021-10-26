@@ -15,6 +15,7 @@ import chatApp.services.persistence.implementation.PersistenceGroupChatServiceIm
 import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
+import chatApp.services.persistence.interfaces.PersistenceUserService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,6 +29,7 @@ public class ChatServlet extends HttpServlet {
     private PersistencePrivateChatServiceImpl persistencePrivateChatService;
     private PersistenceGroupChatServiceImpl persistenceGroupChatService;
     private PersistenceRoomChatServiceImpl persistenceRoomChatService;
+    private PersistenceUserService persistenceUserService;
     private AuthService authService;
 
     @Override
@@ -36,6 +38,7 @@ public class ChatServlet extends HttpServlet {
         persistenceGroupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
         persistenceRoomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
         authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
+        persistenceUserService=new PersistenceUserServiceImpl(new UserStorage());
     }
 
 
@@ -79,6 +82,7 @@ public class ChatServlet extends HttpServlet {
             User current = authService.getCurrentUser(req.getCookies());
             if (anyChat != null && hasPermissions(current, anyChat)) {
                 req.setAttribute("chat", anyChat);
+                req.setAttribute("users",persistenceUserService.getUsersNotAtThatChat(anyChat.getId()));
             } else {
                 resp.getOutputStream().print(" you dont have permissions to participate at that chat");
                 return;

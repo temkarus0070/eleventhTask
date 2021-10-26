@@ -46,6 +46,8 @@ public class UserStorage implements UserRepository {
         }
     }
 
+
+
     @Override
     public void delete(String s) throws Exception {
 
@@ -54,5 +56,17 @@ public class UserStorage implements UserRepository {
     @Override
     public void update(User entity)throws SQLException {
 
+    }
+
+    @Override
+    public Collection<User> getUsersNotAtThatChat(Integer chatId) throws Exception{
+        try(Connection connection=ConnectionManager.getInstance().getConnection()){
+            PreparedStatement preparedStatement=connection.prepareStatement("SELECT distinct * FROM users u " +
+                    "WHERE NOT EXISTS(" +
+                    "SELECT * FROM users_chats us WHERE us.username=u.username and us.chat_id=? ) ");
+            preparedStatement.setInt(1,chatId);
+            ResultSet resultSet=preparedStatement.executeQuery();
+            return usersExtractor.extract(resultSet);
+        }
     }
 }

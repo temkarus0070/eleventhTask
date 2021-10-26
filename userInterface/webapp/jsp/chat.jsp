@@ -22,6 +22,19 @@ pageEncoding="UTF-8"%>
     <input type="submit" value="sendMessage" />
 </form>
 
+<form action="../user" method="post">
+    <input type="hidden" value="${chat.getType()}" name="chatType"/>
+    <input type="hidden" value="${chat.getId()}" name="chatId">
+    <select name="username">
+        <c:forEach items="${users}" var="user">
+            <option value="${user.getName()}">${user.getName()}</option>
+        </c:forEach>
+    </select>
+    <input type="submit" value="add user" />
+</form>
+
+
+
 
 <c:forEach items="${chat.getMessages()}" var="message">
     <h2>${message.getSender().getName()}</h2>

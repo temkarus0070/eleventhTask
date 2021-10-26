@@ -18,4 +18,6 @@ public interface PersistenceUserService {
 
     public void deleteUser(String username)throws Exception;
 
+    public Collection<User> getUsersNotAtThatChat(Integer chatId)throws Exception;
+
 }

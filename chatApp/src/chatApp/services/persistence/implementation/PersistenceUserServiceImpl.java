@@ -43,4 +43,9 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
         userRepository.delete(username);
     }
 
+    @Override
+    public Collection<User> getUsersNotAtThatChat(Integer chatId) throws Exception {
+        return userRepository.getUsersNotAtThatChat(chatId);
+    }
+
 }

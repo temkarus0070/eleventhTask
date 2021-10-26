@@ -13,7 +13,7 @@ public class ChatsExtractor implements Extractor<List<Chat>> {
 
     }
     public static ChatsExtractor getInstance(){
-        if(chatsExtractor !=null){
+        if(chatsExtractor ==null){
             chatsExtractor =new ChatsExtractor();
         }
         return chatsExtractor;

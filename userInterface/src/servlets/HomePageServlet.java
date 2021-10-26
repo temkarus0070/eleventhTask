@@ -1,5 +1,6 @@
 package servlets;
 
+import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.PrivateChat;
@@ -41,8 +42,9 @@ public class HomePageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("name","artyom");
+
         try {
-            Collection<PrivateChat> collection = persistencePrivateChatService.get();
+            User user=authService.getCurrentUser(req.getCookies());
             String type = req.getParameter("chatType");
             ChatType chatType = null;
             if(type==null){
@@ -52,13 +54,13 @@ public class HomePageServlet extends HttpServlet {
                 chatType = ChatType.valueOf(type);
             switch (chatType) {
                 case ROOM:
-                    req.setAttribute("chats", roomChatService.get());
+                    req.setAttribute("chats", roomChatService.getChatsByUserName(user.getName()));
                     break;
                 case GROUP:
-                    req.setAttribute("chats", groupChatService.get());
+                    req.setAttribute("chats", groupChatService.getChatsByUserName(user.getName()));
                     break;
                 default:
-                    req.setAttribute("chats", persistencePrivateChatService.get());
+                    req.setAttribute("chats", persistencePrivateChatService.getChatsByUserName(user.getName()));
                     break;
             }
             req.setAttribute("chatType", chatType.name());

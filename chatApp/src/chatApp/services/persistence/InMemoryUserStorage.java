@@ -60,4 +60,9 @@ public class InMemoryUserStorage implements UserRepository {
             userSet.add(entity);
         }
     }
+
+    @Override
+    public Collection<User> getUsersNotAtThatChat(Integer chatId) throws Exception {
+        return null;
+    }
 }

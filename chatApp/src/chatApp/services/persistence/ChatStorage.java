@@ -15,16 +15,19 @@ public class ChatStorage implements ChatRepository {
     private String chatType = "";
     private final ConnectionManager connectionManager = ConnectionManager.getInstance();
 
-    private Extractor<Chat> chatExtractor = ChatExtractor.getInstance();
+    private Extractor<Chat> chatExtractor;
 
-    private ChatsExtractor chatsExtractor = ChatsExtractor.getInstance();
+    private ChatsExtractor chatsExtractor;
 
     public ChatStorage(ChatType chatType) {
+        this();
         this.chatType = chatType.name();
+
     }
 
     public ChatStorage(){
-
+        chatExtractor=ChatExtractor.getInstance();
+        chatsExtractor=ChatsExtractor.getInstance();
     }
 
 
@@ -32,7 +35,7 @@ public class ChatStorage implements ChatRepository {
     public Collection<Chat> get() throws SQLException {
         try (Connection connection = connectionManager.getConnection();
              Statement statement = connection.createStatement();) {
-            ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM CHATS where chat_type=''%s''", chatType));
+            ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM CHATS where chat_type::text=''%s''", chatType));
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
         }
@@ -41,13 +44,13 @@ public class ChatStorage implements ChatRepository {
 
     public Collection<Chat> getChatsByUser(String username) throws SQLException {
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(String.format("" +
-                    "SELECT * FROM users where name=?" +
-                    "INNER JOIN ON users_chats ON name=?" +
-                    "INNER JOIN ON Chats ON chatId=id" +
-                    "WHERE chatType=%s", chatType));
-            preparedStatement.setString(0, username);
-            preparedStatement.setString(1, username);
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
+                    "INNER JOIN  users_chats uc ON u.username=uc.username " +
+                    "INNER JOIN  Chats c ON c.id=uc.chat_id " +
+                    "WHERE c.chat_type::text=? and u.username=?");
+            preparedStatement.setString(1, chatType);
+            preparedStatement.setString(2, username);
+
             ResultSet resultSet = preparedStatement.executeQuery();
             return chatsExtractor.extract(resultSet);
         }
