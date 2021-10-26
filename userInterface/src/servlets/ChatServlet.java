@@ -159,6 +159,6 @@ public class ChatServlet extends HttpServlet {
         req.setAttribute("chat", anyChat);
         req.setAttribute("chatType", chatType);
         req.setAttribute("id", anyChat.getId());
-        req.getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
+        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d",chatType,anyChat.getId()));
     }
 }

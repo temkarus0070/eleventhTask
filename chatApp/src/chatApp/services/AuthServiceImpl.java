@@ -64,12 +64,7 @@ public class AuthServiceImpl implements AuthService {
     public User register(String username, String password) throws Exception {
         String hashPassword=passwordEncoder.getHashFromPassword(password);
         User user=new User(username,hashPassword);
-        try {
             persistenceUserService.addUser(user);
-        }
-        catch (UsernameAlreadyExistException usernameAlreadyExistException){
-            throw new UsernameAlreadyExistException();
-        }
         return user;
     }
 

@@ -38,14 +38,9 @@ public class RegisterServlet extends HttpServlet {
         resp.addCookie(new Cookie("username",user.getName()));
         resp.addCookie(new Cookie("password",user.getPassword()));
         req.getRequestDispatcher("/jsp/home.jsp").forward(req,resp);
-    }
-    catch (UsernameAlreadyExistException usernameAlreadyExistException){
-        req.setAttribute("usernameExistedException","username already have been used");
-            req.getRequestDispatcher("/jsp/register.jsp").forward(req,resp);
-    }
-    catch (Exception ex){
-        req.setAttribute("registerException",ex.toString());
-        req.getRequestDispatcher("/jsp/register.jsp").forward(req,resp);
+    } catch (Exception usernameAlreadyExistException){
+        resp.getOutputStream().print(usernameAlreadyExistException.getMessage());
+
     }
     }
 }

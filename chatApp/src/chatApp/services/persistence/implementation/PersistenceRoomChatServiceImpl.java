@@ -28,11 +28,16 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
 
 
     @Override
-    public Optional getChat(int id) throws Exception {
-        return Stream.of(chatRepository.get(id))
-                .filter(chat -> chat.getId() == id && chat.getType() == ChatType.ROOM)
-                .map(chat -> (RoomChat) chat)
-                .findFirst();
+    public Optional<RoomChat> getChat(int id) throws Exception {
+        try {
+            return Stream.of(chatRepository.get(id))
+                    .filter(chat -> chat.getId() == id && chat.getType() == ChatType.ROOM)
+                    .map(chat -> (RoomChat) chat)
+                    .findFirst();
+        }
+        catch (Exception ex){
+            throw new Exception("chat not found exception");
+        }
     }
 
 

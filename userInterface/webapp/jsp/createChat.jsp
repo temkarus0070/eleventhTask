@@ -14,6 +14,7 @@
     <title>Title</title>
 </head>
 <body>
+<jsp:include page="header.jsp"></jsp:include>
 <form method="post" action="../chat">
     <fieldset>
         <select id="chatType" name="chatType">

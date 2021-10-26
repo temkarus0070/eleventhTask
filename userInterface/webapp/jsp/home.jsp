@@ -11,12 +11,8 @@
 </head>
 <body>
 
-<nav>
-    <a href="${pageContext.request.contextPath}/jsp/createChat.jsp">create new chat</a>
-    <a href="${pageContext.request.contextPath}/jsp/getChat.jsp">enter in existed chat</a>
-    <a href="${pageContext.request.contextPath}/logout">logout</a>
+<jsp:include page="header.jsp"></jsp:include>
 
-</nav>
 <form method="get" action="/">
 <label for="chatType">chat type</label>
 <select name="chatType" id="chatType">

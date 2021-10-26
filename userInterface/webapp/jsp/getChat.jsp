@@ -15,6 +15,7 @@
     <title>Get chat</title>
 </head>
 <body>
+<jsp:include page="header.jsp"></jsp:include>
 <form method="get" action="../chat">
     <fieldset>
     <select id="chatType" name="chatType">

@@ -36,6 +36,7 @@ public class ChatStorage implements ChatRepository {
         try (Connection connection = connectionManager.getConnection();
              Statement statement = connection.createStatement();) {
             ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM CHATS where chat_type::text=''%s''", chatType));
+            return chatsExtractor.extract(resultSet);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
         }
@@ -64,7 +65,7 @@ public class ChatStorage implements ChatRepository {
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
                     " on c.id=usChats.chat_id " +
-                    "LEFT JOIN  messages as m on m.chat_id=c.id" +
+                    "INNER JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
                     " WHERE c.name=?");
             preparedStatement.setString(1, name);
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
@@ -119,7 +120,7 @@ public class ChatStorage implements ChatRepository {
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
                     " on c.id=usChats.chat_id " +
-                    "LEFT JOIN  messages as m on m.chat_id=c.id" +
+                    "INNER JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
                     " WHERE c.id=?");
             preparedStatement.setInt(1, integer);
             return chatExtractor.extract(preparedStatement.executeQuery());

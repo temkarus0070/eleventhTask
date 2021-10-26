@@ -1,6 +1,7 @@
 package chatApp.services.persistence.implementation;
 
 import chatApp.domain.User;
+import chatApp.domain.exceptions.UsernameAlreadyExistException;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
 import chatApp.services.persistence.interfaces.UserRepository;
 
@@ -18,7 +19,10 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
 
     @Override
     public void addUser(User user) throws Exception{
-        userRepository.add(user);
+        Optional<User> userOptional=getUser(user.getName());
+        if(!userOptional.isPresent())
+            userRepository.add(user);
+        else throw new UsernameAlreadyExistException();
     }
 
     @Override

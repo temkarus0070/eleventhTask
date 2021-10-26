@@ -11,6 +11,7 @@ pageEncoding="UTF-8"%>
     <title>Chat ${chat.getId()}</title>
 </head>
 <body>
+<jsp:include page="header.jsp"></jsp:include>
 <form action="../messages" method="post">
     <input type="hidden" value="${chat.getType()}" name="chatType" id="chatType"/>
     <input type="hidden" value="${chat.getId()}" name="chatId" id="chatId"/>

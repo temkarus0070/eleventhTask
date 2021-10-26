@@ -29,11 +29,16 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
 
 
     @Override
-    public Optional getChat(int id) throws Exception{
-        return Stream.of(repository.get(id))
-                .filter(chat -> chat.getId() == id && chat.getType() == ChatType.GROUP)
-                .map(chat -> (GroupChat) chat)
-                .findFirst();
+    public Optional<GroupChat> getChat(int id) throws Exception{
+        try {
+            return Stream.of(repository.get(id))
+                    .filter(chat -> chat.getId() == id && chat.getType() == ChatType.GROUP)
+                    .map(chat -> (GroupChat) chat)
+                    .findFirst();
+        }
+        catch (Exception ex){
+            throw new Exception("chat not found exception");
+        }
     }
 
     @Override
@@ -82,7 +87,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
     public void addUser(String username, int chatId) throws Exception {
         Optional<GroupChat>groupChat=getChat(chatId);
         if(groupChat.isPresent()) {
-            if(groupChat.get().getUsersCount()<=groupChat.get().getUserList().size()+1)
+            if(groupChat.get().getUsersCount()>=groupChat.get().getUserList().size()+1)
                 repository.addUserToChat(username, chatId);
             else throw new ChatUsersOverflowException();
         }

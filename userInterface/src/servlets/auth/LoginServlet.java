@@ -54,12 +54,12 @@ public class LoginServlet extends HttpServlet {
                 req.getRequestDispatcher("/jsp/home.jsp").forward(req,resp);
             }
             catch (InvalidAuthDataException invalidAuthDataException){
-                resp.getOutputStream().print("invalid auth data");
+                resp.getOutputStream().print(invalidAuthDataException.getMessage());
             }
 
         }
         catch (Exception ex){
-            resp.getOutputStream().print("auth exception");
+            resp.getOutputStream().print(ex.getMessage());
         }
     }
 }

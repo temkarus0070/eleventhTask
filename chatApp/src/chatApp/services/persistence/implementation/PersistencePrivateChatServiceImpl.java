@@ -21,10 +21,15 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
 
     @Override
     public Optional<PrivateChat> getChat(int id)throws Exception {
-        return Stream.of(chatRepository.get(id))
-                .filter(chat -> chat.getId() == id && chat.getType() == ChatType.PRIVATE)
-                .map(chat -> (PrivateChat) chat)
-                .findFirst();
+        try {
+            return Stream.of(chatRepository.get(id))
+                    .filter(chat -> chat.getId() == id && chat.getType() == ChatType.PRIVATE)
+                    .map(chat -> (PrivateChat) chat)
+                    .findFirst();
+        }
+        catch (Exception ex) {
+            throw new Exception("chat not found exception");
+        }
     }
 
 
