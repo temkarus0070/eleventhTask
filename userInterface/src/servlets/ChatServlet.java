@@ -39,7 +39,7 @@ public class ChatServlet extends HttpServlet {
         persistenceGroupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
         persistenceRoomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
         authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
-        persistenceUserService=new PersistenceUserServiceImpl(new UserStorage());
+        persistenceUserService = new PersistenceUserServiceImpl(new UserStorage());
     }
 
 
@@ -83,7 +83,7 @@ public class ChatServlet extends HttpServlet {
             User current = authService.getCurrentUser(req.getCookies());
             if (anyChat != null && hasPermissions(current, anyChat)) {
                 req.setAttribute("chat", anyChat);
-                req.setAttribute("users",persistenceUserService.getUsersNotAtThatChat(anyChat.getId()));
+                req.setAttribute("users", persistenceUserService.getUsersNotAtThatChat(anyChat.getId()));
             } else {
                 resp.getOutputStream().write(" you dont have permissions to participate at that chat".getBytes(StandardCharsets.UTF_8));
                 return;
@@ -160,6 +160,6 @@ public class ChatServlet extends HttpServlet {
         req.setAttribute("chat", anyChat);
         req.setAttribute("chatType", chatType);
         req.setAttribute("id", anyChat.getId());
-        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d",chatType,anyChat.getId()));
+        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d", chatType, anyChat.getId()));
     }
 }

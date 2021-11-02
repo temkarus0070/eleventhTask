@@ -28,9 +28,9 @@ public class AuthFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         if(req.getRequestURI().contains("register")||req.getRequestURI().contains("login")) {
             super.doFilter(req, res, chain);
-        return;
+            return;
         }
-        if(!authService.isAuthorized(req.getCookies())) {
+        if (!authService.isAuthorized(req.getCookies())) {
             req.getRequestDispatcher("/jsp/login.jsp").forward(req, res);
             return;
         }

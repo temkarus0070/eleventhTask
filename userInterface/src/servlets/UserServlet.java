@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class UserServlet extends HttpServlet {
     PersistenceChatService persistenceChatService;
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -28,12 +29,11 @@ public class UserServlet extends HttpServlet {
 
             String username = req.getParameter("username");
             Integer chatId = Integer.parseInt(req.getParameter("chatId"));
-            String chatType=req.getParameter("chatType");
-            persistenceChatService= PersistenceChatServiceFactory.create(ChatType.valueOf(chatType),new ChatStorage(ChatType.ANY));
+            String chatType = req.getParameter("chatType");
+            persistenceChatService = PersistenceChatServiceFactory.create(ChatType.valueOf(chatType), new ChatStorage(ChatType.ANY));
             persistenceChatService.addUser(username, chatId);
-            resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s",chatType,chatId));
-        }
-        catch (Exception ex){
+            resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s", chatType, chatId));
+        } catch (Exception ex) {
             resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
     }
