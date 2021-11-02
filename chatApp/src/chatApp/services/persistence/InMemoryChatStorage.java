@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Optional;
 
 public class InMemoryChatStorage implements ChatRepository {
-    private static int maxId=0;
-    private static InMemoryChatStorage inMemoryChatStorage;
+  private    static int maxId=0;
+  private    static InMemoryChatStorage inMemoryChatStorage;
 
     private InMemoryChatStorage(){
 
