@@ -20,22 +20,19 @@ public class ChatStorage implements ChatRepository {
     private ChatsExtractor chatsExtractor;
 
     public ChatStorage(ChatType chatType) {
-        this();
+        chatExtractor = ChatExtractor.getInstance();
+        chatsExtractor = ChatsExtractor.getInstance();
         this.chatType = chatType.name();
 
     }
 
-    public ChatStorage(){
-        chatExtractor=ChatExtractor.getInstance();
-        chatsExtractor=ChatsExtractor.getInstance();
-    }
-
-
     @Override
     public Collection<Chat> get() throws SQLException {
         try (Connection connection = connectionManager.getConnection();
-             Statement statement = connection.createStatement();) {
-            ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM CHATS where chat_type::text=''%s''", chatType));
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text=? ORDER BY id")) {
+            if(!chatType.equals("ANY"))
+                statement.setString(1,chatType);
+            ResultSet resultSet = statement.executeQuery();
             return chatsExtractor.extract(resultSet);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -48,8 +45,10 @@ public class ChatStorage implements ChatRepository {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
                     "INNER JOIN  users_chats uc ON u.username=uc.username " +
                     "INNER JOIN  Chats c ON c.id=uc.chat_id " +
-                    "WHERE c.chat_type::text=? and u.username=?");
-            preparedStatement.setString(1, chatType);
+                    "WHERE c.chat_type::text=? and u.username=? " +
+                    "ORDER BY c.id");
+            if(!chatType.equals("ANY"))
+                preparedStatement.setString(1, chatType);
             preparedStatement.setString(2, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -65,9 +64,10 @@ public class ChatStorage implements ChatRepository {
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
                     " on c.id=usChats.chat_id " +
-                    "INNER JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                    " WHERE c.name=?");
+                    "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                    " WHERE c.name=? and c.chat_type::text=?");
             preparedStatement.setString(1, name);
+            preparedStatement.setString(2,chatType);
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
             return Optional.ofNullable(chat);
         }
@@ -75,42 +75,42 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void removeUserFromChat(String user, Integer chatId) throws Exception {
-        try(Connection connection= connectionManager.getConnection()){
-            PreparedStatement preparedStatement=connection.prepareStatement("DELETE FROM users_chats WHERE (username=? AND chat_id=?)");
-            preparedStatement.setInt(2,chatId);
-            preparedStatement.setString(1,user);
+        try (Connection connection = connectionManager.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users_chats WHERE (username=? AND chat_id=?)");
+            preparedStatement.setInt(2, chatId);
+            preparedStatement.setString(1, user);
             preparedStatement.executeUpdate();
         }
     }
 
     @Override
     public void addUserToChat(String user, Integer chatId) throws Exception {
-        try(Connection connection=connectionManager.getConnection()) {
-            PreparedStatement preparedStatement=connection.prepareStatement("INSERT INTO users_chats(username,chat_id,has_ban) values(?,?,false)");
-            preparedStatement.setString(1,user);
-            preparedStatement.setInt(2,chatId);
+        try (Connection connection = connectionManager.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users_chats(username,chat_id,has_ban) values(?,?,false)");
+            preparedStatement.setString(1, user);
+            preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
         }
     }
 
     @Override
     public void banUserInChat(String user, Integer chatId) throws Exception {
-        try(Connection connection=connectionManager.getConnection()) {
-            PreparedStatement preparedStatement=connection.prepareStatement("UPDATE users_chats SET has_ban=true " +
+        try (Connection connection = connectionManager.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE users_chats SET has_ban=true " +
                     "where (username=? AND chat_id=?)");
-            preparedStatement.setString(1,user);
-            preparedStatement.setInt(2,chatId);
+            preparedStatement.setString(1, user);
+            preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
         }
     }
 
     @Override
     public void addMessage(Message message, Integer chatId) throws Exception {
-        try(Connection connection= connectionManager.getConnection()){
-            PreparedStatement preparedStatement=connection.prepareStatement("INSERT INTO messages(text,sender_name,chat_id) values (?,?,?)");
+        try (Connection connection = connectionManager.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO messages(text,sender_name,chat_id) values (?,?,?)");
             preparedStatement.setString(1, message.getContent());
-            preparedStatement.setString(2,message.getSender().getName());
-            preparedStatement.setInt(3,chatId);
+            preparedStatement.setString(2, message.getSender().getName());
+            preparedStatement.setInt(3, chatId);
             preparedStatement.executeUpdate();
         }
     }
@@ -120,9 +120,11 @@ public class ChatStorage implements ChatRepository {
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
                     " on c.id=usChats.chat_id " +
-                    "INNER JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                    " WHERE c.id=?");
+                    "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                    " WHERE c.id=? AND c.chat_type::text=?");
             preparedStatement.setInt(1, integer);
+            if(!chatType.equals("ANY"))
+                preparedStatement.setString(2,chatType);
             return chatExtractor.extract(preparedStatement.executeQuery());
         }
     }
@@ -140,14 +142,14 @@ public class ChatStorage implements ChatRepository {
                     break;
                 case ROOM:
                     RoomChat roomChat = (RoomChat) entity;
-                    preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,name,owner) VALUES ('ROOM',?,?)",Statement.RETURN_GENERATED_KEYS);
+                    preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,name,owner) VALUES ('ROOM',?,?)", Statement.RETURN_GENERATED_KEYS);
                     preparedStatement.setString(1, roomChat.getName());
                     preparedStatement.setString(2, roomChat.getChatOwner().getName());
                     break;
                 case GROUP:
                     GroupChat groupChat = (GroupChat) entity;
                     preparedStatement = connection.prepareStatement("INSERT INTO chats(chat_type, name, users_count,owner) VALUES (" +
-                            "'GROUP',?,?,?)",Statement.RETURN_GENERATED_KEYS);
+                            "'GROUP',?,?,?)", Statement.RETURN_GENERATED_KEYS);
                     preparedStatement.setString(1, groupChat.getName());
                     preparedStatement.setInt(2, groupChat.getUsersCount());
                     preparedStatement.setString(3, groupChat.getChatOwner().getName());
@@ -170,38 +172,37 @@ public class ChatStorage implements ChatRepository {
     }
 
 
-
     @Override
     public void delete(Integer integer) throws Exception {
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement preparedStatement=connection.prepareStatement("DELETE FROM chats where id=?");
-            preparedStatement.setInt(1,integer);
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM chats where id=?");
+            preparedStatement.setInt(1, integer);
             preparedStatement.executeUpdate();
         }
     }
 
     @Override
     public void update(Chat entity) throws SQLException {
-        try(Connection connection= connectionManager.getConnection()){
-            PreparedStatement preparedStatement=null;
-            switch (entity.getType()){
+        try (Connection connection = connectionManager.getConnection()) {
+            PreparedStatement preparedStatement = null;
+            switch (entity.getType()) {
                 case ROOM:
-                    RoomChat roomChat=(RoomChat)entity;
-                    if(!((RoomChat)get(entity.getId())).getName().equals(((RoomChat) entity).getName())) {
+                    RoomChat roomChat = (RoomChat) entity;
+                    if (!((RoomChat) get(entity.getId())).getName().equals(((RoomChat) entity).getName())) {
                         preparedStatement = connection.prepareStatement("UPDATE chats SET name=? where id=?");
                         preparedStatement.setString(1, roomChat.getName());
-                        preparedStatement.setInt(2,roomChat.getId());
+                        preparedStatement.setInt(2, roomChat.getId());
                         preparedStatement.executeUpdate();
                     }
                     break;
                 case GROUP:
-                    GroupChat groupChat=(GroupChat) entity;
-                    GroupChat existedChat=(GroupChat) get(entity.getId());
-                    if(!(existedChat.getName().equals(groupChat.getName())&& existedChat.getUsersCount()==groupChat.getUsersCount())){
-                        preparedStatement=connection.prepareStatement("UPDATE chats SET name=? and users_count=? where id=?");
-                        preparedStatement.setString(1,groupChat.getName());
-                        preparedStatement.setInt(2,groupChat.getUsersCount());
-                        preparedStatement.setInt(3,groupChat.getId());
+                    GroupChat groupChat = (GroupChat) entity;
+                    GroupChat existedChat = (GroupChat) get(entity.getId());
+                    if (!(existedChat.getName().equals(groupChat.getName()) && existedChat.getUsersCount() == groupChat.getUsersCount())) {
+                        preparedStatement = connection.prepareStatement("UPDATE chats SET name=? and users_count=? where id=?");
+                        preparedStatement.setString(1, groupChat.getName());
+                        preparedStatement.setInt(2, groupChat.getUsersCount());
+                        preparedStatement.setInt(3, groupChat.getId());
                         preparedStatement.executeUpdate();
                     }
                     break;

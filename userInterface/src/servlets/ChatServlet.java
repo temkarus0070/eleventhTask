@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,7 +39,7 @@ public class ChatServlet extends HttpServlet {
         persistenceGroupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
         persistenceRoomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
         authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
-        persistenceUserService=new PersistenceUserServiceImpl(new UserStorage());
+        persistenceUserService = new PersistenceUserServiceImpl(new UserStorage());
     }
 
 
@@ -82,13 +83,13 @@ public class ChatServlet extends HttpServlet {
             User current = authService.getCurrentUser(req.getCookies());
             if (anyChat != null && hasPermissions(current, anyChat)) {
                 req.setAttribute("chat", anyChat);
-                req.setAttribute("users",persistenceUserService.getUsersNotAtThatChat(anyChat.getId()));
+                req.setAttribute("users", persistenceUserService.getUsersNotAtThatChat(anyChat.getId()));
             } else {
-                resp.getOutputStream().print(" you dont have permissions to participate at that chat");
+                resp.getOutputStream().write(" you dont have permissions to participate at that chat".getBytes(StandardCharsets.UTF_8));
                 return;
             }
         } catch (Exception exception) {
-            resp.getOutputStream().print(exception.getMessage());
+            resp.getOutputStream().write(exception.getMessage().getBytes(StandardCharsets.UTF_8));
             return;
         }
         getServletContext().getRequestDispatcher("/jsp/chat.jsp").forward(req, resp);
@@ -107,7 +108,7 @@ public class ChatServlet extends HttpServlet {
         try {
             current = authService.getCurrentUser(req.getCookies());
         } catch (Exception ex) {
-            resp.getOutputStream().print(ex.getMessage());
+            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
             return;
         }
         String chatName = "";
@@ -115,7 +116,7 @@ public class ChatServlet extends HttpServlet {
             chatName = parameters.get("chatName")[0];
         } catch (Exception ex) {
             if (chatType == ChatType.ROOM || chatType == ChatType.GROUP) {
-                resp.getOutputStream().print("chat name is required");
+                resp.getOutputStream().write("chat name is required".getBytes(StandardCharsets.UTF_8));
                 return;
             }
         }
@@ -143,22 +144,22 @@ public class ChatServlet extends HttpServlet {
                     try {
                         groupChat.setUsersCount(Integer.parseInt(parameters.get("usersCount")[0]));
                     } catch (Exception ex) {
-                        resp.getOutputStream().print("users count is required");
+                        resp.getOutputStream().write("users count is required".getBytes(StandardCharsets.UTF_8));
                         return;
                     }
                     persistenceGroupChatService.addChat(groupChat);
                     anyChat = groupChat;
                     break;
                 default:
-                    resp.getOutputStream().print("chat type not found exception");
+                    resp.getOutputStream().write("chat type not found exception".getBytes(StandardCharsets.UTF_8));
             }
         } catch (Exception ex) {
-            resp.getOutputStream().print(ex.getMessage());
+            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
             return;
         }
         req.setAttribute("chat", anyChat);
         req.setAttribute("chatType", chatType);
         req.setAttribute("id", anyChat.getId());
-        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d",chatType,anyChat.getId()));
+        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d", chatType, anyChat.getId()));
     }
 }

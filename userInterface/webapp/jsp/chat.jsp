@@ -1,24 +1,30 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
 
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<!DOCTYPE html>
+
 <html>
 <head>
+    <link rel="stylesheet"   href="../css/style.css"/>
     <meta charset="UTF-8">
-    <title>Chat ${chat.getId()}</title>
+    <title>Chat ${chat.getId()}<c:if test="${chat.getType().name().equals('ROOM')||chat.getType().name().equals('GROUP')}">
+        <c:out value="${chat.getName()}"/>
+        </c:if>
+    </title>
 </head>
 <body>
-<jsp:include page="header.jsp"></jsp:include>
+<jsp:include page="header.jsp"/>
+<c:if test="${chat.getType().name().equals('ROOM')||chat.getType().name().equals('GROUP')}">
+    <div class="chatName">
+        <h2>${chat.getName()}</h2></div>
+</c:if>
 <form action="../messages" method="post">
     <input type="hidden" value="${chat.getType()}" name="chatType" id="chatType"/>
     <input type="hidden" value="${chat.getId()}" name="chatId" id="chatId"/>
     <label for="message">text</label>
-    <textarea name="message" id="message" required>
-
-    </textarea>
+    <textarea name="message" id="message" required></textarea>
     <br/>
     <input type="submit" value="sendMessage" />
 </form>

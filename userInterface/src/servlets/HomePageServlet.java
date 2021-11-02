@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,24 +34,23 @@ public class HomePageServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        roomChatService=new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
-        groupChatService=new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
-        persistencePrivateChatService=new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
-        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()),new PasswordEncoderImpl());
+        roomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
+        groupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
+        persistencePrivateChatService = new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
+        authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("name","artyom");
+        req.setAttribute("name", "artyom");
 
         try {
-            User user=authService.getCurrentUser(req.getCookies());
+            User user = authService.getCurrentUser(req.getCookies());
             String type = req.getParameter("chatType");
             ChatType chatType = null;
-            if(type==null){
-                chatType=ChatType.PRIVATE;
-            }
-            else
+            if (type == null) {
+                chatType = ChatType.PRIVATE;
+            } else
                 chatType = ChatType.valueOf(type);
             switch (chatType) {
                 case ROOM:
@@ -65,9 +65,8 @@ public class HomePageServlet extends HttpServlet {
             }
             req.setAttribute("chatType", chatType.name());
             getServletContext().getRequestDispatcher("/jsp/home.jsp").forward(req, resp);
-        }
-        catch (Exception ex){
-            resp.getOutputStream().print(ex.getMessage());
+        } catch (Exception ex) {
+            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
     }
 

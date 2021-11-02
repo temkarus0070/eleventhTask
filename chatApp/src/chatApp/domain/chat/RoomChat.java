@@ -15,4 +15,9 @@ public class RoomChat extends Chat {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public ChatType getType() {
+        return super.getType();
+    }
 }

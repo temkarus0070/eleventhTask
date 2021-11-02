@@ -20,14 +20,14 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
     @Override
     public void addUser(User user) throws Exception{
         Optional<User> userOptional=getUser(user.getName());
-        if(!userOptional.isPresent())
+        if(userOptional.isEmpty())
             userRepository.add(user);
         else throw new UsernameAlreadyExistException();
     }
 
     @Override
     public Optional<User> getUser(String userName)throws Exception {
-        return userRepository.get().stream().filter(user -> user.getName().equals(userName)).findFirst();
+        return Optional.ofNullable(userRepository.get(userName));
     }
 
 

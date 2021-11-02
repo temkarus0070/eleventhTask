@@ -19,15 +19,13 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
     }
 
 
-
-
     public void removeChat(int id) throws Exception {
         chatRepository.delete(id);
     }
 
     @Override
     public Collection<T> get() throws Exception {
-        throw new UnsupportedOperationException();
+        return (Collection<T>) chatRepository.get();
     }
 
 
@@ -47,34 +45,31 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
 
 
     public void addUser(String username, int chatId) throws Exception {
-        chatRepository.addUserToChat(username,chatId);
+        chatRepository.addUserToChat(username, chatId);
     }
 
 
     public void banUserInChat(String username, int chatId) throws Exception {
-        chatRepository.banUserInChat(username,chatId);
+        chatRepository.banUserInChat(username, chatId);
     }
 
 
     public void removeUserFromChat(String username, int chatId) throws Exception {
-        chatRepository.removeUserFromChat(username,chatId);
+        chatRepository.removeUserFromChat(username, chatId);
     }
 
-    public Optional<T> getChat(int chatId) throws Exception{
+    public Optional<T> getChat(int chatId) throws Exception {
         return (Optional<T>) Optional.of(chatRepository.get(chatId));
     }
 
 
-
-
-    public void addMessage(Message message,int chatId)throws Exception{
-        Optional<T> chat=getChat(chatId);
-        if(chat.isPresent()){
-            if(chat.get().getBannedUsers().contains(message.getSender())){
+    public void addMessage(Message message, int chatId) throws Exception {
+        Optional<T> chat = getChat(chatId);
+        if (chat.isPresent()) {
+            if (chat.get().getBannedUsers().contains(message.getSender())) {
                 throw new UserBannedException();
-            }
-            else
-                chatRepository.addMessage(message,chatId);
+            } else
+                chatRepository.addMessage(message, chatId);
         }
 
     }

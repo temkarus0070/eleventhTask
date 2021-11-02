@@ -20,9 +20,10 @@ public class UserExtractor implements Extractor<User> {
     }
     @Override
     public User extract(ResultSet resultSet) throws SQLException {
-        User user=new User();
+        User user=null;
         if(resultSet.next()){
-            user.setName(resultSet.getString("name"));
+            user=new User();
+            user.setName(resultSet.getString("username"));
             user.setPassword(resultSet.getString("password"));
 
         }

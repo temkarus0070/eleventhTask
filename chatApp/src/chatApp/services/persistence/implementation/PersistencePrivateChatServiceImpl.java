@@ -23,7 +23,6 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
     public Optional<PrivateChat> getChat(int id)throws Exception {
         try {
             return Stream.of(chatRepository.get(id))
-                    .filter(chat -> chat.getId() == id && chat.getType() == ChatType.PRIVATE)
                     .map(chat -> (PrivateChat) chat)
                     .findFirst();
         }
@@ -37,7 +36,6 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
     @Override
     public Collection<PrivateChat> get()throws Exception {
         return chatRepository.get().stream()
-                .filter(chat -> chat.getType() == ChatType.PRIVATE)
                 .map(chat -> (PrivateChat) chat)
                 .collect(Collectors.toSet());
     }
@@ -46,7 +44,7 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
 
     @Override
     public Collection<PrivateChat> getChatsByUserName(String username)throws Exception {
-        return this.chatRepository.getChatsByUser(username).stream().filter(chat->chat.getType()==ChatType.PRIVATE)
+        return this.chatRepository.getChatsByUser(username).stream()
                 .map(chat->(PrivateChat)chat)
                 .collect(Collectors.toSet());
     }

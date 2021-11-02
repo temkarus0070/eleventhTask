@@ -16,50 +16,50 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class LoginServlet extends HttpServlet {
     private AuthService authService;
     private PersistenceUserService persistenceUserService;
+
     @Override
     public void init() throws ServletException {
-        authService=new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()),new PasswordEncoderImpl());
-        persistenceUserService=new PersistenceUserServiceImpl(new UserStorage());
+        authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
+        persistenceUserService = new PersistenceUserServiceImpl(new UserStorage());
         super.init();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/jsp/login.jsp").forward(req,resp);
+        req.getRequestDispatcher("/jsp/login.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String username="";
-        String password="";
-        Map<String,String[]> params=req.getParameterMap();
-        try{
-            username=params.get("username")[0];
-            password=params.get("password")[0];
+        String username = "";
+        String password = "";
+        Map<String, String[]> params = req.getParameterMap();
+        try {
+            username = params.get("username")[0];
+            password = params.get("password")[0];
             try {
                 User user = authService.login(username, password);
-                Cookie usernameCookie=new Cookie("username",user.getName());
+                Cookie usernameCookie = new Cookie("username", user.getName());
                 usernameCookie.setMaxAge(999999);
-                Cookie passwordCookie=new Cookie("password",user.getPassword());
+                Cookie passwordCookie = new Cookie("password", user.getPassword());
                 passwordCookie.setMaxAge(999999);
 
-               resp.addCookie(usernameCookie);
+                resp.addCookie(usernameCookie);
                 resp.addCookie(passwordCookie);
 
-                req.getRequestDispatcher("/jsp/home.jsp").forward(req,resp);
-            }
-            catch (InvalidAuthDataException invalidAuthDataException){
-                resp.getOutputStream().print(invalidAuthDataException.getMessage());
+                resp.sendRedirect("/");
+            } catch (InvalidAuthDataException invalidAuthDataException) {
+                resp.getOutputStream().write(invalidAuthDataException.getMessage().getBytes(StandardCharsets.UTF_8));
             }
 
-        }
-        catch (Exception ex){
-            resp.getOutputStream().print(ex.getMessage());
+        } catch (Exception ex) {
+            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
     }
 }
