@@ -38,7 +38,7 @@ public class RegisterServlet extends HttpServlet {
         User user=authService.register(username,password);
         resp.addCookie(new Cookie("username",user.getName()));
         resp.addCookie(new Cookie("password",user.getPassword()));
-        req.getRequestDispatcher("/jsp/home.jsp").forward(req,resp);
+        resp.sendRedirect("/");
     } catch (Exception usernameAlreadyExistException){
         resp.getOutputStream().write((usernameAlreadyExistException.getMessage().getBytes(StandardCharsets.UTF_8)));
 

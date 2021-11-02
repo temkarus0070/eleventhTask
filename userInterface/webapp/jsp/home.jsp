@@ -1,14 +1,15 @@
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <html>
 <head>
     <link rel="stylesheet"   href="../css/style.css"/>
     <title>Home page</title>
 </head>
 <body>
+
 
 <jsp:include page="header.jsp"/>
 
@@ -23,7 +24,12 @@
 </form>
 <ul>
 <c:forEach items="${chats}" var="chat">
-    <li><a href="../chat?chatType=${chat.getType()}&chatId=${chat.getId()}" >chat ${chat.getId()}</a></li>
+    <li><a href="../chat?chatType=${chat.getType()}&chatId=${chat.getId()}" >
+        <c:if test="${chat.getType().name().equals('GROUP') ||chat.getType().name().equals('ROOM')}">
+        <c:out value="${chat.getName()}"></c:out></c:if>
+        <c:if test="${chat.getType().name().equals('PRIVATE')}">
+            <c:out value="chat ${chat.getId()}"></c:out></c:if>
+    </a></li>
 
 </c:forEach>
 </ul>

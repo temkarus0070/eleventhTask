@@ -5,4 +5,9 @@ public class PrivateChat extends Chat {
     public PrivateChat() {
         this.type = ChatType.PRIVATE;
     }
+
+    @Override
+    public ChatType getType() {
+        return super.getType();
+    }
 }

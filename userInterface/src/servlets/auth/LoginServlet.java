@@ -52,7 +52,7 @@ public class LoginServlet extends HttpServlet {
                resp.addCookie(usernameCookie);
                 resp.addCookie(passwordCookie);
 
-                req.getRequestDispatcher("/jsp/home.jsp").forward(req,resp);
+                resp.sendRedirect("/");
             }
             catch (InvalidAuthDataException invalidAuthDataException){
                 resp.getOutputStream().write(invalidAuthDataException.getMessage().getBytes(StandardCharsets.UTF_8));

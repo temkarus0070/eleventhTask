@@ -23,4 +23,9 @@ public class GroupChat extends Chat {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public ChatType getType() {
+        return super.getType();
+    }
 }
