@@ -38,7 +38,7 @@ public class MessagesServlet extends HttpServlet {
     public void init() throws ServletException {
         persistenceUserService=new PersistenceUserServiceImpl(new UserStorage());
         repository=new ChatStorage(ChatType.ROOM);
-        persistenceChatService=new PersistenceChatServiceImpl(new ChatStorage());
+        persistenceChatService=new PersistenceChatServiceImpl(new ChatStorage(ChatType.ANY));
     }
 
     @Override

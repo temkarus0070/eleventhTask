@@ -20,7 +20,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
 
     public Optional<GroupChat> getChatByName(String name)throws Exception {
         return repository.getChatByName(name)
-                .stream().filter(chat -> chat.getType()==ChatType.GROUP)
+                .stream()
                 .map(chat -> (GroupChat) chat)
                 .findFirst();
     }
@@ -32,7 +32,6 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
     public Optional<GroupChat> getChat(int id) throws Exception{
         try {
             return Stream.of(repository.get(id))
-                    .filter(chat -> chat.getId() == id && chat.getType() == ChatType.GROUP)
                     .map(chat -> (GroupChat) chat)
                     .findFirst();
         }
@@ -78,7 +77,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
 
     @Override
     public Collection<GroupChat> getChatsByUserName(String username) throws Exception {
-        return this.repository.getChatsByUser(username).stream().filter(chat->chat.getType()==ChatType.GROUP)
+        return this.repository.getChatsByUser(username).stream()
                 .map(chat->(GroupChat)chat)
                 .collect(Collectors.toSet());
     }

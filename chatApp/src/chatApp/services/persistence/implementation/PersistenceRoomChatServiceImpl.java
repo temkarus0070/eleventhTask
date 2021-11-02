@@ -20,8 +20,7 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
     }
 
     public Optional<RoomChat> getChatByName(String name) throws Exception {
-        return chatRepository.get().stream()
-                .filter(chat -> chat.getType() == ChatType.ROOM && ((RoomChat) chat).getName().equals(name))
+        return chatRepository.getChatByName(name).stream()
                 .map(chat -> (RoomChat) chat)
                 .findFirst();
     }
@@ -31,7 +30,6 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
     public Optional<RoomChat> getChat(int id) throws Exception {
         try {
             return Stream.of(chatRepository.get(id))
-                    .filter(chat -> chat.getId() == id && chat.getType() == ChatType.ROOM)
                     .map(chat -> (RoomChat) chat)
                     .findFirst();
         }
@@ -44,7 +42,6 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
     @Override
     public Collection<RoomChat> get() throws Exception {
         return this.chatRepository.get().stream()
-                .filter(chat -> chat.getType() == ChatType.ROOM)
                 .map(chat -> (RoomChat) chat)
                 .collect(Collectors.toSet());
     }
@@ -64,7 +61,7 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
 
     @Override
     public Collection<RoomChat> getChatsByUserName(String username) throws Exception {
-        return this.chatRepository.getChatsByUser(username).stream().filter(chat -> chat.getType() == ChatType.ROOM)
+        return this.chatRepository.getChatsByUser(username).stream()
                 .map(chat -> (RoomChat) chat)
                 .collect(Collectors.toSet());
     }

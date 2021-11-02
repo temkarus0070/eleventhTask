@@ -29,7 +29,7 @@ public class UserServlet extends HttpServlet {
             String username = req.getParameter("username");
             Integer chatId = Integer.parseInt(req.getParameter("chatId"));
             String chatType=req.getParameter("chatType");
-            persistenceChatService= PersistenceChatServiceFactory.create(ChatType.valueOf(chatType),new ChatStorage());
+            persistenceChatService= PersistenceChatServiceFactory.create(ChatType.valueOf(chatType),new ChatStorage(ChatType.ANY));
             persistenceChatService.addUser(username, chatId);
             resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s",chatType,chatId));
         }

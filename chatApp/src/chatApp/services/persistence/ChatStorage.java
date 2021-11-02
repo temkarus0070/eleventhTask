@@ -20,22 +20,17 @@ public class ChatStorage implements ChatRepository {
     private ChatsExtractor chatsExtractor;
 
     public ChatStorage(ChatType chatType) {
-        this();
+        chatExtractor=ChatExtractor.getInstance();
+        chatsExtractor=ChatsExtractor.getInstance();
         this.chatType = chatType.name();
 
     }
-
-    public ChatStorage(){
-        chatExtractor=ChatExtractor.getInstance();
-        chatsExtractor=ChatsExtractor.getInstance();
-    }
-
 
     @Override
     public Collection<Chat> get() throws SQLException {
         try (Connection connection = connectionManager.getConnection();
              Statement statement = connection.createStatement();) {
-            ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM CHATS where chat_type::text=''%s''", chatType));
+            ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM CHATS where chat_type::text=''%s'' ORDER BY id", chatType));
             return chatsExtractor.extract(resultSet);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -48,7 +43,8 @@ public class ChatStorage implements ChatRepository {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
                     "INNER JOIN  users_chats uc ON u.username=uc.username " +
                     "INNER JOIN  Chats c ON c.id=uc.chat_id " +
-                    "WHERE c.chat_type::text=? and u.username=?");
+                    "WHERE c.chat_type::text=? and u.username=? " +
+                    "ORDER BY c.id");
             preparedStatement.setString(1, chatType);
             preparedStatement.setString(2, username);
 
@@ -65,7 +61,7 @@ public class ChatStorage implements ChatRepository {
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
                     " on c.id=usChats.chat_id " +
-                    "INNER JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                    "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
                     " WHERE c.name=?");
             preparedStatement.setString(1, name);
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
