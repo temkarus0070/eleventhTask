@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -63,17 +64,17 @@ public class MessagesServlet extends HttpServlet {
                    }
                }
                else{
-                   resp.getOutputStream().print("user not found exception");
+                   resp.getOutputStream().write("user not found exception".getBytes(StandardCharsets.UTF_8));
                }
 
             }
             else {
-                resp.getOutputStream().print("chat not found exception");
+                resp.getOutputStream().write("chat not found exception".getBytes(StandardCharsets.UTF_8));
             }
                 resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d",chatType,chat.getId()));
         }
         catch (Exception ex){
-            resp.getOutputStream().print(ex.getMessage());
+            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
 
     }

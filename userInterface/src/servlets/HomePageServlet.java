@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,7 +68,7 @@ public class HomePageServlet extends HttpServlet {
             getServletContext().getRequestDispatcher("/jsp/home.jsp").forward(req, resp);
         }
         catch (Exception ex){
-            resp.getOutputStream().print(ex.getMessage());
+            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
     }
 

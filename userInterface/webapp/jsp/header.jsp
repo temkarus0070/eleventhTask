@@ -6,12 +6,8 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <link rel="stylesheet" href="../css/style.css"/>
-    <title>Title</title>
-</head>
-<body>
+
+
 <nav>
     <a href="${pageContext.request.contextPath}/jsp/createChat.jsp">create new chat</a>
     <a href="../">home</a>
@@ -20,5 +16,3 @@
     <b>${cookie['username'].value}</b>
 
 </nav>
-</body>
-</html>

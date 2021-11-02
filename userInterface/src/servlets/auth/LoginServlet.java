@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class LoginServlet extends HttpServlet {
@@ -54,12 +55,12 @@ public class LoginServlet extends HttpServlet {
                 req.getRequestDispatcher("/jsp/home.jsp").forward(req,resp);
             }
             catch (InvalidAuthDataException invalidAuthDataException){
-                resp.getOutputStream().print(invalidAuthDataException.getMessage());
+                resp.getOutputStream().write(invalidAuthDataException.getMessage().getBytes(StandardCharsets.UTF_8));
             }
 
         }
         catch (Exception ex){
-            resp.getOutputStream().print(ex.getMessage());
+            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
     }
 }

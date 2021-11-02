@@ -3,15 +3,14 @@
          pageEncoding="UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="../css/style.css"/>
+    <link rel="stylesheet"   href="../css/style.css"/>
     <title>Home page</title>
 </head>
 <body>
 
-<jsp:include page="header.jsp"></jsp:include>
+<jsp:include page="header.jsp"/>
 
 <form method="get" action="/">
 <label for="chatType">chat type</label>
@@ -29,4 +28,5 @@
 </c:forEach>
 </ul>
 </body>
+
 </html>

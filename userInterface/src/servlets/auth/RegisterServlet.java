@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class RegisterServlet extends HttpServlet {
     private AuthService authService;
@@ -39,7 +40,7 @@ public class RegisterServlet extends HttpServlet {
         resp.addCookie(new Cookie("password",user.getPassword()));
         req.getRequestDispatcher("/jsp/home.jsp").forward(req,resp);
     } catch (Exception usernameAlreadyExistException){
-        resp.getOutputStream().print(usernameAlreadyExistException.getMessage());
+        resp.getOutputStream().write((usernameAlreadyExistException.getMessage().getBytes(StandardCharsets.UTF_8)));
 
     }
     }
