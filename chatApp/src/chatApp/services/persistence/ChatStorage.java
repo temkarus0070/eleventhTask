@@ -28,10 +28,13 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public Collection<Chat> get() throws SQLException {
-        try (Connection connection = connectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text=? ORDER BY id")) {
-            if(!chatType.equals("ANY"))
-                statement.setString(1,chatType);
+        try (Connection connection = connectionManager.getConnection()) {
+            PreparedStatement statement = null;
+            if (!chatType.equals("ANY")) {
+                statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text=? ORDER BY id");
+                statement.setString(1, chatType);
+            } else
+               statement= connection.prepareStatement("SELECT * FROM CHATS  ORDER BY id");
             ResultSet resultSet = statement.executeQuery();
             return chatsExtractor.extract(resultSet);
         } catch (SQLException sqlException) {
@@ -42,14 +45,22 @@ public class ChatStorage implements ChatRepository {
 
     public Collection<Chat> getChatsByUser(String username) throws SQLException {
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
-                    "INNER JOIN  users_chats uc ON u.username=uc.username " +
-                    "INNER JOIN  Chats c ON c.id=uc.chat_id " +
-                    "WHERE c.chat_type::text=? and u.username=? " +
-                    "ORDER BY c.id");
-            if(!chatType.equals("ANY"))
-                preparedStatement.setString(1, chatType);
-            preparedStatement.setString(2, username);
+            PreparedStatement preparedStatement = null;
+            if (!chatType.equals("ANY")) {
+                preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
+                        "INNER JOIN  users_chats uc ON u.username=uc.username " +
+                        "INNER JOIN  Chats c ON c.id=uc.chat_id " +
+                        "WHERE u.username=? and c.chat_type::text=? " +
+                        "ORDER BY c.id");
+                preparedStatement.setString(2, chatType);
+            } else
+                preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
+                        "INNER JOIN  users_chats uc ON u.username=uc.username " +
+                        "INNER JOIN  Chats c ON c.id=uc.chat_id " +
+                        "WHERE u.username=? " +
+                        "ORDER BY c.id");
+
+            preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             return chatsExtractor.extract(resultSet);
@@ -62,12 +73,21 @@ public class ChatStorage implements ChatRepository {
         if (chatType.equals("PRIVATE"))
             throw new UnsupportedOperationException();
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                    " on c.id=usChats.chat_id " +
-                    "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                    " WHERE c.name=? and c.chat_type::text=?");
+            PreparedStatement preparedStatement = null;
+            if(!chatType.equals("ANY")){
+                preparedStatement=connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                        " on c.id=usChats.chat_id " +
+                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                        " WHERE c.name=? and c.chat_type::text=?");
+                preparedStatement.setString(2, chatType);
+            }
+            else
+                preparedStatement=connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                        " on c.id=usChats.chat_id " +
+                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                        " WHERE c.name=?");
             preparedStatement.setString(1, name);
-            preparedStatement.setString(2,chatType);
+
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
             return Optional.ofNullable(chat);
         }
@@ -118,13 +138,20 @@ public class ChatStorage implements ChatRepository {
     @Override
     public Chat get(Integer integer) throws SQLException {
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                    " on c.id=usChats.chat_id " +
-                    "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                    " WHERE c.id=? AND c.chat_type::text=?");
+            PreparedStatement preparedStatement = null;
+            if (!chatType.equals("ANY")) {
+                preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                        " on c.id=usChats.chat_id " +
+                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                        " WHERE c.id=? AND c.chat_type::text=?");
+                preparedStatement.setString(2, chatType);
+            } else
+                preparedStatement=connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                        " on c.id=usChats.chat_id " +
+                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                        " WHERE c.id=?");
             preparedStatement.setInt(1, integer);
-            if(!chatType.equals("ANY"))
-                preparedStatement.setString(2,chatType);
+
             return chatExtractor.extract(preparedStatement.executeQuery());
         }
     }

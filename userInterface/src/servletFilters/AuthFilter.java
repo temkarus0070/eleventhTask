@@ -25,6 +25,7 @@ public class AuthFilter extends HttpFilter {
     }
 
     @Override
+
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         if(req.getRequestURI().contains("register")||req.getRequestURI().contains("login")) {
             super.doFilter(req, res, chain);
