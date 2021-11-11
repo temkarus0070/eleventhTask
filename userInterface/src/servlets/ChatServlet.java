@@ -85,7 +85,7 @@ public class ChatServlet extends HttpServlet {
                 req.setAttribute("chat", anyChat);
                 req.setAttribute("users", persistenceUserService.getUsersNotAtThatChat(anyChat.getId()));
             } else {
-                resp.getOutputStream().write(" you dont have permissions to participate at that chat".getBytes(StandardCharsets.UTF_8));
+                resp.getOutputStream().write(" you dont have permissions to participate at that chat or chat not found".getBytes(StandardCharsets.UTF_8));
                 return;
             }
         } catch (Exception exception) {

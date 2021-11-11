@@ -9,6 +9,7 @@ import chatApp.services.persistence.implementation.PersistenceGroupChatServiceIm
 import chatApp.services.persistence.interfaces.PersistenceChatService;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
