@@ -14,18 +14,26 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class ChatStorage implements ChatRepository {
-    private String chatType = "";
+    private final ChatType chatType;
+    private final Array array;
     private final ConnectionManager connectionManager;
 
-    private Extractor<Chat> chatExtractor;
+    private final Extractor<Chat> chatExtractor;
 
-    private ChatsExtractor chatsExtractor;
+    private final ChatsExtractor chatsExtractor;
 
-    public ChatStorage(ChatType chatType) {
+    public ChatStorage(ChatType chatType) throws ChatAppDatabaseException {
         chatExtractor = ChatExtractor.getInstance();
         chatsExtractor = ChatsExtractor.getInstance();
-        this.chatType = chatType.name();
+        this.chatType = chatType;
         this.connectionManager = new ConnectionManager();
+        try (Connection connection = connectionManager.getConnection()) {
+            String[] array = chatType.getValues();
+            this.array = connection.createArrayOf("text", array);
+        } catch (SQLException sqlException) {
+            throw new ChatAppDatabaseException(sqlException);
+        }
+
 
     }
 
@@ -33,14 +41,11 @@ public class ChatStorage implements ChatRepository {
     public Collection<Chat> get() throws ChatAppDatabaseException {
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement statement = null;
-            if (!chatType.equals("ANY")) {
-                statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text=? ORDER BY id");
-                statement.setString(1, chatType);
-            } else
-                statement = connection.prepareStatement("SELECT * FROM CHATS  ORDER BY id");
+            statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text in ? ORDER BY id");
+            statement.setArray(1, array);
             ResultSet resultSet = statement.executeQuery();
             return chatsExtractor.extract(resultSet);
-        } catch (SQLException | ChatAppDatabaseException sqlException) {
+        } catch (SQLException sqlException) {
             throw new ChatAppDatabaseException(sqlException);
         }
     }
@@ -48,25 +53,18 @@ public class ChatStorage implements ChatRepository {
     public Collection<Chat> getChatsByUser(String username) throws ChatAppDatabaseException {
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = null;
-            if (!chatType.equals("ANY")) {
-                preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
-                        "INNER JOIN  users_chats uc ON u.username=uc.username " +
-                        "INNER JOIN  Chats c ON c.id=uc.chat_id " +
-                        "WHERE u.username=? and c.chat_type::text=? " +
-                        "ORDER BY c.id");
-                preparedStatement.setString(2, chatType);
-            } else
-                preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
-                        "INNER JOIN  users_chats uc ON u.username=uc.username " +
-                        "INNER JOIN  Chats c ON c.id=uc.chat_id " +
-                        "WHERE u.username=? " +
-                        "ORDER BY c.id");
+            preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
+                    "INNER JOIN  users_chats uc ON u.username=uc.username " +
+                    "INNER JOIN  Chats c ON c.id=uc.chat_id " +
+                    "WHERE u.username=? and c.chat_type::text  = any(?::text[]) " +
+                    "ORDER BY c.id");
 
+            preparedStatement.setArray(2, array);
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             return chatsExtractor.extract(resultSet);
-        } catch (SQLException | ChatAppDatabaseException throwables) {
+        } catch (SQLException throwables) {
             throw new ChatAppDatabaseException(throwables);
         }
 
@@ -74,26 +72,19 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public Optional<Chat> getChatByName(String name) throws ChatAppDatabaseException {
-        if (chatType.equals("PRIVATE"))
+        if (chatType == ChatType.PRIVATE)
             throw new UnsupportedOperationException();
         try (Connection connection = connectionManager.getConnection()) {
             PreparedStatement preparedStatement = null;
-            if (!chatType.equals("ANY")) {
-                preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                        " on c.id=usChats.chat_id " +
-                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                        " WHERE c.name=? and c.chat_type::text=?");
-                preparedStatement.setString(2, chatType);
-            } else
-                preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                        " on c.id=usChats.chat_id " +
-                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                        " WHERE c.name=?");
-            preparedStatement.setString(1, name);
+            preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                    " on c.id=usChats.chat_id " +
+                    "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                    " WHERE c.name=? and c.chat_type::text = any(?::text[])");
+            preparedStatement.setArray(2, array);
 
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
             return Optional.ofNullable(chat);
-        } catch (SQLException | ChatAppDatabaseException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -105,7 +96,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setInt(2, chatId);
             preparedStatement.setString(1, user);
             preparedStatement.executeUpdate();
-        } catch (ChatAppDatabaseException | SQLException chatAppDatabaseException) {
+        } catch (SQLException chatAppDatabaseException) {
             throw new ChatAppDatabaseException(chatAppDatabaseException);
         }
     }
@@ -117,7 +108,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(1, user);
             preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
-        } catch (ChatAppDatabaseException | SQLException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -130,7 +121,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(1, user);
             preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
-        } catch (SQLException | ChatAppDatabaseException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -143,7 +134,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(2, message.getSender().getName());
             preparedStatement.setInt(3, chatId);
             preparedStatement.executeUpdate();
-        } catch (SQLException | ChatAppDatabaseException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -151,22 +142,15 @@ public class ChatStorage implements ChatRepository {
     @Override
     public Chat get(Integer integer) throws ChatAppDatabaseException {
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement preparedStatement = null;
-            if (!chatType.equals("ANY")) {
-                preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                        " on c.id=usChats.chat_id " +
-                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                        " WHERE c.id=? AND c.chat_type::text=?");
-                preparedStatement.setString(2, chatType);
-            } else
-                preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                        " on c.id=usChats.chat_id " +
-                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                        " WHERE c.id=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                    " on c.id=usChats.chat_id " +
+                    "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                    " WHERE c.id=? AND c.chat_type::text = any(?::text[])");
+            preparedStatement.setArray(2, array);
             preparedStatement.setInt(1, integer);
 
             return chatExtractor.extract(preparedStatement.executeQuery());
-        } catch (SQLException | ChatAppDatabaseException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -210,7 +194,7 @@ public class ChatStorage implements ChatRepository {
                 preparedStatement1.executeUpdate();
                 System.out.println(id);
             }
-        } catch (SQLException | ChatAppDatabaseException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -222,7 +206,7 @@ public class ChatStorage implements ChatRepository {
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM chats where id=?");
             preparedStatement.setInt(1, integer);
             preparedStatement.executeUpdate();
-        } catch (SQLException | ChatAppDatabaseException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -253,7 +237,7 @@ public class ChatStorage implements ChatRepository {
                     }
                     break;
             }
-        } catch (SQLException | ChatAppDatabaseException exception) {
+        } catch (SQLException exception) {
             throw new ChatAppDatabaseException(exception);
         }
     }

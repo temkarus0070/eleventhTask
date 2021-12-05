@@ -3,6 +3,7 @@ package servlets;
 import chatApp.domain.User;
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
+import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.factories.ChatServiceFactory;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,11 +37,15 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        persistencePrivateChatService = new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
-        persistenceGroupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
-        persistenceRoomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
-        authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
-        persistenceUserService = new PersistenceUserServiceImpl(new UserStorage());
+        try {
+            persistencePrivateChatService = new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
+            persistenceGroupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
+            persistenceRoomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
+            authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
+            persistenceUserService = new PersistenceUserServiceImpl(new UserStorage());
+        } catch (ChatAppDatabaseException exception) {
+            throw new ChatAppDatabaseException(exception);
+        }
     }
 
 

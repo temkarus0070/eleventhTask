@@ -1,6 +1,6 @@
 package chatApp.domain.exceptions;
 
-public class ChatAppDatabaseException extends Exception {
+public class ChatAppDatabaseException extends RuntimeException {
     public ChatAppDatabaseException(Throwable throwable) {
         super(throwable);
     }
