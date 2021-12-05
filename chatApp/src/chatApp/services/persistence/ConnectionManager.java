@@ -1,36 +1,20 @@
 package chatApp.services.persistence;
+import chatApp.domain.exceptions.ChatAppDatabaseException;
+
+import javax.sql.DataSource;
 import java.sql.*;
+import javax.naming.*;
 
 public class ConnectionManager {
-    private final static String DB_URL="jdbc:postgresql://localhost:5432/chat";
 
-    private static ConnectionManager connectionManager;
-
-
-    private ConnectionManager(){
+    public Connection getConnection() throws ChatAppDatabaseException {
         try {
-            Class.forName("org.postgresql.Driver");
+            InitialContext initialContext = new InitialContext();
+            DataSource ds = (DataSource) initialContext.lookup("java:/comp/env/jdbc/chatDB");
+            return ds.getConnection();
+        } catch (SQLException | NamingException ex) {
+            throw new ChatAppDatabaseException(ex);
         }
-        catch (ClassNotFoundException classNotFoundException){
-            classNotFoundException.printStackTrace();
-        }
-    }
-
-    public static ConnectionManager getInstance(){
-        if(connectionManager==null){
-            connectionManager=new ConnectionManager();
-        }
-        return connectionManager;
-    }
-
-    public Connection getConnection(){
-        try {
-            return DriverManager.getConnection(DB_URL,"postgres","postgres");
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return null;
     }
 
 
