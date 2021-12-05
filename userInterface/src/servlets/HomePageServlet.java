@@ -11,10 +11,7 @@ import chatApp.services.persistence.ChatStorage;
 import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.UserStorage;
-import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
+import chatApp.services.persistence.implementation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,14 +27,17 @@ public class HomePageServlet extends HttpServlet {
     private PersistenceRoomChatServiceImpl roomChatService;
     private PersistenceGroupChatServiceImpl groupChatService;
     private PersistencePrivateChatServiceImpl persistencePrivateChatService;
+    private PersistenceChatServiceImpl persistenceChatService;
     private AuthService authService;
 
     @Override
     public void init() throws ServletException {
+
         roomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
         groupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
         persistencePrivateChatService = new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
         authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
+        persistenceChatService = new PersistenceChatServiceImpl(new ChatStorage(ChatType.ANY));
     }
 
     @Override
@@ -59,9 +59,11 @@ public class HomePageServlet extends HttpServlet {
                 case GROUP:
                     req.setAttribute("chats", groupChatService.getChatsByUserName(user.getName()));
                     break;
-                default:
+                case PRIVATE:
                     req.setAttribute("chats", persistencePrivateChatService.getChatsByUserName(user.getName()));
                     break;
+                default:
+                    req.setAttribute("chats", persistenceChatService.getChatsByUserName(user.getName()));
             }
             req.setAttribute("chatType", chatType.name());
             getServletContext().getRequestDispatcher("/jsp/home.jsp").forward(req, resp);

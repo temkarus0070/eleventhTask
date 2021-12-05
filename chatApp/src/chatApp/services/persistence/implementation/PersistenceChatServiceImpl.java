@@ -34,7 +34,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
 
     @Override
     public Collection<T> getChatsByUserName(String username) throws ChatAppDatabaseException {
-        throw new ChatAppDatabaseException(new UnsupportedOperationException());
+        return (Collection<T>) chatRepository.getChatsByUser(username);
     }
 
 

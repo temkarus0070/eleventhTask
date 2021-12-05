@@ -61,7 +61,6 @@ public class ChatServlet extends HttpServlet {
             switch (type) {
                 case PRIVATE:
                     Optional<PrivateChat> chat = Optional.empty();
-
                     chat = persistencePrivateChatService.getChat(id);
                     anyChat = chat.get();
                     break;
