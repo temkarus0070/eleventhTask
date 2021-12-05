@@ -4,6 +4,7 @@ package chatApp.services.persistence;
 
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.Message;
+import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.services.persistence.interfaces.ChatRepository;
 
 import java.util.Collection;
@@ -46,22 +47,22 @@ public class InMemoryChatStorage implements ChatRepository {
     }
 
     @Override
-    public void removeUserFromChat(String user, Integer chatId) throws Exception {
+    public void removeUserFromChat(String user, Integer chatId) throws ChatAppDatabaseException {
 
     }
 
     @Override
-    public void addUserToChat(String user, Integer chatId) throws Exception {
+    public void addUserToChat(String user, Integer chatId) throws ChatAppDatabaseException {
 
     }
 
     @Override
-    public void banUserInChat(String user, Integer chatId) throws Exception {
+    public void banUserInChat(String user, Integer chatId) throws ChatAppDatabaseException {
 
     }
 
     @Override
-    public void addMessage(Message message, Integer chatId) throws Exception {
+    public void addMessage(Message message, Integer chatId) throws ChatAppDatabaseException {
 
     }
 

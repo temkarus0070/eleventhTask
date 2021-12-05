@@ -28,4 +28,11 @@ public class GroupChat extends Chat {
     public ChatType getType() {
         return super.getType();
     }
+
+    @Override
+    public String toString() {
+        return "GroupChat{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

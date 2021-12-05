@@ -10,4 +10,9 @@ public class PrivateChat extends Chat {
     public ChatType getType() {
         return super.getType();
     }
+
+    @Override
+    public String toString() {
+        return getType().name() + " " + getId();
+    }
 }

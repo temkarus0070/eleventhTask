@@ -1,6 +1,7 @@
 package chatApp.services.persistence.implementation;
 
 import chatApp.domain.User;
+import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.domain.exceptions.UsernameAlreadyExistException;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
 import chatApp.services.persistence.interfaces.UserRepository;
@@ -18,37 +19,36 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
     }
 
     @Override
-    public void addUser(User user) throws Exception{
-        Optional<User> userOptional=getUser(user.getName());
-        if(userOptional.isEmpty())
+    public void addUser(User user) throws ChatAppDatabaseException {
+        Optional<User> userOptional = getUser(user.getName());
+        if (userOptional.isEmpty())
             userRepository.add(user);
-        else throw new UsernameAlreadyExistException();
+        else throw new ChatAppDatabaseException(new UsernameAlreadyExistException());
     }
 
     @Override
-    public Optional<User> getUser(String userName)throws Exception {
+    public Optional<User> getUser(String userName) throws ChatAppDatabaseException {
         return Optional.ofNullable(userRepository.get(userName));
     }
 
 
-
     @Override
-    public Collection<User> get()throws Exception {
+    public Collection<User> get() throws ChatAppDatabaseException {
         return userRepository.get();
     }
 
     @Override
-    public void updateUser(User user)throws Exception {
+    public void updateUser(User user) throws ChatAppDatabaseException {
         userRepository.update(user);
     }
 
     @Override
-    public void deleteUser(String username)throws Exception {
+    public void deleteUser(String username) throws ChatAppDatabaseException {
         userRepository.delete(username);
     }
 
     @Override
-    public Collection<User> getUsersNotAtThatChat(Integer chatId) throws Exception {
+    public Collection<User> getUsersNotAtThatChat(Integer chatId) throws ChatAppDatabaseException {
         return userRepository.getUsersNotAtThatChat(chatId);
     }
 

@@ -158,9 +158,7 @@ public class ChatStorage implements ChatRepository {
     @Override
     public void add(Chat entity) throws ChatAppDatabaseException {
         try (Connection connection = connectionManager.getConnection()) {
-            ChatType chatType = entity.getType();
             PreparedStatement preparedStatement = null;
-            String sql = "";
             switch (chatType) {
                 case PRIVATE:
                     preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,owner) VALUES ('PRIVATE',?)", Statement.RETURN_GENERATED_KEYS);

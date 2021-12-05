@@ -1,6 +1,7 @@
 package chatApp.services.persistence;
 
 import chatApp.domain.User;
+import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.services.PasswordEncoderImpl;
 import chatApp.services.persistence.interfaces.UserRepository;
 
@@ -62,7 +63,7 @@ public class InMemoryUserStorage implements UserRepository {
     }
 
     @Override
-    public Collection<User> getUsersNotAtThatChat(Integer chatId) throws Exception {
+    public Collection<User> getUsersNotAtThatChat(Integer chatId) throws ChatAppDatabaseException {
         return null;
     }
 }

@@ -2,6 +2,7 @@ package chatApp.services.persistence.implementation;
 
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.PrivateChat;
+import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.domain.exceptions.ChatUsersOverflowException;
 import chatApp.services.persistence.interfaces.ChatRepository;
 import chatApp.services.persistence.interfaces.PersistenceChatService;
@@ -20,45 +21,41 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
     }
 
     @Override
-    public Optional<PrivateChat> getChat(int id)throws Exception {
+    public Optional<PrivateChat> getChat(int id) throws ChatAppDatabaseException {
         try {
             return Stream.of(chatRepository.get(id))
                     .map(chat -> (PrivateChat) chat)
                     .findFirst();
-        }
-        catch (Exception ex) {
-            throw new Exception("chat not found exception");
+        } catch (ChatAppDatabaseException ex) {
+            throw new ChatAppDatabaseException("chat not found ChatAppDatabaseException");
         }
     }
 
 
-
     @Override
-    public Collection<PrivateChat> get()throws Exception {
+    public Collection<PrivateChat> get() throws ChatAppDatabaseException {
         return chatRepository.get().stream()
                 .map(chat -> (PrivateChat) chat)
                 .collect(Collectors.toSet());
     }
 
 
-
     @Override
-    public Collection<PrivateChat> getChatsByUserName(String username)throws Exception {
+    public Collection<PrivateChat> getChatsByUserName(String username) throws ChatAppDatabaseException {
         return this.chatRepository.getChatsByUser(username).stream()
-                .map(chat->(PrivateChat)chat)
+                .map(chat -> (PrivateChat) chat)
                 .collect(Collectors.toSet());
     }
 
 
-
     @Override
-    public void addUser(String username, int chatId) throws Exception{
-        Optional<PrivateChat> privateChat=getChat(chatId);
-        if(privateChat.isPresent()) {
-            if(privateChat.get().getUserList().size()<2)
+    public void addUser(String username, int chatId) throws ChatAppDatabaseException {
+        Optional<PrivateChat> privateChat = getChat(chatId);
+        if (privateChat.isPresent()) {
+            if (privateChat.get().getUserList().size() < 2)
                 chatRepository.addUserToChat(username, chatId);
             else
-                throw new ChatUsersOverflowException();
+                throw new ChatAppDatabaseException(new ChatUsersOverflowException());
         }
     }
 

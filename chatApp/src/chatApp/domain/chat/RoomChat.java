@@ -20,4 +20,12 @@ public class RoomChat extends Chat {
     public ChatType getType() {
         return super.getType();
     }
+
+    @Override
+    public String toString() {
+        return "RoomChat{" +
+                "type=" + type +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
