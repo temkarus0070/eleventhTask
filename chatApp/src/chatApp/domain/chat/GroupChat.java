@@ -31,8 +31,6 @@ public class GroupChat extends Chat {
 
     @Override
     public String toString() {
-        return "GroupChat{" +
-                "name='" + name + '\'' +
-                '}';
+        return "GroupChat " + name;
     }
 }

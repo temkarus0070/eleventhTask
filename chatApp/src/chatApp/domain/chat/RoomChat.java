@@ -23,9 +23,6 @@ public class RoomChat extends Chat {
 
     @Override
     public String toString() {
-        return "RoomChat{" +
-                "type=" + type +
-                ", name='" + name + '\'' +
-                '}';
+        return "RoomChat" + " " + name;
     }
 }

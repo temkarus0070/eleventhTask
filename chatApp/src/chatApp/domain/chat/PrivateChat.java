@@ -13,6 +13,6 @@ public class PrivateChat extends Chat {
 
     @Override
     public String toString() {
-        return getType().name() + " " + getId();
+        return "PrivateChat" + " " + getId();
     }
 }

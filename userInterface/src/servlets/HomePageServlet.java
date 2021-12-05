@@ -49,7 +49,7 @@ public class HomePageServlet extends HttpServlet {
             String type = req.getParameter("chatType");
             ChatType chatType = null;
             if (type == null) {
-                chatType = ChatType.PRIVATE;
+                chatType = ChatType.ANY;
             } else
                 chatType = ChatType.valueOf(type);
             switch (chatType) {
