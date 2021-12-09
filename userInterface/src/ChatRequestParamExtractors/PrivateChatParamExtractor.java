@@ -13,9 +13,22 @@ public class PrivateChatParamExtractor implements ChatParamExtractor<PrivateChat
 
     @Override
     public Optional<PrivateChat> extractChat(Map<String, String[]> params) {
-        int id = Integer.parseInt(params.get("chatId")[0]);
         Optional<PrivateChat> chat = Optional.empty();
-        chat = persistencePrivateChatService.getChat(id);
+
+        if (params.get("chatId") != null) {
+            int id = Integer.parseInt(params.get("chatId")[0]);
+
+            chat = persistencePrivateChatService.getChat(id);
+        }
         return chat;
     }
+
+    @Override
+    public Optional<PrivateChat> putChat(Map<String, String[]> params) {
+        Optional<PrivateChat> optionalPrivateChat = Optional.of(new PrivateChat());
+        return optionalPrivateChat;
+    }
+
+
 }
+

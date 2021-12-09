@@ -1,5 +1,6 @@
 package servletFilters;
 
+import chatApp.domain.exceptions.ChatAppException;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
 import chatApp.services.PasswordEncoderImpl;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class AuthFilter extends HttpFilter {
 
@@ -27,18 +29,21 @@ public class AuthFilter extends HttpFilter {
     @Override
 
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        if(req.getRequestURI().contains("register")||req.getRequestURI().contains("login")) {
+        if (req.getRequestURI().contains("register") || req.getRequestURI().contains("login")) {
             super.doFilter(req, res, chain);
             return;
         }
-        if (!authService.isAuthorized(req.getCookies())) {
-            req.getRequestDispatcher("/jsp/login.jsp").forward(req, res);
-            return;
+        try {
+            if (!authService.isAuthorized(req.getCookies())) {
+                req.getRequestDispatcher("/jsp/login.jsp").forward(req, res);
+                return;
+            } else {
+                req.setAttribute("isAuthorized", true);
+            }
+        } catch (ChatAppException e) {
+            res.getOutputStream().write(e.getMessage().getBytes(StandardCharsets.UTF_8));
         }
-        else{
-            req.setAttribute("isAuthorized",true);
-        }
-        super.doFilter(req,res,chain);
+        super.doFilter(req, res, chain);
 
     }
 }

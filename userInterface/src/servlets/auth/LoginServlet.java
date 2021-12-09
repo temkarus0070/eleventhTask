@@ -1,6 +1,7 @@
 package servlets.auth;
 
 import chatApp.domain.User;
+import chatApp.domain.exceptions.ChatAppException;
 import chatApp.domain.exceptions.InvalidAuthDataException;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
@@ -44,18 +45,19 @@ public class LoginServlet extends HttpServlet {
             username = params.get("username")[0];
             password = params.get("password")[0];
             try {
-                User user = authService.login(username, password);
-                Cookie usernameCookie = new Cookie("username", user.getName());
-                usernameCookie.setMaxAge(999999);
-                Cookie passwordCookie = new Cookie("password", user.getPassword());
-                passwordCookie.setMaxAge(999999);
+                if (authService.login(username, password)) {
+                    Cookie usernameCookie = new Cookie("username", username);
+                    usernameCookie.setMaxAge(999999);
+                    Cookie passwordCookie = new Cookie("password", password);
+                    passwordCookie.setMaxAge(999999);
 
-                resp.addCookie(usernameCookie);
-                resp.addCookie(passwordCookie);
+                    resp.addCookie(usernameCookie);
+                    resp.addCookie(passwordCookie);
 
-                resp.sendRedirect("/");
-            } catch (InvalidAuthDataException invalidAuthDataException) {
-                resp.getOutputStream().write(invalidAuthDataException.getMessage().getBytes(StandardCharsets.UTF_8));
+                    resp.sendRedirect("/");
+                }
+            } catch (ChatAppException chatAppException) {
+                resp.getOutputStream().write(chatAppException.getMessage().getBytes(StandardCharsets.UTF_8));
             }
 
         } catch (Exception ex) {

@@ -4,6 +4,8 @@ import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.PrivateChat;
+import chatApp.factories.ChatServiceFactory;
+import chatApp.factories.PersistenceChatServiceFactory;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
 import chatApp.services.PasswordEncoderImpl;
@@ -12,6 +14,7 @@ import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.UserStorage;
 import chatApp.services.persistence.implementation.*;
+import chatApp.services.persistence.interfaces.PersistenceChatService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -42,8 +45,6 @@ public class HomePageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("name", "artyom");
-
         try {
             User user = authService.getCurrentUser(req.getCookies());
             String type = req.getParameter("chatType");
@@ -52,19 +53,8 @@ public class HomePageServlet extends HttpServlet {
                 chatType = ChatType.ANY;
             } else
                 chatType = ChatType.valueOf(type);
-            switch (chatType) {
-                case ROOM:
-                    req.setAttribute("chats", roomChatService.getChatsByUserName(user.getName()));
-                    break;
-                case GROUP:
-                    req.setAttribute("chats", groupChatService.getChatsByUserName(user.getName()));
-                    break;
-                case PRIVATE:
-                    req.setAttribute("chats", persistencePrivateChatService.getChatsByUserName(user.getName()));
-                    break;
-                default:
-                    req.setAttribute("chats", persistenceChatService.getChatsByUserName(user.getName()));
-            }
+            PersistenceChatService persistenceChatService = PersistenceChatServiceFactory.create(chatType, new ChatStorage(chatType));
+            req.setAttribute("chats", persistenceChatService.getChatsByUserName(user.getName()));
             req.setAttribute("chatType", chatType.name());
             getServletContext().getRequestDispatcher("/jsp/home.jsp").forward(req, resp);
         } catch (Exception ex) {
@@ -72,8 +62,4 @@ public class HomePageServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-    }
 }

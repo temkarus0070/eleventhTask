@@ -2,9 +2,7 @@ package chatApp.services;
 
 import chatApp.MyLogger;
 import chatApp.domain.User;
-import chatApp.domain.exceptions.InvalidAuthDataException;
-import chatApp.domain.exceptions.UserNotExistsException;
-import chatApp.domain.exceptions.UsernameAlreadyExistException;
+import chatApp.domain.exceptions.*;
 import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
 
@@ -20,15 +18,16 @@ public class AuthServiceImpl implements AuthService {
     private PersistenceUserService persistenceUserService;
     private PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(PersistenceUserService persistenceUserService,PasswordEncoder passwordEncoder){
-        this.persistenceUserService=persistenceUserService;
-        this.passwordEncoder=passwordEncoder;
+    public AuthServiceImpl(PersistenceUserService persistenceUserService, PasswordEncoder passwordEncoder) {
+        this.persistenceUserService = persistenceUserService;
+        this.passwordEncoder = passwordEncoder;
     }
+
     @Override
-    public boolean isAuthorized(Cookie[] cookies) {
-        String username="";
-        String password="";
-        if(cookies!=null) {
+    public boolean isAuthorized(Cookie[] cookies) throws ChatAppException {
+        String username = "";
+        String password = "";
+        if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("username")) {
                     username = cookie.getValue();
@@ -36,47 +35,49 @@ public class AuthServiceImpl implements AuthService {
                     password = cookie.getValue();
                 }
             }
-            try {
-                login(username, password);
-                return true;
-            } catch (Exception ex) {
-                return false;
+            return login(username, password);
+        }
+        return false;
+    }
+
+
+    @Override
+    public boolean login(String username, String password) throws ChatAppException {
+        User user = null;
+        Optional<User> userOptional = persistenceUserService.getUser(username);
+        if (userOptional.isPresent()) {
+            String hashPassword = passwordEncoder.getHashFromPassword(password);
+            if (!(userOptional.get().getPassword().equals(hashPassword) ||
+                    userOptional.get().getPassword().equals(password))) {
+                MyLogger.log(Level.SEVERE, new InvalidAuthDataException().getMessage());
+                throw new ChatAppException(new InvalidAuthDataException());
             }
+
         }
-        else
-            return false;
-    }
-
-
-
-    @Override
-    public User login(String username, String password) throws Exception {
-        User user=null;
-        Optional<User> userOptional=persistenceUserService.getUser(username);
-        if(userOptional.isPresent()){
-            String hashPassword=passwordEncoder.getHashFromPassword(password);
-            if(!(userOptional.get().getPassword().equals(hashPassword) ||
-                    userOptional.get().getPassword().equals(password)))
-                throw new InvalidAuthDataException();
-        }
-        return userOptional.get();
+        return true;
     }
 
     @Override
-    public User register(String username, String password) throws Exception {
-        String hashPassword=passwordEncoder.getHashFromPassword(password);
-        User user=new User(username,hashPassword);
+    public boolean register(String username, String password) throws ChatAppException {
+        String hashPassword = passwordEncoder.getHashFromPassword(password);
+        User user = new User(username, hashPassword);
+        try {
             persistenceUserService.addUser(user);
-        return user;
+        } catch (ChatAppDatabaseException chatAppDatabaseException) {
+            MyLogger.log(Level.SEVERE, chatAppDatabaseException.getMessage());
+            throw new ChatAppException(chatAppDatabaseException);
+        }
+        return true;
     }
 
     @Override
-    public User getCurrentUser(Cookie[] cookies)throws Exception {
-        Cookie cookie= Arrays.stream(cookies).filter(cookie1 -> cookie1.getName().equals("username")).findFirst().get();
-        if(cookie!=null){
-           return persistenceUserService.getUser(cookie.getValue()).get();
+    public User getCurrentUser(Cookie[] cookies) throws ChatAppException {
+        Cookie cookie = Arrays.stream(cookies).filter(cookie1 -> cookie1.getName().equals("username")).findFirst().get();
+        if (cookie != null) {
+            return persistenceUserService.getUser(cookie.getValue()).get();
+        } else {
+            MyLogger.log(Level.SEVERE, "User not exists");
+            throw new ChatAppException(new UserNotExistsException());
         }
-        MyLogger.log(Level.SEVERE, "User not exists");
-        throw new UserNotExistsException();
     }
 }

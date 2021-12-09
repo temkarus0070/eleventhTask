@@ -6,6 +6,7 @@ import chatApp.domain.User;
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
+import chatApp.domain.exceptions.ChatAppException;
 import chatApp.factories.ChatServiceFactory;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
@@ -14,10 +15,7 @@ import chatApp.services.persistence.ChatStorage;
 import chatApp.services.persistence.InMemoryChatStorage;
 import chatApp.services.persistence.InMemoryUserStorage;
 import chatApp.services.persistence.UserStorage;
-import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistencePrivateChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceRoomChatServiceImpl;
-import chatApp.services.persistence.implementation.PersistenceUserServiceImpl;
+import chatApp.services.persistence.implementation.*;
 import chatApp.services.persistence.interfaces.PersistenceUserService;
 
 import javax.servlet.ServletException;
@@ -27,22 +25,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ChatServlet extends HttpServlet {
-    private PersistencePrivateChatServiceImpl persistencePrivateChatService;
-    private PersistenceGroupChatServiceImpl persistenceGroupChatService;
-    private PersistenceRoomChatServiceImpl persistenceRoomChatService;
+    private PersistenceChatServiceImpl persistenceChatService;
     private PersistenceUserService persistenceUserService;
     private AuthService authService;
 
     @Override
     public void init() throws ServletException {
         try {
-            persistencePrivateChatService = new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
-            persistenceGroupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
-            persistenceRoomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
+            persistenceChatService = new PersistenceChatServiceImpl(new ChatStorage(ChatType.ANY));
             authService = new AuthServiceImpl(new PersistenceUserServiceImpl(new UserStorage()), new PasswordEncoderImpl());
             persistenceUserService = new PersistenceUserServiceImpl(new UserStorage());
         } catch (ChatAppDatabaseException exception) {
@@ -57,15 +51,20 @@ public class ChatServlet extends HttpServlet {
             ChatParamExtractor chatParamExtractor = ChatRequestParamExtractorBuilder.build(req.getParameterMap());
             Optional<Chat> chat = chatParamExtractor.extractChat(req.getParameterMap());
             User current = authService.getCurrentUser(req.getCookies());
-            if (chat.isPresent() && hasPermissions(current, chat.get())) {
-                req.setAttribute("chat", chat.get());
-                req.setAttribute("users", persistenceUserService.getUsersNotAtThatChat(chat.get().getId()));
-                req.setAttribute("usersToBan", persistenceUserService.get());
-            } else {
-                resp.getOutputStream().write(" you dont have permissions to participate at that chat".getBytes(StandardCharsets.UTF_8));
-                return;
+            if (chat.isPresent()) {
+                if (hasPermissions(current, chat.get())) {
+                    Set<User> bannedUserSet = new HashSet<>(chat.get().getBannedUsers());
+                    Set<User> currentUsers = new HashSet<>(chat.get().getUserList());
+                    req.setAttribute("chat", chat.get());
+                    req.setAttribute("users", persistenceUserService.getUsersNotAtThatChat(chat.get().getId()));
+                    Collection<User> users = persistenceUserService.get().stream().filter(e -> !bannedUserSet.contains(e) && currentUsers.contains(e)).collect(Collectors.toList());
+                    req.setAttribute("usersToBan", users);
+                } else {
+                    resp.getOutputStream().write(" you dont have permissions to participate at that chat".getBytes(StandardCharsets.UTF_8));
+                    return;
+                }
             }
-        } catch (Exception exception) {
+        } catch (ChatAppException exception) {
             resp.getOutputStream().write(exception.getMessage().getBytes(StandardCharsets.UTF_8));
             return;
         }
@@ -79,64 +78,22 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<String, String[]> parameters = req.getParameterMap();
-        ChatType chatType = ChatType.valueOf(parameters.get("chatType")[0]);
-        User current = null;
+        ChatParamExtractor chatParamExtractor = ChatRequestParamExtractorBuilder.build(req.getParameterMap());
+        Optional<Chat> chat = chatParamExtractor.putChat(req.getParameterMap());
         try {
-            current = authService.getCurrentUser(req.getCookies());
-        } catch (Exception ex) {
-            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
-            return;
-        }
-        String chatName = "";
-        try {
-            chatName = parameters.get("chatName")[0];
-        } catch (Exception ex) {
-            if (chatType == ChatType.ROOM || chatType == ChatType.GROUP) {
-                resp.getOutputStream().write("chat name is required".getBytes(StandardCharsets.UTF_8));
-                return;
+            User current = authService.getCurrentUser(req.getCookies());
+            if (chat.isPresent()) {
+                chat.get().setChatOwner(current);
+                persistenceChatService.addChat(chat.get());
+                req.setAttribute("chat", chat.get());
+                req.setAttribute("chatType", chat.get().getType());
+                req.setAttribute("id", chat.get().getId());
+                resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d", chat.get().getType(), chat.get().getId()));
             }
+        } catch (ChatAppException e) {
+            resp.getOutputStream().write(e.getMessage().getBytes(StandardCharsets.UTF_8));
         }
-        Chat anyChat = null;
-        try {
-            switch (chatType) {
-                case PRIVATE:
-                    PrivateChat privateChat = new PrivateChat();
-                    privateChat.setChatOwner(current);
-                    persistencePrivateChatService.addChat(privateChat);
-                    anyChat = privateChat;
-                    break;
-                case ROOM:
-                    RoomChat roomChat = new RoomChat();
-                    roomChat.setName(chatName);
-                    roomChat.setChatOwner(current);
-                    persistenceRoomChatService.addChat(roomChat);
-                    anyChat = roomChat;
-                    break;
-                case GROUP:
 
-                    GroupChat groupChat = new GroupChat();
-                    groupChat.setName(chatName);
-                    groupChat.setChatOwner(current);
-                    try {
-                        groupChat.setUsersCount(Integer.parseInt(parameters.get("usersCount")[0]));
-                    } catch (Exception ex) {
-                        resp.getOutputStream().write("users count is required".getBytes(StandardCharsets.UTF_8));
-                        return;
-                    }
-                    persistenceGroupChatService.addChat(groupChat);
-                    anyChat = groupChat;
-                    break;
-                default:
-                    resp.getOutputStream().write("chat type not found exception".getBytes(StandardCharsets.UTF_8));
-            }
-        } catch (Exception ex) {
-            resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
-            return;
-        }
-        req.setAttribute("chat", anyChat);
-        req.setAttribute("chatType", chatType);
-        req.setAttribute("id", anyChat.getId());
-        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d", chatType, anyChat.getId()));
+
     }
 }

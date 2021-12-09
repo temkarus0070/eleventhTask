@@ -23,4 +23,12 @@ public class RoomChatParamExtractor implements ChatParamExtractor<RoomChat> {
             roomChat = persistenceRoomChatService.getChat(id);
         return roomChat;
     }
+
+    @Override
+    public Optional<RoomChat> putChat(Map<String, String[]> params) {
+        Optional<RoomChat> roomChatOptional = Optional.of(new RoomChat());
+        String chatName = params.get("chatName")[0];
+        roomChatOptional.get().setName(chatName);
+        return roomChatOptional;
+    }
 }

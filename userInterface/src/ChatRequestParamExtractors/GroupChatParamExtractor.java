@@ -5,6 +5,7 @@ import chatApp.domain.chat.GroupChat;
 import chatApp.services.persistence.ChatStorage;
 import chatApp.services.persistence.implementation.PersistenceGroupChatServiceImpl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,14 +14,25 @@ public class GroupChatParamExtractor implements ChatParamExtractor<GroupChat> {
 
     @Override
     public Optional<GroupChat> extractChat(Map<String, String[]> params) {
-        int id = Integer.parseInt(params.get("chatId")[0]);
-        Optional<GroupChat> groupChat = Optional.empty();
-        if (params.get("chatName") != null) {
-            String chatName = params.get("chatName")[0];
-            if (chatName != null)
-                groupChat = persistenceGroupChatService.getChatByName(chatName);
-        } else
-            groupChat = persistenceGroupChatService.getChat(id);
-        return groupChat;
+        Optional<GroupChat> optionalGroupChat = Optional.empty();
+        if (params.get("chatId") != null) {
+            int id = Integer.parseInt(params.get("chatId")[0]);
+            optionalGroupChat = persistenceGroupChatService.getChat(id);
+        } else if (params.get("chatName") != null) {
+            optionalGroupChat = persistenceGroupChatService.getChatByName(params.get("chatName")[0]);
+        }
+        return optionalGroupChat;
+    }
+
+    @Override
+    public Optional<GroupChat> putChat(Map<String, String[]> params) {
+        Optional<GroupChat> optionalGroupChat = Optional.empty();
+        String chatName = params.get("chatName")[0];
+        GroupChat groupChat = new GroupChat();
+        groupChat.setName(chatName);
+        groupChat.setUsersCount(Integer.parseInt(params.get("usersCount")[0]));
+        persistenceGroupChatService.addChat(groupChat);
+        optionalGroupChat = Optional.of(groupChat);
+        return Optional.empty();
     }
 }

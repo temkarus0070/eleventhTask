@@ -1,6 +1,7 @@
 package ChatRequestParamExtractors;
 
 import chatApp.domain.chat.ChatType;
+import chatApp.domain.exceptions.ClassOfChatAppNotFoundException;
 
 import java.util.Map;
 
@@ -15,5 +16,6 @@ public class ChatRequestParamExtractorBuilder {
             case GROUP:
                 return new GroupChatParamExtractor();
         }
+        throw new ClassOfChatAppNotFoundException();
     }
 }

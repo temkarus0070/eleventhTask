@@ -1,6 +1,7 @@
 package servlets.auth;
 
 import chatApp.domain.User;
+import chatApp.domain.exceptions.ChatAppException;
 import chatApp.domain.exceptions.UsernameAlreadyExistException;
 import chatApp.services.AuthService;
 import chatApp.services.AuthServiceImpl;
@@ -32,16 +33,17 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    try{
-        String username=req.getParameterMap().get("username")[0];
-        String password=req.getParameterMap().get("password")[0];
-        User user=authService.register(username,password);
-        resp.addCookie(new Cookie("username",user.getName()));
-        resp.addCookie(new Cookie("password",user.getPassword()));
-        resp.sendRedirect("/");
-    } catch (Exception usernameAlreadyExistException){
-        resp.getOutputStream().write((usernameAlreadyExistException.getMessage().getBytes(StandardCharsets.UTF_8)));
+        try {
+            String username = req.getParameterMap().get("username")[0];
+            String password = req.getParameterMap().get("password")[0];
+            if (authService.register(username, password)) {
+                resp.addCookie(new Cookie("username", username));
+                resp.addCookie(new Cookie("password", password));
+                resp.sendRedirect("/");
+            }
+        } catch (ChatAppException usernameAlreadyExistException) {
+            resp.getOutputStream().write((usernameAlreadyExistException.getMessage().getBytes(StandardCharsets.UTF_8)));
 
-    }
+        }
     }
 }
