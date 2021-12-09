@@ -2,6 +2,7 @@ package servlets;
 
 import ChatRequestParamExtractors.ChatParamExtractor;
 import ChatRequestParamExtractors.ChatRequestParamExtractorBuilder;
+import chatApp.MyLogger;
 import chatApp.domain.User;
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class ChatServlet extends HttpServlet {
@@ -65,6 +67,7 @@ public class ChatServlet extends HttpServlet {
                 }
             }
         } catch (ChatAppException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             resp.getOutputStream().write(exception.getMessage().getBytes(StandardCharsets.UTF_8));
             return;
         }
@@ -91,6 +94,7 @@ public class ChatServlet extends HttpServlet {
                 resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%d", chat.get().getType(), chat.get().getId()));
             }
         } catch (ChatAppException e) {
+            MyLogger.log(Level.SEVERE, e.getMessage());
             resp.getOutputStream().write(e.getMessage().getBytes(StandardCharsets.UTF_8));
         }
 

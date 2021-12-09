@@ -86,6 +86,7 @@ public class ChatStorage implements ChatRepository {
                     "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
                     " WHERE c.name=? and c.chat_type::text = any(?::text[])");
             preparedStatement.setArray(2, array);
+            preparedStatement.setString(1, name);
 
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
             return Optional.ofNullable(chat);

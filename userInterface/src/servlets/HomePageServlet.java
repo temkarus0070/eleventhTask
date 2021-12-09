@@ -1,5 +1,6 @@
 package servlets;
 
+import chatApp.MyLogger;
 import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
 
 public class HomePageServlet extends HttpServlet {
     private PersistenceRoomChatServiceImpl roomChatService;
@@ -58,6 +60,7 @@ public class HomePageServlet extends HttpServlet {
             req.setAttribute("chatType", chatType.name());
             getServletContext().getRequestDispatcher("/jsp/home.jsp").forward(req, resp);
         } catch (Exception ex) {
+            MyLogger.log(Level.SEVERE, ex.getMessage());
             resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
     }

@@ -39,9 +39,11 @@ public class UserServlet extends HttpServlet {
 
             String username = req.getParameter("username");
             Integer chatId = Integer.parseInt(req.getParameter("chatId"));
-            String chatType = req.getParameter("chatType");
-            persistenceChatService.addUser(username, chatId);
-            resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s", chatType, chatId));
+            String chatTypeInStr = req.getParameter("chatType");
+            ChatType chatType = ChatType.valueOf(chatTypeInStr);
+            PersistenceChatService persistenceChatService1 = PersistenceChatServiceFactory.create(chatType, new ChatStorage(chatType));
+            persistenceChatService1.addUser(username, chatId);
+            resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s", chatTypeInStr, chatId));
         } catch (Exception ex) {
             resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }

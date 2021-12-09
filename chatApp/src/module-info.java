@@ -10,4 +10,5 @@ module chatApp {
     exports chatApp.services;
     exports chatApp.factories;
     exports chatApp.services.persistence;
+    exports chatApp;
 }

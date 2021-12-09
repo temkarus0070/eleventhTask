@@ -31,8 +31,7 @@ public class GroupChatParamExtractor implements ChatParamExtractor<GroupChat> {
         GroupChat groupChat = new GroupChat();
         groupChat.setName(chatName);
         groupChat.setUsersCount(Integer.parseInt(params.get("usersCount")[0]));
-        persistenceGroupChatService.addChat(groupChat);
         optionalGroupChat = Optional.of(groupChat);
-        return Optional.empty();
+        return optionalGroupChat;
     }
 }

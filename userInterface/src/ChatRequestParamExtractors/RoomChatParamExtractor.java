@@ -14,13 +14,15 @@ public class RoomChatParamExtractor implements ChatParamExtractor<RoomChat> {
     @Override
     public Optional<RoomChat> extractChat(Map<String, String[]> params) {
         Optional<RoomChat> roomChat = Optional.empty();
-        int id = Integer.parseInt(params.get("chatId")[0]);
-        if (params.get("chatName") != null) {
+        if (params.get("chatId") != null) {
+            int id = Integer.parseInt(params.get("chatId")[0]);
+            roomChat = persistenceRoomChatService.getChat(id);
+        } else if (params.get("chatName") != null) {
             String chatName = params.get("chatName")[0];
             if (chatName != null)
                 roomChat = persistenceRoomChatService.getChatByName(chatName);
-        } else
-            roomChat = persistenceRoomChatService.getChat(id);
+
+        }
         return roomChat;
     }
 
