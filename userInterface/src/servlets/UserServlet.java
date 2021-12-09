@@ -17,11 +17,20 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class UserServlet extends HttpServlet {
-    PersistenceChatService persistenceChatService;
+    PersistenceChatService persistenceChatService = new PersistenceChatServiceImpl(new ChatStorage(ChatType.ANY));
 
     @Override
     public void init() throws ServletException {
         super.init();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String username = req.getParameter("username");
+        String chatType = req.getParameter("chatType");
+        Integer chatId = Integer.parseInt(req.getParameter("chatId"));
+        persistenceChatService.banUserInChat(username, chatId);
+        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s", chatType, chatId));
     }
 
     @Override
@@ -31,7 +40,6 @@ public class UserServlet extends HttpServlet {
             String username = req.getParameter("username");
             Integer chatId = Integer.parseInt(req.getParameter("chatId"));
             String chatType = req.getParameter("chatType");
-            persistenceChatService = PersistenceChatServiceFactory.create(ChatType.valueOf(chatType), new ChatStorage(ChatType.ANY));
             persistenceChatService.addUser(username, chatId);
             resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s", chatType, chatId));
         } catch (Exception ex) {

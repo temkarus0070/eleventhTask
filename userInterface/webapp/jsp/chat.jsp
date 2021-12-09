@@ -37,10 +37,19 @@ pageEncoding="UTF-8"%>
             <option value="${user.getName()}">${user.getName()}</option>
         </c:forEach>
     </select>
-    <input type="submit" value="add user" />
+    <input type="submit" value="add user"/>
 </form>
 
-
+<form action="../user" method="get">
+    <input type="hidden" value="${chat.getType()}" name="chatType"/>
+    <input type="hidden" value="${chat.getId()}" name="chatId">
+    <select name="username">
+        <c:forEach items="${usersToBan}" var="user">
+            <option value="${user.getName()}">${user.getName()}</option>
+        </c:forEach>
+    </select>
+    <input type="submit" value="ban user"/>
+</form>
 
 
 <c:forEach items="${chat.getMessages()}" var="message">

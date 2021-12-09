@@ -1,5 +1,6 @@
 package chatApp.services.persistence.implementation;
 
+import chatApp.MyLogger;
 import chatApp.domain.User;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.domain.exceptions.UsernameAlreadyExistException;
@@ -10,12 +11,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class PersistenceUserServiceImpl implements PersistenceUserService {
     private UserRepository userRepository;
 
     public PersistenceUserServiceImpl(UserRepository userRepository) {
-        this.userRepository=userRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -23,7 +25,10 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
         Optional<User> userOptional = getUser(user.getName());
         if (userOptional.isEmpty())
             userRepository.add(user);
-        else throw new ChatAppDatabaseException(new UsernameAlreadyExistException());
+        else {
+            MyLogger.log(Level.SEVERE, String.format("user %s already exists", user.getName()));
+            throw new ChatAppDatabaseException(new UsernameAlreadyExistException());
+        }
     }
 
     @Override

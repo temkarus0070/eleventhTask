@@ -1,5 +1,6 @@
 package chatApp.services.persistence.implementation;
 
+import chatApp.MyLogger;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.RoomChat;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
@@ -9,11 +10,12 @@ import chatApp.services.persistence.interfaces.PersistenceChatService;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<RoomChat>  implements PersistenceChatService<RoomChat>{
-    private ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
     public PersistenceRoomChatServiceImpl(ChatRepository repository) {
         super(repository);
@@ -21,19 +23,16 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
     }
 
     public Optional<RoomChat> getChatByName(String name) throws ChatAppDatabaseException {
-        return chatRepository.getChatByName(name).stream()
-                .map(chat -> (RoomChat) chat)
-                .findFirst();
+        return Optional.of((RoomChat) chatRepository.getChatByName(name).get());
     }
 
 
     @Override
     public Optional<RoomChat> getChat(int id) throws ChatAppDatabaseException {
         try {
-            return Stream.of(chatRepository.get(id))
-                    .map(chat -> (RoomChat) chat)
-                    .findFirst();
+            return Optional.ofNullable((RoomChat) chatRepository.get(id));
         } catch (ChatAppDatabaseException ex) {
+            MyLogger.log(Level.SEVERE, String.format("chat not found with id=%d", id));
             throw new ChatAppDatabaseException("chat not found ChatAppDatabaseException");
         }
     }
@@ -52,7 +51,9 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
         if (existedChat.isPresent()) {
             if (!chat.getName().equals(existedChat.get().getName())) {
                 if (getChatByName(chat.getName()).isPresent()) {
-                    throw new ChatAppDatabaseException(new ChatAlreadyExistsException());
+                    ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
+                    MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+                    throw new ChatAppDatabaseException(chatAlreadyExistsException);
                 }
             }
             this.chatRepository.update(chat);
@@ -70,7 +71,9 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
     public void addChat(RoomChat chat) throws ChatAppDatabaseException {
         Optional<RoomChat> chatOptional = getChatByName(chat.getName());
         if (chatOptional.isPresent()) {
-            throw new ChatAppDatabaseException(new ChatAlreadyExistsException());
+            ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
+            MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+            throw new ChatAppDatabaseException(chatAlreadyExistsException);
         } else {
             chatRepository.add(chat);
         }

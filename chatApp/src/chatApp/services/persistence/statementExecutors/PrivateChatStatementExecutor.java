@@ -1,15 +1,18 @@
 package chatApp.services.persistence.statementExecutors;
 
+import chatApp.MyLogger;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.PrivateChat;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.services.persistence.ConnectionManager;
 
 import java.sql.*;
+import java.util.logging.Level;
 
 public class PrivateChatStatementExecutor implements StatementExecutor<PrivateChat> {
     @Override
     public void executeUpdate(PrivateChat chat) throws ChatAppDatabaseException {
+        MyLogger.log(Level.SEVERE, "PrivateChat can't be updated");
         throw new UnsupportedOperationException();
     }
 
@@ -25,6 +28,7 @@ public class PrivateChatStatementExecutor implements StatementExecutor<PrivateCh
             chat.setId(id);
             return chat;
         } catch (SQLException sqlException) {
+            MyLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
         }
     }

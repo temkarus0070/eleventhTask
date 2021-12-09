@@ -1,5 +1,6 @@
 package chatApp.services.persistence.implementation;
 
+import chatApp.MyLogger;
 import chatApp.domain.chat.*;
 
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
@@ -10,6 +11,8 @@ import chatApp.services.persistence.interfaces.PersistenceChatService;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,21 +25,18 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
     }
 
     public Optional<GroupChat> getChatByName(String name) throws ChatAppDatabaseException {
-        return repository.getChatByName(name)
-                .stream()
-                .map(chat -> (GroupChat) chat)
-                .findFirst();
+        return Optional.of((GroupChat) repository.getChatByName(name).get());
+
     }
 
 
     @Override
     public Optional<GroupChat> getChat(int id) throws ChatAppDatabaseException {
         try {
-            return Stream.of(repository.get(id))
-                    .map(chat -> (GroupChat) chat)
-                    .findFirst();
+            return Optional.ofNullable((GroupChat) repository.get(id));
         } catch (ChatAppDatabaseException ex) {
-            throw new ChatAppDatabaseException("chat not found ChatAppDatabaseException");
+            MyLogger.log(Level.SEVERE, ex.getMessage());
+            throw new ChatAppDatabaseException(ex.getMessage());
         }
     }
 
@@ -52,10 +52,13 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
         Optional<GroupChat> existedChat = getChat(chat.getId());
         if (existedChat.isPresent()) {
             if (chat.getUsersCount() < chat.getUserList().size()) {
-                throw new ChatAppDatabaseException("Your chat size will be less than current users count. Remove users or set greater value");
+                MyLogger.log(Level.SEVERE, "Your chat size can't be less than current users count. Remove users or set greater value");
+                throw new ChatAppDatabaseException("Your chat size can't be less than current users count. Remove users or set greater value");
             } else if (!chat.getName().equals(existedChat.get().getName())) {
                 if (getChatByName(chat.getName()).isPresent()) {
-                    throw new ChatAppDatabaseException(new ChatAlreadyExistsException());
+                    ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
+                    MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+                    throw new ChatAppDatabaseException(chatAlreadyExistsException);
                 }
             }
             this.repository.update(chat);
@@ -67,7 +70,9 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
     public void addChat(GroupChat chat) throws ChatAppDatabaseException {
         Optional<GroupChat> chatOptional = getChatByName(chat.getName());
         if (chatOptional.isPresent()) {
-            throw new ChatAppDatabaseException(new ChatAlreadyExistsException());
+            ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
+            MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+            throw new ChatAppDatabaseException(chatAlreadyExistsException);
         } else {
             repository.add(chat);
         }
@@ -86,7 +91,11 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
         if (groupChat.isPresent()) {
             if (groupChat.get().getUsersCount() >= groupChat.get().getUserList().size() + 1)
                 repository.addUserToChat(username, chatId);
-            else throw new ChatAppDatabaseException(new ChatUsersOverflowException());
+            else {
+                ChatUsersOverflowException chatUsersOverflowException = new ChatUsersOverflowException();
+                MyLogger.log(Level.SEVERE, chatUsersOverflowException.getMessage());
+                throw new ChatAppDatabaseException(chatUsersOverflowException);
+            }
         }
     }
 }

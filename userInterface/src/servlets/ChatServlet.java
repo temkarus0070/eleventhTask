@@ -1,5 +1,7 @@
 package servlets;
 
+import ChatRequestParamExtractors.ChatParamExtractor;
+import ChatRequestParamExtractors.ChatRequestParamExtractorBuilder;
 import chatApp.domain.User;
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAlreadyExistsException;
@@ -51,44 +53,14 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String chatName;
-        Chat anyChat = null;
-        int id = 0;
         try {
-            ChatType type = ChatType.valueOf(req.getParameterMap().get("chatType")[0]);
-            if (req.getParameterMap().get("chatId") != null)
-                id = Integer.parseInt(req.getParameterMap().get("chatId")[0]);
-            switch (type) {
-                case PRIVATE:
-                    Optional<PrivateChat> chat = Optional.empty();
-                    chat = persistencePrivateChatService.getChat(id);
-                    anyChat = chat.get();
-                    break;
-                case GROUP:
-                    Optional<GroupChat> groupChat = Optional.empty();
-                    if (req.getParameterMap().get("chatName") != null) {
-                        chatName = req.getParameterMap().get("chatName")[0];
-                        if (chatName != null)
-                            groupChat = persistenceGroupChatService.getChatByName(chatName);
-                    } else
-                        groupChat = persistenceGroupChatService.getChat(id);
-                    anyChat = groupChat.get();
-                    break;
-                case ROOM:
-                    Optional<RoomChat> roomChat = Optional.empty();
-                    if (req.getParameterMap().get("chatName") != null) {
-                        chatName = req.getParameterMap().get("chatName")[0];
-                        if (chatName != null)
-                            roomChat = persistenceRoomChatService.getChatByName(chatName);
-                    } else
-                        roomChat = persistenceRoomChatService.getChat(id);
-                    anyChat = roomChat.get();
-                    break;
-            }
+            ChatParamExtractor chatParamExtractor = ChatRequestParamExtractorBuilder.build(req.getParameterMap());
+            Optional<Chat> chat = chatParamExtractor.extractChat(req.getParameterMap());
             User current = authService.getCurrentUser(req.getCookies());
-            if (anyChat != null && hasPermissions(current, anyChat)) {
-                req.setAttribute("chat", anyChat);
-                req.setAttribute("users", persistenceUserService.getUsersNotAtThatChat(anyChat.getId()));
+            if (chat.isPresent() && hasPermissions(current, chat.get())) {
+                req.setAttribute("chat", chat.get());
+                req.setAttribute("users", persistenceUserService.getUsersNotAtThatChat(chat.get().getId()));
+                req.setAttribute("usersToBan", persistenceUserService.get());
             } else {
                 resp.getOutputStream().write(" you dont have permissions to participate at that chat".getBytes(StandardCharsets.UTF_8));
                 return;

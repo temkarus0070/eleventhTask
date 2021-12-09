@@ -1,11 +1,13 @@
 package chatApp.services.persistence.statementExecutors;
 
+import chatApp.MyLogger;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.RoomChat;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.services.persistence.ConnectionManager;
 
 import java.sql.*;
+import java.util.logging.Level;
 
 public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
     @Override
@@ -17,6 +19,7 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
             preparedStatement.setInt(2, roomChat.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
+            MyLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
         }
 
@@ -36,6 +39,7 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
             chat.setId(id);
             return chat;
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }

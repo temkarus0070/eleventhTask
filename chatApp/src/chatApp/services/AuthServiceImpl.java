@@ -1,5 +1,6 @@
 package chatApp.services;
 
+import chatApp.MyLogger;
 import chatApp.domain.User;
 import chatApp.domain.exceptions.InvalidAuthDataException;
 import chatApp.domain.exceptions.UserNotExistsException;
@@ -13,6 +14,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class AuthServiceImpl implements AuthService {
     private PersistenceUserService persistenceUserService;
@@ -74,6 +76,7 @@ public class AuthServiceImpl implements AuthService {
         if(cookie!=null){
            return persistenceUserService.getUser(cookie.getValue()).get();
         }
+        MyLogger.log(Level.SEVERE, "User not exists");
         throw new UserNotExistsException();
     }
 }

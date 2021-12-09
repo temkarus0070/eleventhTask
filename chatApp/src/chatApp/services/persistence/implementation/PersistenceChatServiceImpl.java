@@ -1,5 +1,6 @@
 package chatApp.services.persistence.implementation;
 
+import chatApp.MyLogger;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.Message;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
@@ -9,9 +10,10 @@ import chatApp.services.persistence.interfaces.PersistenceChatService;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceChatService<T> {
-    private ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
     public PersistenceChatServiceImpl(ChatRepository repository) {
         this.chatRepository = repository;
@@ -66,6 +68,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
         Optional<T> chat = getChat(chatId);
         if (chat.isPresent()) {
             if (chat.get().getBannedUsers().contains(message.getSender())) {
+                MyLogger.log(Level.SEVERE, String.format("user %s was banned", message.getSender().getName()));
                 throw new ChatAppDatabaseException(new UserBannedException());
             } else
                 chatRepository.addMessage(message, chatId);

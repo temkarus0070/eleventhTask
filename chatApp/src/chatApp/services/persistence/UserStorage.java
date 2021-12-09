@@ -1,5 +1,6 @@
 package chatApp.services.persistence;
 
+import chatApp.MyLogger;
 import chatApp.domain.User;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.services.persistence.interfaces.UserRepository;
@@ -9,6 +10,7 @@ import chatApp.services.persistence.mappers.UsersExtractor;
 import java.sql.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
 
 public class UserStorage implements UserRepository {
     private UsersExtractor usersExtractor=UsersExtractor.getInstance();
@@ -25,6 +27,7 @@ public class UserStorage implements UserRepository {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM users");
             return usersExtractor.extract(resultSet);
         } catch (SQLException | ChatAppDatabaseException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -36,6 +39,7 @@ public class UserStorage implements UserRepository {
             preparedStatement.setString(1, s);
             return userExtractor.extract(preparedStatement.executeQuery());
         } catch (SQLException | ChatAppDatabaseException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -48,6 +52,7 @@ public class UserStorage implements UserRepository {
             preparedStatement.setString(2, entity.getPassword());
             preparedStatement.executeUpdate();
         } catch (SQLException | ChatAppDatabaseException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -73,6 +78,7 @@ public class UserStorage implements UserRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             return usersExtractor.extract(resultSet);
         } catch (SQLException | ChatAppDatabaseException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }

@@ -1,5 +1,6 @@
 package chatApp.services.persistence;
 
+import chatApp.MyLogger;
 import chatApp.domain.chat.*;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
 import chatApp.factories.StatementExecutorFactory;
@@ -12,6 +13,9 @@ import chatApp.services.persistence.statementExecutors.StatementExecutor;
 import java.sql.*;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class ChatStorage implements ChatRepository {
     private final ChatType chatType;
@@ -29,6 +33,7 @@ public class ChatStorage implements ChatRepository {
             String[] array = chatType.getValues();
             this.array = connection.createArrayOf("text", array);
         } catch (SQLException sqlException) {
+            MyLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
         }
 
@@ -44,6 +49,7 @@ public class ChatStorage implements ChatRepository {
             ResultSet resultSet = statement.executeQuery();
             return chatsExtractor.extract(resultSet);
         } catch (SQLException sqlException) {
+            MyLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
         }
     }
@@ -63,6 +69,7 @@ public class ChatStorage implements ChatRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             return chatsExtractor.extract(resultSet);
         } catch (SQLException throwables) {
+            MyLogger.log(Level.SEVERE, throwables.getMessage());
             throw new ChatAppDatabaseException(throwables);
         }
 
@@ -83,6 +90,7 @@ public class ChatStorage implements ChatRepository {
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
             return Optional.ofNullable(chat);
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -95,6 +103,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(1, user);
             preparedStatement.executeUpdate();
         } catch (SQLException chatAppDatabaseException) {
+            MyLogger.log(Level.SEVERE, chatAppDatabaseException.getMessage());
             throw new ChatAppDatabaseException(chatAppDatabaseException);
         }
     }
@@ -107,6 +116,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -120,6 +130,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -133,6 +144,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setInt(3, chatId);
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -149,6 +161,7 @@ public class ChatStorage implements ChatRepository {
 
             return chatExtractor.extract(preparedStatement.executeQuery());
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -163,6 +176,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement1.setInt(2, entity.getId());
             preparedStatement1.executeUpdate();
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }
@@ -175,6 +189,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setInt(1, integer);
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
+            MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }

@@ -1,5 +1,6 @@
 package chatApp.services.persistence.implementation;
 
+import chatApp.MyLogger;
 import chatApp.domain.chat.ChatType;
 import chatApp.domain.chat.PrivateChat;
 import chatApp.domain.exceptions.ChatAppDatabaseException;
@@ -9,6 +10,7 @@ import chatApp.services.persistence.interfaces.PersistenceChatService;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,11 +25,10 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
     @Override
     public Optional<PrivateChat> getChat(int id) throws ChatAppDatabaseException {
         try {
-            return Stream.of(chatRepository.get(id))
-                    .map(chat -> (PrivateChat) chat)
-                    .findFirst();
+            return Optional.ofNullable((PrivateChat) chatRepository.get(id));
         } catch (ChatAppDatabaseException ex) {
-            throw new ChatAppDatabaseException("chat not found ChatAppDatabaseException");
+            MyLogger.log(Level.SEVERE, ex.getMessage());
+            throw new ChatAppDatabaseException(ex.getMessage());
         }
     }
 
@@ -54,8 +55,11 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
         if (privateChat.isPresent()) {
             if (privateChat.get().getUserList().size() < 2)
                 chatRepository.addUserToChat(username, chatId);
-            else
-                throw new ChatAppDatabaseException(new ChatUsersOverflowException());
+            else {
+                ChatUsersOverflowException chatUsersOverflowException = new ChatUsersOverflowException();
+                MyLogger.log(Level.SEVERE, chatUsersOverflowException.getMessage());
+                throw new ChatAppDatabaseException(chatUsersOverflowException);
+            }
         }
     }
 

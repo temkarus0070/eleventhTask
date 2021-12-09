@@ -50,12 +50,16 @@ public class ChatExtractor implements Extractor<Chat>{
                     break;
             }
 
+            List<User> bannnedUsers = new ArrayList<>();
             List<User> userList = new ArrayList<>();
             List<Message> messageList = new ArrayList<>();
             Set<User> userSet = new HashSet<>();
             do {
                 User user = new User(resultSet.getString("username"));
                 if (!userSet.contains(user)) {
+                    if (resultSet.getBoolean("has_ban")) {
+                        bannnedUsers.add(user);
+                    }
                     userList.add(user);
                     userSet.add(user);
                 }
@@ -63,6 +67,7 @@ public class ChatExtractor implements Extractor<Chat>{
                 messageList.add(message);
             }
             while (resultSet.next());
+            chat.setBannedUsers(bannnedUsers);
             chat.setUserList(userList);
             chat.setMessages(messageList);
         }
