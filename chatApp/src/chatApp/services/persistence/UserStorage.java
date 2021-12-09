@@ -11,18 +11,16 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class UserStorage implements UserRepository {
-    private ConnectionManager connectionManager;
     private UsersExtractor usersExtractor=UsersExtractor.getInstance();
     private UserExtractor userExtractor=UserExtractor.getInstance();
 
 
     public UserStorage() {
-        connectionManager = new ConnectionManager();
     }
 
     @Override
     public Collection<User> get() throws ChatAppDatabaseException {
-        try (Connection connection = connectionManager.getConnection()) {
+        try (Connection connection = ConnectionManager.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM users");
             return usersExtractor.extract(resultSet);
@@ -33,7 +31,7 @@ public class UserStorage implements UserRepository {
 
     @Override
     public User get(String s) throws ChatAppDatabaseException {
-        try (Connection connection = connectionManager.getConnection()) {
+        try (Connection connection = ConnectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users where username=?");
             preparedStatement.setString(1, s);
             return userExtractor.extract(preparedStatement.executeQuery());
@@ -44,7 +42,7 @@ public class UserStorage implements UserRepository {
 
     @Override
     public void add(User entity) throws ChatAppDatabaseException {
-        try (Connection connection = connectionManager.getConnection()) {
+        try (Connection connection = ConnectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users(username,password) VALUES (?,?)");
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setString(2, entity.getPassword());
@@ -67,7 +65,7 @@ public class UserStorage implements UserRepository {
 
     @Override
     public Collection<User> getUsersNotAtThatChat(Integer chatId) throws ChatAppDatabaseException {
-        try (Connection connection = connectionManager.getConnection()) {
+        try (Connection connection = ConnectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT distinct * FROM users u " +
                     "WHERE NOT EXISTS(" +
                     "SELECT * FROM users_chats us WHERE us.username=u.username and us.chat_id=? ) ");
