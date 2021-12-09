@@ -65,8 +65,11 @@ public class ChatServlet extends HttpServlet {
                     resp.getOutputStream().write(" you dont have permissions to participate at that chat".getBytes(StandardCharsets.UTF_8));
                     return;
                 }
+            } else {
+                resp.getOutputStream().write("chat not found".getBytes(StandardCharsets.UTF_8));
+                return;
             }
-        } catch (ChatAppException exception) {
+        } catch (Exception exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
             resp.getOutputStream().write(exception.getMessage().getBytes(StandardCharsets.UTF_8));
             return;
