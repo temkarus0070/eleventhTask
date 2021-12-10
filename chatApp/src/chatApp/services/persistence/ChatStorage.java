@@ -47,6 +47,7 @@ public class ChatStorage implements ChatRepository {
             statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text in ? ORDER BY id");
             statement.setArray(1, array);
             ResultSet resultSet = statement.executeQuery();
+            statement.close();
             return chatsExtractor.extract(resultSet);
         } catch (SQLException sqlException) {
             MyLogger.log(Level.SEVERE, sqlException.getMessage());
@@ -67,6 +68,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
+            preparedStatement.close();
             return chatsExtractor.extract(resultSet);
         } catch (SQLException throwables) {
             MyLogger.log(Level.SEVERE, throwables.getMessage());
@@ -89,6 +91,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(1, name);
 
             Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
+            preparedStatement.close();
             return Optional.ofNullable(chat);
         } catch (SQLException exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
@@ -103,6 +106,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setInt(2, chatId);
             preparedStatement.setString(1, user);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException chatAppDatabaseException) {
             MyLogger.log(Level.SEVERE, chatAppDatabaseException.getMessage());
             throw new ChatAppDatabaseException(chatAppDatabaseException);
@@ -116,6 +120,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(1, user);
             preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
@@ -130,6 +135,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(1, user);
             preparedStatement.setInt(2, chatId);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
@@ -144,6 +150,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement.setString(2, message.getSender().getName());
             preparedStatement.setInt(3, chatId);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
@@ -159,7 +166,7 @@ public class ChatStorage implements ChatRepository {
                     " WHERE c.id=? AND c.chat_type::text = any(?::text[])");
             preparedStatement.setArray(2, array);
             preparedStatement.setInt(1, integer);
-
+            preparedStatement.close();
             return chatExtractor.extract(preparedStatement.executeQuery());
         } catch (SQLException exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
@@ -176,6 +183,7 @@ public class ChatStorage implements ChatRepository {
             preparedStatement1.setString(1, entity.getChatOwner().getName());
             preparedStatement1.setInt(2, entity.getId());
             preparedStatement1.executeUpdate();
+            preparedStatement1.close();
         } catch (SQLException exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
@@ -189,6 +197,7 @@ public class ChatStorage implements ChatRepository {
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM chats where id=?");
             preparedStatement.setInt(1, integer);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException exception) {
             MyLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);

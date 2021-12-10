@@ -19,6 +19,7 @@ public class GroupChatStatementExecutor implements StatementExecutor<GroupChat> 
             preparedStatement.setInt(2, groupChat.getUsersCount());
             preparedStatement.setInt(3, groupChat.getId());
             preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException sqlException) {
             MyLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
@@ -35,6 +36,7 @@ public class GroupChatStatementExecutor implements StatementExecutor<GroupChat> 
             preparedStatement.setInt(2, groupChat.getUsersCount());
             preparedStatement.setString(3, groupChat.getChatOwner().getName());
             preparedStatement.executeUpdate();
+            preparedStatement.close();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             resultSet.next();
             int id = resultSet.getInt(1);
