@@ -12,9 +12,10 @@ import java.util.logging.Level;
 public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
     @Override
     public void executeUpdate(RoomChat chat) throws ChatAppDatabaseException {
-        try (Connection connection = ConnectionManager.getConnection()) {
+        try (Connection connection = ConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE chats SET name=? where id=?");) {
             RoomChat roomChat = chat;
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE chats SET name=? where id=?");
+
             preparedStatement.setString(1, roomChat.getName());
             preparedStatement.setInt(2, roomChat.getId());
             preparedStatement.executeUpdate();
@@ -28,9 +29,10 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
 
     @Override
     public Chat executeAdd(RoomChat chat) throws ChatAppDatabaseException {
-        try (Connection connection = ConnectionManager.getConnection()) {
+        try (Connection connection = ConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,name,owner) VALUES ('ROOM',?,?)", Statement.RETURN_GENERATED_KEYS);) {
             RoomChat roomChat = chat;
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,name,owner) VALUES ('ROOM',?,?)", Statement.RETURN_GENERATED_KEYS);
+
             preparedStatement.setString(1, roomChat.getName());
             preparedStatement.setString(2, roomChat.getChatOwner().getName());
             preparedStatement.executeUpdate();
