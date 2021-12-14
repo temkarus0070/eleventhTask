@@ -15,11 +15,9 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("UPDATE chats SET name=? where id=?");) {
             RoomChat roomChat = chat;
-
             preparedStatement.setString(1, roomChat.getName());
             preparedStatement.setInt(2, roomChat.getId());
             preparedStatement.executeUpdate();
-            preparedStatement.close();
         } catch (SQLException sqlException) {
             MyLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
@@ -36,7 +34,6 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
             preparedStatement.setString(1, roomChat.getName());
             preparedStatement.setString(2, roomChat.getChatOwner().getName());
             preparedStatement.executeUpdate();
-            preparedStatement.close();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             resultSet.next();
             int id = resultSet.getInt(1);

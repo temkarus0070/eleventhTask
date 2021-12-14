@@ -79,8 +79,20 @@
         <filter-name>authFilter</filter-name>
         <filter-class>servletFilters.AuthFilter</filter-class>
     </filter>
+
+
     <filter-mapping>
         <filter-name>authFilter</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>unicode</filter-name>
+        <filter-class>servletFilters.UnicodeFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>unicode</filter-name>
         <url-pattern>*</url-pattern>
     </filter-mapping>
 

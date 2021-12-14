@@ -37,7 +37,6 @@ public class GroupChatStatementExecutor implements StatementExecutor<GroupChat> 
             preparedStatement.setInt(2, groupChat.getUsersCount());
             preparedStatement.setString(3, groupChat.getChatOwner().getName());
             preparedStatement.executeUpdate();
-            preparedStatement.close();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             resultSet.next();
             int id = resultSet.getInt(1);
