@@ -40,7 +40,7 @@ pageEncoding="UTF-8"%>
     <input type="submit" value="add user"/>
 </form>
 
-<form action="../user" method="get">
+<form action="../ban" method="post">
     <input type="hidden" value="${chat.getType()}" name="chatType"/>
     <input type="hidden" value="${chat.getId()}" name="chatId">
     <select name="username">

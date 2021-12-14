@@ -1,5 +1,6 @@
 package servlets;
 
+import chatApp.MyLogger;
 import chatApp.domain.User;
 import chatApp.domain.chat.Chat;
 import chatApp.domain.chat.ChatType;
@@ -28,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class MessagesServlet extends HttpServlet {
     private PersistenceChatServiceImpl persistenceChatService;
@@ -43,8 +45,8 @@ public class MessagesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Chat chat = null;
         ChatType chatType = null;
+        Optional<Chat> chatOptional = Optional.empty();
         Map<String, String[]> params = req.getParameterMap();
         try {
             chatType = ChatType.valueOf(params.get("chatType")[0]);
@@ -54,13 +56,11 @@ public class MessagesServlet extends HttpServlet {
                 Optional<User> userOptional = persistenceUserService.getUser(Arrays.stream(req.getCookies()).filter(e -> e.getName().equals("username")).findFirst().get().getValue());
                 if (userOptional.isPresent()) {
                     String messageText = params.get("message")[0];
-                    Optional<Chat> chatOptional = persistenceChatService.getChat(id);
+                    chatOptional = persistenceChatService.getChat(id);
                     if (chatOptional.isPresent()) {
-                        chat = chatOptional.get();
                         Message message = new Message(messageText, userOptional.get());
-                        persistenceChatService.addMessage(message, chat.getId());
-                        req.setAttribute("chat", chat);
-                        chat = chatOptional.get();
+                        persistenceChatService.addMessage(message, chatOptional.get().getId());
+                        req.setAttribute("chat", chatOptional.get());
                     }
                 } else {
                     resp.getOutputStream().write("user not found exception".getBytes(StandardCharsets.UTF_8));
@@ -69,8 +69,9 @@ public class MessagesServlet extends HttpServlet {
             } else {
                 resp.getOutputStream().write("chat not found exception".getBytes(StandardCharsets.UTF_8));
             }
-            resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d", chatType, chat.getId()));
+            resp.sendRedirect(String.format("/chat?chatType=%s&chatId=%d", chatType, chatOptional.get().getId()));
         } catch (Exception ex) {
+            MyLogger.log(Level.SEVERE, ex.getMessage());
             resp.getOutputStream().write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
         }
 

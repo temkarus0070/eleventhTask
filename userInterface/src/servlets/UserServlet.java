@@ -24,19 +24,10 @@ public class UserServlet extends HttpServlet {
         super.init();
     }
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String username = req.getParameter("username");
-        String chatType = req.getParameter("chatType");
-        Integer chatId = Integer.parseInt(req.getParameter("chatId"));
-        persistenceChatService.banUserInChat(username, chatId);
-        resp.sendRedirect(String.format("../chat?chatType=%s&chatId=%s", chatType, chatId));
-    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-
             String username = req.getParameter("username");
             Integer chatId = Integer.parseInt(req.getParameter("chatId"));
             String chatTypeInStr = req.getParameter("chatType");
