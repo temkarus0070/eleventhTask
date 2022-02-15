@@ -7,8 +7,11 @@ import org.temkarus0070.application.services.persistence.ConnectionManager;
 
 import java.sql.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GroupChatStatementExecutor implements StatementExecutor<GroupChat> {
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
+
     @Override
     public void executeUpdate(GroupChat chat) throws ChatAppDatabaseException {
         try (Connection connection = ConnectionManager.getConnection();
@@ -20,7 +23,7 @@ public class GroupChatStatementExecutor implements StatementExecutor<GroupChat> 
             preparedStatement.setInt(3, groupChat.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
-            MyLogger.log(Level.SEVERE, sqlException.getMessage());
+            myLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
         }
     }
@@ -42,7 +45,7 @@ public class GroupChatStatementExecutor implements StatementExecutor<GroupChat> 
             chat.setId(id);
             return chat;
         } catch (SQLException e) {
-            MyLogger.log(Level.SEVERE, e.getMessage());
+            myLogger.log(Level.SEVERE, e.getMessage());
             throw new ChatAppDatabaseException(e);
         }
     }

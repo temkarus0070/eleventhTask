@@ -5,6 +5,11 @@ import java.io.IOException;
 
 public class UnicodeFilter implements Filter {
     @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+
+    @Override
     public void doFilter(
             ServletRequest request,
             ServletResponse response,
@@ -13,5 +18,10 @@ public class UnicodeFilter implements Filter {
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
         next.doFilter(request, response);
+    }
+
+    @Override
+    public void destroy() {
+
     }
 }

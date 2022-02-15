@@ -9,9 +9,11 @@ import org.temkarus0070.application.services.persistence.interfaces.PersistenceC
 import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<RoomChat>  implements PersistenceChatService<RoomChat>{
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private final ChatRepository chatRepository;
 
     public PersistenceRoomChatServiceImpl(ChatRepository repository) {
@@ -29,7 +31,7 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
         try {
             return Optional.ofNullable((RoomChat) chatRepository.get(id));
         } catch (ChatAppDatabaseException ex) {
-            MyLogger.log(Level.SEVERE, String.format("chat not found with id=%d", id));
+            myLogger.log(Level.SEVERE, String.format("chat not found with id=%d", id));
             throw new ChatAppDatabaseException("chat not found ChatAppDatabaseException");
         }
     }
@@ -49,7 +51,7 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
             if (!chat.getName().equals(existedChat.get().getName())) {
                 if (getChatByName(chat.getName()).isPresent()) {
                     ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
-                    MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+                    myLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
                     throw new ChatAppDatabaseException(chatAlreadyExistsException);
                 }
             }
@@ -69,7 +71,7 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
         Optional<RoomChat> chatOptional = getChatByName(chat.getName());
         if (chatOptional.isPresent()) {
             ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
-            MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+            myLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
             throw new ChatAppDatabaseException(chatAlreadyExistsException);
         } else {
             chatRepository.add(chat);

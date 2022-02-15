@@ -7,11 +7,13 @@ import org.temkarus0070.application.services.persistence.ConnectionManager;
 
 import java.sql.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PrivateChatStatementExecutor implements StatementExecutor<PrivateChat> {
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
     @Override
     public void executeUpdate(PrivateChat chat) throws ChatAppDatabaseException {
-        MyLogger.log(Level.SEVERE, "PrivateChat can't be updated");
+        myLogger.log(Level.SEVERE, "PrivateChat can't be updated");
         throw new UnsupportedOperationException();
     }
 
@@ -28,7 +30,7 @@ public class PrivateChatStatementExecutor implements StatementExecutor<PrivateCh
             chat.setId(id);
             return chat;
         } catch (SQLException sqlException) {
-            MyLogger.log(Level.SEVERE, sqlException.getMessage());
+            myLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
         }
     }

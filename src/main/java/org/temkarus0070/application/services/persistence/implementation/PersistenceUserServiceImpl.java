@@ -9,8 +9,10 @@ import org.temkarus0070.application.services.persistence.interfaces.UserReposito
 import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PersistenceUserServiceImpl implements PersistenceUserService {
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private UserRepository userRepository;
 
     public PersistenceUserServiceImpl(UserRepository userRepository) {
@@ -23,7 +25,7 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
         if (userOptional.isEmpty())
             userRepository.add(user);
         else {
-            MyLogger.log(Level.SEVERE, String.format("user %s already exists", user.getName()));
+            myLogger.log(Level.SEVERE, String.format("user %s already exists", user.getName()));
             throw new ChatAppDatabaseException(new UsernameAlreadyExistException());
         }
     }

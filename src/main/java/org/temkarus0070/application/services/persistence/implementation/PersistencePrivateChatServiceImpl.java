@@ -9,9 +9,11 @@ import org.temkarus0070.application.services.persistence.interfaces.PersistenceC
 import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImpl<PrivateChat>  implements PersistenceChatService<PrivateChat>{
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private ChatRepository chatRepository;
 
     public PersistencePrivateChatServiceImpl(ChatRepository repository) {
@@ -24,7 +26,7 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
         try {
             return Optional.ofNullable((PrivateChat) chatRepository.get(id));
         } catch (ChatAppDatabaseException ex) {
-            MyLogger.log(Level.SEVERE, ex.getMessage());
+            myLogger.log(Level.SEVERE, ex.getMessage());
             throw new ChatAppDatabaseException(ex.getMessage());
         }
     }
@@ -54,7 +56,7 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
                 chatRepository.addUserToChat(username, chatId);
             else {
                 ChatUsersOverflowException chatUsersOverflowException = new ChatUsersOverflowException();
-                MyLogger.log(Level.SEVERE, chatUsersOverflowException.getMessage());
+                myLogger.log(Level.SEVERE, chatUsersOverflowException.getMessage());
                 throw new ChatAppDatabaseException(chatUsersOverflowException);
             }
         }

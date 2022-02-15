@@ -1,7 +1,6 @@
 package org.temkarus0070.application.services.persistence.implementation;
 
-import org.temkarus0070.application.domain.chat.*;
-
+import org.temkarus0070.application.domain.chat.GroupChat;
 import org.temkarus0070.application.domain.exceptions.ChatAlreadyExistsException;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
 import org.temkarus0070.application.domain.exceptions.ChatUsersOverflowException;
@@ -11,9 +10,11 @@ import org.temkarus0070.application.services.persistence.interfaces.PersistenceC
 import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<GroupChat> implements PersistenceChatService<GroupChat> {
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private final ChatRepository repository;
 
     public PersistenceGroupChatServiceImpl(ChatRepository repository) {
@@ -32,7 +33,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
         try {
             return Optional.ofNullable((GroupChat) repository.get(id));
         } catch (ChatAppDatabaseException ex) {
-            MyLogger.log(Level.SEVERE, ex.getMessage());
+            myLogger.log(Level.SEVERE, ex.getMessage());
             throw new ChatAppDatabaseException(ex.getMessage());
         }
     }
@@ -49,12 +50,12 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
         Optional<GroupChat> existedChat = getChat(chat.getId());
         if (existedChat.isPresent()) {
             if (chat.getUsersCount() < chat.getUserList().size()) {
-                MyLogger.log(Level.SEVERE, "Your chat size can't be less than current users count. Remove users or set greater value");
+                myLogger.log(Level.SEVERE, "Your chat size can't be less than current users count. Remove users or set greater value");
                 throw new ChatAppDatabaseException("Your chat size can't be less than current users count. Remove users or set greater value");
             } else if (!chat.getName().equals(existedChat.get().getName())) {
                 if (getChatByName(chat.getName()).isPresent()) {
                     ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
-                    MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+                    myLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
                     throw new ChatAppDatabaseException(chatAlreadyExistsException);
                 }
             }
@@ -68,7 +69,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
         Optional<GroupChat> chatOptional = getChatByName(chat.getName());
         if (chatOptional.isPresent()) {
             ChatAlreadyExistsException chatAlreadyExistsException = new ChatAlreadyExistsException();
-            MyLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
+            myLogger.log(Level.SEVERE, chatAlreadyExistsException.getMessage());
             throw new ChatAppDatabaseException(chatAlreadyExistsException);
         } else {
             repository.add(chat);
@@ -90,7 +91,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
                 repository.addUserToChat(username, chatId);
             else {
                 ChatUsersOverflowException chatUsersOverflowException = new ChatUsersOverflowException();
-                MyLogger.log(Level.SEVERE, chatUsersOverflowException.getMessage());
+                myLogger.log(Level.SEVERE, chatUsersOverflowException.getMessage());
                 throw new ChatAppDatabaseException(chatUsersOverflowException);
             }
         }

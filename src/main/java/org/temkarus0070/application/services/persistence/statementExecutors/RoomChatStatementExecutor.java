@@ -7,8 +7,10 @@ import org.temkarus0070.application.services.persistence.ConnectionManager;
 
 import java.sql.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
     @Override
     public void executeUpdate(RoomChat chat) throws ChatAppDatabaseException {
         try (Connection connection = ConnectionManager.getConnection();
@@ -18,7 +20,7 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
             preparedStatement.setInt(2, roomChat.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
-            MyLogger.log(Level.SEVERE, sqlException.getMessage());
+            myLogger.log(Level.SEVERE, sqlException.getMessage());
             throw new ChatAppDatabaseException(sqlException);
         }
 
@@ -39,7 +41,7 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
             chat.setId(id);
             return chat;
         } catch (SQLException exception) {
-            MyLogger.log(Level.SEVERE, exception.getMessage());
+            myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
     }

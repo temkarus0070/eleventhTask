@@ -10,9 +10,11 @@ import org.temkarus0070.application.services.persistence.interfaces.PersistenceC
 import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceChatService<T> {
     private final ChatRepository chatRepository;
+    private Logger myLogger = Logger.getLogger(this.getClass().getName());
 
     public PersistenceChatServiceImpl(ChatRepository repository) {
         this.chatRepository = repository;
@@ -67,7 +69,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
         Optional<T> chat = getChat(chatId);
         if (chat.isPresent()) {
             if (chat.get().getBannedUsers().contains(message.getSender())) {
-                MyLogger.log(Level.SEVERE, String.format("user %s was banned", message.getSender().getName()));
+                myLogger.log(Level.SEVERE, String.format("user %s was banned", message.getSender().getName()));
                 throw new ChatAppDatabaseException(new UserBannedException());
             } else
                 chatRepository.addMessage(message, chatId);
