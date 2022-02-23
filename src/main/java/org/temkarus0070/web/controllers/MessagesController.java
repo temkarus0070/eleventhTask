@@ -3,7 +3,6 @@ package org.temkarus0070.web.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.temkarus0070.application.domain.User;
@@ -33,7 +32,7 @@ public class MessagesController {
     }
 
     @PostMapping
-    public String add(@RequestBody Message message, Model model, HttpServletRequest req, @RequestParam Integer chatId) {
+    public String add(Message message, Model model, HttpServletRequest req, @RequestParam Integer chatId) {
         try {
 
             User currentUser = authService.getCurrentUser(req.getCookies());
@@ -42,7 +41,8 @@ public class MessagesController {
             model.addAttribute("chat", persistenceChatService.getChat(chatId));
             return "chat";
         } catch (ChatAppException e) {
-            return e.getMessage();
+            model.addAttribute("error", e.getMessage());
+            return "error";
         }
     }
 }

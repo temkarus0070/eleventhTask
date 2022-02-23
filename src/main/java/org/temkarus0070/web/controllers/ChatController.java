@@ -2,7 +2,10 @@ package org.temkarus0070.web.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.Chat;
 import org.temkarus0070.application.domain.exceptions.ChatAppException;
@@ -51,13 +54,14 @@ public class ChatController {
                     return "chat";
                 } else return "You dont have permissions to this chat";
             } catch (ChatAppException chatAppException) {
-                return chatAppException.getMessage();
+                model.addAttribute("error", chatAppException.getMessage());
+                return "error";
             }
         } else return "chat not found";
     }
 
     @PostMapping
-    public String add(@RequestBody Chat chat, HttpServletRequest req, Model model) {
+    public String add(Chat chat, HttpServletRequest req, Model model) {
         try {
             User currentUser = authService.getCurrentUser(req.getCookies());
             persistenceChatService.addChat(chat);
@@ -67,13 +71,14 @@ public class ChatController {
             model.addAttribute("id", chat.getId());
             return "chat";
         } catch (ChatAppException e) {
-            return e.getMessage();
+            model.addAttribute("error", e.getMessage());
+            return "error";
         }
 
     }
 
     @PostMapping("/addUser")
-    public String addUser(Model model, HttpServletRequest req, @RequestBody User user, @RequestBody Chat chat) {
+    public String addUser(Model model, HttpServletRequest req, User user, Chat chat) {
         try {
             User currentUser = authService.getCurrentUser(req.getCookies());
             chat = persistenceChatService.getChat(chat.getId()).get();
@@ -87,12 +92,13 @@ public class ChatController {
                 return "chat";
             }
         } catch (ChatAppException exception) {
-            return exception.getMessage();
+            model.addAttribute("error", exception.getMessage());
+            return "error";
         }
     }
 
     @PostMapping("/ban")
-    public String banUser(Model model, @RequestBody Chat chat, @RequestBody User user, HttpServletRequest req) {
+    public String banUser(Model model, Chat chat, User user, HttpServletRequest req) {
         try {
             User currentUser = authService.getCurrentUser(req.getCookies());
             chat = persistenceChatService.getChat(chat.getId()).get();
@@ -106,7 +112,8 @@ public class ChatController {
                 return "chat";
             }
         } catch (ChatAppException exception) {
-            return exception.getMessage();
+            model.addAttribute("error", exception.getMessage());
+            return "error";
         }
     }
 

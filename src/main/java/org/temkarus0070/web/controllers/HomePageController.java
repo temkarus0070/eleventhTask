@@ -40,8 +40,8 @@ public class HomePageController {
             model.addAttribute("chatType", chatType);
 
         } catch (Exception exception) {
-            resp.sendRedirect("/login");
-            return exception.getMessage();
+            model.addAttribute("error", exception.getMessage());
+            return "error";
         }
         return "home";
     }

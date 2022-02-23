@@ -1,9 +1,9 @@
 package org.temkarus0070.web.controllers;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
 import org.temkarus0070.application.domain.exceptions.ChatAppException;
@@ -30,27 +30,31 @@ public class AuthController {
         return "login";
     }
 
+    @GetMapping("/register")
+    public String register() {
+        return "register";
+    }
+
     @PostMapping("/login")
-    public String login(@RequestBody User user, HttpServletResponse resp) {
+    public String login(User user, HttpServletResponse resp, Model model) {
         try {
             if (authService.login(user.getUsername(), user.getPassword())) {
                 Cookie usernameCookie = new Cookie("username", user.getUsername());
                 usernameCookie.setMaxAge(999999);
                 Cookie passwordCookie = new Cookie("password", user.getPassword());
                 passwordCookie.setMaxAge(999999);
-
                 resp.addCookie(usernameCookie);
                 resp.addCookie(passwordCookie);
-                resp.sendRedirect("/");
                 return "home";
             } else return "login failed";
-        } catch (ChatAppException | IOException exception) {
-            return exception.getMessage();
+        } catch (ChatAppException exception) {
+            model.addAttribute("error", exception.getMessage());
+            return "error";
         }
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody User user, HttpServletResponse resp) {
+    public String register(User user, HttpServletResponse resp, Model model) throws IOException {
         try {
             persistenceUserService.addUser(user);
             Cookie usernameCookie = new Cookie("username", user.getUsername());
@@ -62,9 +66,12 @@ public class AuthController {
             resp.addCookie(passwordCookie);
             resp.sendRedirect("/");
             return "home";
+
         } catch (ChatAppDatabaseException | IOException e) {
-            return e.getMessage();
+            model.addAttribute("error", e.getMessage());
+            return "error";
         }
+
     }
 
     @GetMapping("/logout")
