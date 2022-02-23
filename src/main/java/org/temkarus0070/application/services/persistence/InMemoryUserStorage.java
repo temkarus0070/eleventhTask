@@ -55,7 +55,7 @@ public class InMemoryUserStorage implements UserRepository {
 
     @Override
     public void update(User entity) {
-        User user=get().stream().filter(e->e.getName().equals(entity.getName())).findFirst().get();
+        User user = get().stream().filter(e -> e.getUsername().equals(entity.getUsername())).findFirst().get();
         if(user!=null){
             userSet.remove(user);
             userSet.add(entity);

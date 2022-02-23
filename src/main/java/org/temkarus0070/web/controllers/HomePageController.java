@@ -35,7 +35,7 @@ public class HomePageController {
                 chatType = ChatType.ANY;
             }
             PersistenceChatService persistenceChatService = persistenceChatServiceFactory.create(chatType, chatRepository);
-            model.addAttribute("chats", persistenceChatService.getChatsByUserName(currentUser.getName()));
+            model.addAttribute("chats", persistenceChatService.getChatsByUserName(currentUser.getUsername()));
             model.addAttribute("chatType", chatType);
 
         } catch (ChatAppException | ClassNotFoundException exception) {

@@ -3,7 +3,6 @@ package org.temkarus0070.application.services.persistence;
 import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
-import org.temkarus0070.application.services.AuthServiceImpl;
 import org.temkarus0070.application.services.persistence.interfaces.UserRepository;
 import org.temkarus0070.application.services.persistence.mappers.UserExtractor;
 import org.temkarus0070.application.services.persistence.mappers.UsersExtractor;
@@ -51,7 +50,7 @@ public class UserStorage implements UserRepository {
     public void add(User entity) throws ChatAppDatabaseException {
         try (Connection connection = ConnectionManager.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users(username,password) VALUES (?,?)");
-            preparedStatement.setString(1, entity.getName());
+            preparedStatement.setString(1, entity.getUsername());
             preparedStatement.setString(2, entity.getPassword());
             preparedStatement.executeUpdate();
         } catch (SQLException | ChatAppDatabaseException exception) {

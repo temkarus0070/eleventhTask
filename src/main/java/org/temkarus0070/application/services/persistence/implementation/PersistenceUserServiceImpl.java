@@ -23,11 +23,11 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
 
     @Override
     public void addUser(User user) throws ChatAppDatabaseException {
-        Optional<User> userOptional = getUser(user.getName());
+        Optional<User> userOptional = getUser(user.getUsername());
         if (userOptional.isEmpty())
             userRepository.add(user);
         else {
-            myLogger.log(Level.SEVERE, String.format("user %s already exists", user.getName()));
+            myLogger.log(Level.SEVERE, String.format("user %s already exists", user.getUsername()));
             throw new ChatAppDatabaseException(new UsernameAlreadyExistException());
         }
     }

@@ -3,7 +3,7 @@ package org.temkarus0070.application.domain;
 import java.util.Objects;
 
 public class User {
-    private String name;
+    private String username;
     private String password;
 
     public String getPassword() {
@@ -14,28 +14,26 @@ public class User {
         this.password = password;
     }
 
-    public User(String name, String password){
-        this.name=name;
-        this.password=password;
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
     public User() {
 
     }
 
-    public User(String name){
-        this.name=name;
+    public User(String username) {
+        this.username = username;
     }
 
 
-
-
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
@@ -43,11 +41,11 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return name.equals(user.name);
+        return username.equals(user.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(username);
     }
 }

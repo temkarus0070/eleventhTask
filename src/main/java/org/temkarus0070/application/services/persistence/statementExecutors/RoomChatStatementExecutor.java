@@ -33,7 +33,7 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
             RoomChat roomChat = chat;
 
             preparedStatement.setString(1, roomChat.getName());
-            preparedStatement.setString(2, roomChat.getChatOwner().getName());
+            preparedStatement.setString(2, roomChat.getChatOwner().getUsername());
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             resultSet.next();

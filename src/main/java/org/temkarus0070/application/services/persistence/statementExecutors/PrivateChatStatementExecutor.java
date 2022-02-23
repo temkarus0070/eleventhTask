@@ -22,7 +22,7 @@ public class PrivateChatStatementExecutor implements StatementExecutor<PrivateCh
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,owner) VALUES ('PRIVATE',?)", Statement.RETURN_GENERATED_KEYS);) {
 
-            preparedStatement.setString(1, chat.getChatOwner().getName());
+            preparedStatement.setString(1, chat.getChatOwner().getUsername());
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             resultSet.next();

@@ -148,7 +148,7 @@ public class ChatStorage implements ChatRepository {
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO messages(text,sender_name,chat_id) values (?,?,?)");) {
 
             preparedStatement.setString(1, message.getContent());
-            preparedStatement.setString(2, message.getSender().getName());
+            preparedStatement.setString(2, message.getSender().getUsername());
             preparedStatement.setInt(3, chatId);
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
@@ -182,7 +182,7 @@ public class ChatStorage implements ChatRepository {
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement1 = connection.prepareStatement("INSERT INTO users_chats VALUES (?,?,false)");) {
 
-            preparedStatement1.setString(1, entity.getChatOwner().getName());
+            preparedStatement1.setString(1, entity.getChatOwner().getUsername());
             preparedStatement1.setInt(2, entity.getId());
             preparedStatement1.executeUpdate();
         } catch (SQLException exception) {

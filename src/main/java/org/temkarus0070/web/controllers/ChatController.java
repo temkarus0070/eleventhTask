@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 
 @Controller("/chat")
 public class ChatController {
-    private PersistenceChatServiceImpl<Chat> persistenceChatService;
-    private PersistenceUserService persistenceUserService;
-    private AuthService authService;
+    private final PersistenceChatServiceImpl<Chat> persistenceChatService;
+    private final PersistenceUserService persistenceUserService;
+    private final AuthService authService;
 
     public ChatController(PersistenceChatServiceImpl<Chat> persistenceChatService, PersistenceUserService persistenceUserService, AuthService authService) {
         this.persistenceChatService = persistenceChatService;
@@ -43,7 +43,7 @@ public class ChatController {
                 User currentUser = authService.getCurrentUser(req.getCookies());
                 if (hasPermissions(currentUser, chat)) {
                     Set<User> bannedUserSet = new HashSet<>(chat.getBannedUsers());
-                    Set<User> currentUsers = new HashSet<>(chat..getUserList());
+                    Set<User> currentUsers = new HashSet<>(chat.getUserList());
 
                     model.addAttribute("chat", chat);
                     model.addAttribute("users", persistenceUserService.getUsersNotAtThatChat(chat.getId()));
@@ -63,7 +63,7 @@ public class ChatController {
         try {
             User currentUser = authService.getCurrentUser(req.getCookies());
             persistenceChatService.addChat(chat);
-            persistenceChatService.addUser(currentUser.getName(), chat.getId());
+            persistenceChatService.addUser(currentUser.getUsername(), chat.getId());
             model.addAttribute("chat", chat);
             model.addAttribute("chatType", chat.getType());
             model.addAttribute("id", chat.getId());
@@ -72,6 +72,44 @@ public class ChatController {
             return e.getMessage();
         }
 
+    }
+
+    @PostMapping("/addUser")
+    public String addUser(Model model, HttpServletRequest req, @RequestBody User user, @RequestBody Chat chat) {
+        try {
+            User currentUser = authService.getCurrentUser(req.getCookies());
+            chat = persistenceChatService.getChat(chat.getId()).get();
+            if (chat == null) {
+                return "chat not found";
+            } else if (!chat.getUserList().contains(currentUser)) {
+                return "you cant add user";
+            } else {
+                persistenceChatService.addUser(user.getUsername(), chat.getId());
+                model.addAttribute("chat", chat);
+                return "chat";
+            }
+        } catch (ChatAppException exception) {
+            return exception.getMessage();
+        }
+    }
+
+    @PostMapping("/ban")
+    public String banUser(Model model, @RequestBody Chat chat, @RequestBody User user, HttpServletRequest req) {
+        try {
+            User currentUser = authService.getCurrentUser(req.getCookies());
+            chat = persistenceChatService.getChat(chat.getId()).get();
+            if (chat == null) {
+                return "chat not found";
+            } else if (!chat.getUserList().contains(currentUser)) {
+                return "you cant ban user";
+            } else {
+                persistenceChatService.banUserInChat(user.getUsername(), chat.getId());
+                model.addAttribute("chat", chat);
+                return "chat";
+            }
+        } catch (ChatAppException exception) {
+            return exception.getMessage();
+        }
     }
 
     private boolean hasPermissions(User user, Chat chat) {

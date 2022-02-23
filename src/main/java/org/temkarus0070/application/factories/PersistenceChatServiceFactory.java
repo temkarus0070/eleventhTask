@@ -1,5 +1,6 @@
 package org.temkarus0070.application.factories;
 
+import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceChatServiceImpl;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceGroupChatServiceImpl;
@@ -8,6 +9,7 @@ import org.temkarus0070.application.services.persistence.implementation.Persiste
 import org.temkarus0070.application.services.persistence.interfaces.ChatRepository;
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceChatService;
 
+@Component
 public class PersistenceChatServiceFactory {
     public PersistenceChatService create(ChatType chatType, ChatRepository chatRepository) throws ClassNotFoundException {
         PersistenceChatService persistenceChatService;

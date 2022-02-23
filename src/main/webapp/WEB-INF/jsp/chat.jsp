@@ -26,12 +26,12 @@ pageEncoding="UTF-8"%>
     <label for="message">text</label>
     <textarea name="message" id="message" required></textarea>
     <br/>
-    <input type="submit" value="sendMessage" />
+    <input type="submit" value="sendMessage"/>
 </form>
 
-<form action="../user" method="post">
-    <input type="hidden" value="${chat.getType()}" name="chatType"/>
-    <input type="hidden" value="${chat.getId()}" name="chatId">
+<form action="./addUser" method="post">
+    <input type="hidden" value="${chat.getType()}" name="type"/>
+    <input type="hidden" value="${chat.getId()}" name="id">
     <select name="username">
         <c:forEach items="${users}" var="user">
             <option value="${user.getName()}">${user.getName()}</option>

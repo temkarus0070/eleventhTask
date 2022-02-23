@@ -72,7 +72,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
         Optional<T> chat = getChat(chatId);
         if (chat.isPresent()) {
             if (chat.get().getBannedUsers().contains(message.getSender())) {
-                myLogger.log(Level.SEVERE, String.format("user %s was banned", message.getSender().getName()));
+                myLogger.log(Level.SEVERE, String.format("user %s was banned", message.getSender().getUsername()));
                 throw new ChatAppDatabaseException(new UserBannedException());
             } else
                 chatRepository.addMessage(message, chatId);

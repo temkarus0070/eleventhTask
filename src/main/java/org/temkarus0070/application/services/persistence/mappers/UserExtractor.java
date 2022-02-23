@@ -22,8 +22,8 @@ public class UserExtractor implements Extractor<User> {
     public User extract(ResultSet resultSet) throws SQLException {
         User user=null;
         if(resultSet.next()){
-            user=new User();
-            user.setName(resultSet.getString("username"));
+            user = new User();
+            user.setUsername(resultSet.getString("username"));
             user.setPassword(resultSet.getString("password"));
 
         }
