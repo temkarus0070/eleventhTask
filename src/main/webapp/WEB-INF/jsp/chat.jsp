@@ -20,32 +20,32 @@ pageEncoding="UTF-8"%>
     <div class="chatName">
         <h2>${chat.getName()}</h2></div>
 </c:if>
-<form action="../messages" method="post">
+<form action="./messages" method="post">
     <input type="hidden" value="${chat.getType()}" name="chatType" id="chatType"/>
     <input type="hidden" value="${chat.getId()}" name="chatId" id="chatId"/>
-    <label for="message">text</label>
-    <textarea name="message" id="message" required></textarea>
+    <label for="content">text</label>
+    <textarea name="content" id="content" required></textarea>
     <br/>
     <input type="submit" value="sendMessage"/>
 </form>
 
-<form action="./addUser" method="post">
+<form action="./chat/addUser" method="post">
     <input type="hidden" value="${chat.getType()}" name="type"/>
     <input type="hidden" value="${chat.getId()}" name="id">
     <select name="username">
         <c:forEach items="${users}" var="user">
-            <option value="${user.getName()}">${user.getName()}</option>
+            <option value="${user.getUsername()}">${user.getUsername()}</option>
         </c:forEach>
     </select>
     <input type="submit" value="add user"/>
 </form>
 
-<form action="../ban" method="post">
+<form action="./chat/ban" method="post">
     <input type="hidden" value="${chat.getType()}" name="chatType"/>
-    <input type="hidden" value="${chat.getId()}" name="chatId">
+    <input type="hidden" value="${chat.getId()}" name="id">
     <select name="username">
         <c:forEach items="${usersToBan}" var="user">
-            <option value="${user.getName()}">${user.getName()}</option>
+            <option value="${user.getUsername()}">${user.getUsername()}</option>
         </c:forEach>
     </select>
     <input type="submit" value="ban user"/>
@@ -53,7 +53,7 @@ pageEncoding="UTF-8"%>
 
 
 <c:forEach items="${chat.getMessages()}" var="message">
-    <h2>${message.getSender().getName()}</h2>
+    <h2>${message.getSender().getUsername()}</h2>
     <span>${message.getContent()}</span>
 
 

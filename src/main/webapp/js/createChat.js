@@ -1,8 +1,8 @@
 
 
 $(document).ready(function (){
-   const formFieldSet=$("fieldset")[0];
-   const chatTypeField=$("#chatType");
+   const formFieldSet = $("fieldset")[0];
+    const chatTypeField = $("#type");
    
    chatTypeField.trigger("change");
 
@@ -26,13 +26,13 @@ $(document).ready(function (){
     }
 
     function addFieldsToPrivateChat(){
-        deleteFields(["chatName","usersCount"])
+        deleteFields(["name", "usersCount"])
     }
 
-    function addFieldsToNameableChat(){
-       deleteField("usersCount");
-        if (!hasFields("chatName")) {
-            addField("text","chatName","chatName",formFieldSet,"chat name");
+    function addFieldsToNameableChat() {
+        deleteField("usersCount");
+        if (!hasFields("name")) {
+            addField("text", "name", "name", formFieldSet, "chat name");
         }
     }
 

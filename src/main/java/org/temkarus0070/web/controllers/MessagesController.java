@@ -4,7 +4,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.Chat;
 import org.temkarus0070.application.domain.chat.Message;
@@ -32,14 +31,15 @@ public class MessagesController {
     }
 
     @PostMapping
-    public String add(Message message, Model model, HttpServletRequest req, @RequestParam Integer chatId) {
+    public String add(Message message, Model model, HttpServletRequest req, int chatId) {
         try {
 
             User currentUser = authService.getCurrentUser(req.getCookies());
             message.setSender(currentUser);
             persistenceChatService.addMessage(message, chatId);
-            model.addAttribute("chat", persistenceChatService.getChat(chatId));
-            return "chat";
+
+            model.addAttribute("chat", persistenceChatService.getChat(chatId).get());
+            return "redirect:/chat?chatId=" + chatId;
         } catch (ChatAppException e) {
             model.addAttribute("error", e.getMessage());
             return "error";

@@ -29,7 +29,8 @@ public class GroupChatStatementExecutor implements StatementExecutor<GroupChat> 
     }
 
     @Override
-    public Chat executeAdd(GroupChat chat) throws ChatAppDatabaseException {
+    public Chat executeAdd(Chat chat1) throws ChatAppDatabaseException {
+        GroupChat chat = (GroupChat) chat1;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO chats(chat_type, name, users_count,owner) VALUES (" +
                      "'GROUP',?,?,?)", Statement.RETURN_GENERATED_KEYS);) {

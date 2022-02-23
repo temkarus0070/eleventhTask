@@ -54,6 +54,10 @@ public abstract class Chat {
         return id;
     }
 
+    public void setType(ChatType type) {
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

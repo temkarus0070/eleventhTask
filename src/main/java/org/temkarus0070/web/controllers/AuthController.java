@@ -45,7 +45,7 @@ public class AuthController {
                 passwordCookie.setMaxAge(999999);
                 resp.addCookie(usernameCookie);
                 resp.addCookie(passwordCookie);
-                return "home";
+                return "redirect:/home";
             } else return "login failed";
         } catch (ChatAppException exception) {
             model.addAttribute("error", exception.getMessage());
@@ -65,7 +65,7 @@ public class AuthController {
             resp.addCookie(usernameCookie);
             resp.addCookie(passwordCookie);
             resp.sendRedirect("/");
-            return "home";
+            return "redirect:/home";
 
         } catch (ChatAppDatabaseException | IOException e) {
             model.addAttribute("error", e.getMessage());
@@ -82,8 +82,7 @@ public class AuthController {
                 resp.addCookie(cookie);
             }
         }
-        resp.sendRedirect("/login");
-        return "login";
+        return "redirect:/login";
     }
 
 }

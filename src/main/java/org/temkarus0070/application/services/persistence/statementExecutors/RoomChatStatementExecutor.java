@@ -27,7 +27,8 @@ public class RoomChatStatementExecutor implements StatementExecutor<RoomChat> {
     }
 
     @Override
-    public Chat executeAdd(RoomChat chat) throws ChatAppDatabaseException {
+    public Chat executeAdd(Chat chat1) throws ChatAppDatabaseException {
+        RoomChat chat = (RoomChat) chat1;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,name,owner) VALUES ('ROOM',?,?)", Statement.RETURN_GENERATED_KEYS);) {
             RoomChat roomChat = chat;

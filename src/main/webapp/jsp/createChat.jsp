@@ -14,10 +14,10 @@
     <title>Title</title>
 </head>
 <body>
-<jsp:include page="header.jsp"></jsp:include>
+<jsp:include page="../WEB-INF/jsp/header.jsp"></jsp:include>
 <form method="post" action="../chat">
     <fieldset>
-        <select id="chatType" name="chatType">
+        <select id="type" name="type">
             <option selected value="PRIVATE">private chat</option>
             <option value="GROUP">group chat</option>
             <option value="ROOM">room chat</option>

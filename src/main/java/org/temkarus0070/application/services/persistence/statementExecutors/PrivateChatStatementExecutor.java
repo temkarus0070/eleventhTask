@@ -18,7 +18,8 @@ public class PrivateChatStatementExecutor implements StatementExecutor<PrivateCh
     }
 
     @Override
-    public Chat executeAdd(PrivateChat chat) throws ChatAppDatabaseException {
+    public Chat executeAdd(Chat chat1) throws ChatAppDatabaseException {
+        PrivateChat chat = (PrivateChat) chat1;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Chats(chat_type,owner) VALUES ('PRIVATE',?)", Statement.RETURN_GENERATED_KEYS);) {
 

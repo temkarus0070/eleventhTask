@@ -15,16 +15,16 @@
     <title>Get chat</title>
 </head>
 <body>
-<jsp:include page="header.jsp"></jsp:include>
-<form method="get" action="../chat">
+<jsp:include page="../WEB-INF/jsp/header.jsp"></jsp:include>
+<form method="get" action="./chat">
     <fieldset>
-    <select id="chatType" name="chatType">
-        <option selected value="PRIVATE">private chat</option>
-        <option value="GROUP">group chat</option>
-        <option value="ROOM">room chat</option>
-    </select>
-    <label for="chatId">chat identifier</label>
-    <input type="number" required id="chatId" name="chatId" />
+        <select id="chatType" name="chatType">
+            <option selected value="PRIVATE">private chat</option>
+            <option value="GROUP">group chat</option>
+            <option value="ROOM">room chat</option>
+        </select>
+        <label for="chatId">chat identifier</label>
+        <input type="number" required id="chatId" name="chatId"/>
     </fieldset>
     <input type="submit" value="get"/>
 </form>

@@ -28,7 +28,7 @@ public class HomePageController {
         this.chatRepository = chatRepository;
     }
 
-    @GetMapping("/")
+    @GetMapping("/home")
     public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType, HttpServletResponse resp) throws IOException {
         try {
             User currentUser = authService.getCurrentUser(req.getCookies());
