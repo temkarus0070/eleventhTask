@@ -25,6 +25,11 @@ public class AuthController {
         this.persistenceUserService = persistenceUserService;
     }
 
+    @GetMapping("/login")
+    public String get() {
+        return "login";
+    }
+
     @PostMapping("/login")
     public String login(@RequestBody User user, HttpServletResponse resp) {
         try {
@@ -44,7 +49,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/lregister")
+    @PostMapping("/register")
     public String register(@RequestBody User user, HttpServletResponse resp) {
         try {
             persistenceUserService.addUser(user);

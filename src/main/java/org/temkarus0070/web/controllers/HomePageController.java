@@ -6,13 +6,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.ChatType;
-import org.temkarus0070.application.domain.exceptions.ChatAppException;
 import org.temkarus0070.application.factories.PersistenceChatServiceFactory;
 import org.temkarus0070.application.services.AuthService;
 import org.temkarus0070.application.services.persistence.interfaces.ChatRepository;
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceChatService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Controller
 public class HomePageController {
@@ -28,7 +29,7 @@ public class HomePageController {
     }
 
     @GetMapping("/")
-    public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType) {
+    public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType, HttpServletResponse resp) throws IOException {
         try {
             User currentUser = authService.getCurrentUser(req.getCookies());
             if (chatType == null) {
@@ -38,7 +39,8 @@ public class HomePageController {
             model.addAttribute("chats", persistenceChatService.getChatsByUserName(currentUser.getUsername()));
             model.addAttribute("chatType", chatType);
 
-        } catch (ChatAppException | ClassNotFoundException exception) {
+        } catch (Exception exception) {
+            resp.sendRedirect("/login");
             return exception.getMessage();
         }
         return "home";

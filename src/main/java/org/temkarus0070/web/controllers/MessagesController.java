@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.Chat;
@@ -16,7 +17,8 @@ import org.temkarus0070.application.services.persistence.interfaces.PersistenceU
 
 import javax.servlet.http.HttpServletRequest;
 
-@Controller("/messages")
+@Controller
+@RequestMapping("/messages")
 public class MessagesController {
     private PersistenceChatServiceImpl<Chat> persistenceChatService;
     private PersistenceUserService persistenceUserService;

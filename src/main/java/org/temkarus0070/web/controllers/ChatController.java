@@ -2,10 +2,7 @@ package org.temkarus0070.web.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.Chat;
 import org.temkarus0070.application.domain.exceptions.ChatAppException;
@@ -20,7 +17,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Controller("/chat")
+@Controller()
+@RequestMapping("/chat")
 public class ChatController {
     private final PersistenceChatServiceImpl<Chat> persistenceChatService;
     private final PersistenceUserService persistenceUserService;
