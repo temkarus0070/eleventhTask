@@ -10,7 +10,7 @@
 
 <nav>
     <a href="${pageContext.request.contextPath}/jsp/createChat.jsp">create new chat</a>
-    <a href="../">home</a>
+    <a href="../home">home</a>
     <a href="${pageContext.request.contextPath}/jsp/getChat.jsp">enter in existed chat</a>
     <a href="${pageContext.request.contextPath}/logout">logout</a>
     <b>${cookie['username'].value}</b>

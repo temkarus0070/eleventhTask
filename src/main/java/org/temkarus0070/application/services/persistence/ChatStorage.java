@@ -1,5 +1,7 @@
 package org.temkarus0070.application.services.persistence;
 
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.chat.Chat;
 import org.temkarus0070.application.domain.chat.ChatType;
@@ -19,6 +21,7 @@ import java.util.logging.Logger;
 
 @Component
 public class ChatStorage implements ChatRepository {
+    private JdbcTemplate jdbcTemplate;
     private Logger myLogger = Logger.getLogger(ChatStorage.class.getName());
 
     private Array array;
@@ -27,19 +30,18 @@ public class ChatStorage implements ChatRepository {
 
     private final ChatsExtractor chatsExtractor;
 
-    public ChatStorage(Extractor<Chat> chatExtractor, ChatsExtractor chatsExtractor) {
+    public ChatStorage(JdbcTemplate jdbcTemplate, Extractor<Chat> chatExtractor, ChatsExtractor chatsExtractor) {
+        this.jdbcTemplate = jdbcTemplate;
         this.chatExtractor = chatExtractor;
         this.chatsExtractor = chatsExtractor;
     }
 
     private void setChatType(ChatType chatType) {
-        try (Connection connection = ConnectionManager.getConnection()) {
+        jdbcTemplate.execute((ConnectionCallback<Object>) con -> {
             String[] array = chatType.getValues();
-            this.array = connection.createArrayOf("text", array);
-        } catch (SQLException sqlException) {
-            myLogger.log(Level.SEVERE, sqlException.getMessage());
-            throw new ChatAppDatabaseException(sqlException);
-        }
+            this.array = con.createArrayOf("text", array);
+            return null;
+        });
     }
 
 
