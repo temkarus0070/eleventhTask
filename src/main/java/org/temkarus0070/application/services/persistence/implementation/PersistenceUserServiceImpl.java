@@ -1,5 +1,6 @@
 package org.temkarus0070.application.services.persistence.implementation;
 
+import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
 import org.temkarus0070.application.domain.exceptions.UsernameAlreadyExistException;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Component
 public class PersistenceUserServiceImpl implements PersistenceUserService {
     private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private UserRepository userRepository;

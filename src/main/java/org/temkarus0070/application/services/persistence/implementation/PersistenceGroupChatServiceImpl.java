@@ -1,5 +1,6 @@
 package org.temkarus0070.application.services.persistence.implementation;
 
+import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.GroupChat;
 import org.temkarus0070.application.domain.exceptions.ChatAlreadyExistsException;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
@@ -23,7 +24,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
     }
 
     public Optional<GroupChat> getChatByName(String name) throws ChatAppDatabaseException {
-        return Optional.of((GroupChat) repository.getChatByName(name).get());
+        return Optional.of((GroupChat) repository.getChatByName(name, ChatType.GROUP).get());
 
     }
 
@@ -31,7 +32,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
     @Override
     public Optional<GroupChat> getChat(int id) throws ChatAppDatabaseException {
         try {
-            return Optional.ofNullable((GroupChat) repository.get(id));
+            return Optional.ofNullable((GroupChat) repository.get(id, ChatType.GROUP));
         } catch (ChatAppDatabaseException ex) {
             myLogger.log(Level.SEVERE, ex.getMessage());
             throw new ChatAppDatabaseException(ex.getMessage());
@@ -40,7 +41,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
 
     @Override
     public Collection<GroupChat> get() throws ChatAppDatabaseException {
-        return this.repository.get().stream()
+        return this.repository.get(ChatType.GROUP).stream()
                 .map(chat -> (GroupChat) chat)
                 .collect(Collectors.toSet());
     }
@@ -78,7 +79,7 @@ public class PersistenceGroupChatServiceImpl extends PersistenceChatServiceImpl<
 
     @Override
     public Collection<GroupChat> getChatsByUserName(String username) throws ChatAppDatabaseException {
-        return this.repository.getChatsByUser(username).stream()
+        return this.repository.getChatsByUser(username, ChatType.GROUP).stream()
                 .map(chat -> (GroupChat) chat)
                 .collect(Collectors.toSet());
     }

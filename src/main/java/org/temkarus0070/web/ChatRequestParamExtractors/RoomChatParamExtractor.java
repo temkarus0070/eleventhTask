@@ -1,6 +1,5 @@
 package org.temkarus0070.web.ChatRequestParamExtractors;
 
-import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.RoomChat;
 import org.temkarus0070.application.services.persistence.ChatStorage;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceRoomChatServiceImpl;
@@ -9,7 +8,11 @@ import java.util.Map;
 import java.util.Optional;
 
 public class RoomChatParamExtractor implements ChatParamExtractor<RoomChat> {
-    private PersistenceRoomChatServiceImpl persistenceRoomChatService = new PersistenceRoomChatServiceImpl(new ChatStorage(ChatType.ROOM));
+    private PersistenceRoomChatServiceImpl persistenceRoomChatService;
+
+    public RoomChatParamExtractor(ChatStorage chatStorage) {
+        persistenceRoomChatService = new PersistenceRoomChatServiceImpl(chatStorage);
+    }
 
     @Override
     public Optional<RoomChat> extractChat(Map<String, String[]> params) {

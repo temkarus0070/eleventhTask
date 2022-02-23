@@ -1,5 +1,6 @@
 package org.temkarus0070.application.services.persistence.implementation;
 
+import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.PrivateChat;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
 import org.temkarus0070.application.domain.exceptions.ChatUsersOverflowException;
@@ -24,7 +25,7 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
     @Override
     public Optional<PrivateChat> getChat(int id) throws ChatAppDatabaseException {
         try {
-            return Optional.ofNullable((PrivateChat) chatRepository.get(id));
+            return Optional.ofNullable((PrivateChat) chatRepository.get(id, ChatType.PRIVATE));
         } catch (ChatAppDatabaseException ex) {
             myLogger.log(Level.SEVERE, ex.getMessage());
             throw new ChatAppDatabaseException(ex.getMessage());
@@ -34,7 +35,7 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
 
     @Override
     public Collection<PrivateChat> get() throws ChatAppDatabaseException {
-        return chatRepository.get().stream()
+        return chatRepository.get(ChatType.PRIVATE).stream()
                 .map(chat -> (PrivateChat) chat)
                 .collect(Collectors.toSet());
     }
@@ -42,7 +43,7 @@ public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImp
 
     @Override
     public Collection<PrivateChat> getChatsByUserName(String username) throws ChatAppDatabaseException {
-        return this.chatRepository.getChatsByUser(username).stream()
+        return this.chatRepository.getChatsByUser(username, ChatType.PRIVATE).stream()
                 .map(chat -> (PrivateChat) chat)
                 .collect(Collectors.toSet());
     }

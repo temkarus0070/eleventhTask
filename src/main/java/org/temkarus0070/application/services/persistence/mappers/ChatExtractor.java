@@ -1,5 +1,6 @@
 package org.temkarus0070.application.services.persistence.mappers;
 
+import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.*;
 
@@ -10,19 +11,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class ChatExtractor implements Extractor<Chat>{
-    private static ChatExtractor chatExtractor;
-    private ChatExtractor(){
+    public ChatExtractor() {
 
     }
-
-    public static ChatExtractor getInstance(){
-        if(chatExtractor ==null){
-            chatExtractor =new ChatExtractor();
-        }
-        return chatExtractor;
-    }
-
 
 
     @Override

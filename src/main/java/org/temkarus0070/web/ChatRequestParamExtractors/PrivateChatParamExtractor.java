@@ -1,6 +1,5 @@
 package org.temkarus0070.web.ChatRequestParamExtractors;
 
-import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.PrivateChat;
 import org.temkarus0070.application.services.persistence.ChatStorage;
 import org.temkarus0070.application.services.persistence.implementation.PersistencePrivateChatServiceImpl;
@@ -9,7 +8,11 @@ import java.util.Map;
 import java.util.Optional;
 
 public class PrivateChatParamExtractor implements ChatParamExtractor<PrivateChat> {
-    private final PersistencePrivateChatServiceImpl persistencePrivateChatService = new PersistencePrivateChatServiceImpl(new ChatStorage(ChatType.PRIVATE));
+    private final PersistencePrivateChatServiceImpl persistencePrivateChatService;
+
+    public PrivateChatParamExtractor(ChatStorage chatStorage) {
+        persistencePrivateChatService = new PersistencePrivateChatServiceImpl(chatStorage);
+    }
 
     @Override
     public Optional<PrivateChat> extractChat(Map<String, String[]> params) {

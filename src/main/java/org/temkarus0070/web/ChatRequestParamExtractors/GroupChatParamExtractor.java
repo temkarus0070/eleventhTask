@@ -1,6 +1,5 @@
 package org.temkarus0070.web.ChatRequestParamExtractors;
 
-import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.GroupChat;
 import org.temkarus0070.application.services.persistence.ChatStorage;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceGroupChatServiceImpl;
@@ -9,7 +8,12 @@ import java.util.Map;
 import java.util.Optional;
 
 public class GroupChatParamExtractor implements ChatParamExtractor<GroupChat> {
-    private PersistenceGroupChatServiceImpl persistenceGroupChatService = new PersistenceGroupChatServiceImpl(new ChatStorage(ChatType.GROUP));
+
+    private final PersistenceGroupChatServiceImpl persistenceGroupChatService;
+
+    public GroupChatParamExtractor(ChatStorage chatStorage) {
+        persistenceGroupChatService = new PersistenceGroupChatServiceImpl(chatStorage);
+    }
 
     @Override
     public Optional<GroupChat> extractChat(Map<String, String[]> params) {

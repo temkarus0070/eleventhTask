@@ -1,5 +1,6 @@
 package org.temkarus0070.application.services.persistence.mappers;
 
+import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.chat.*;
 
 import java.sql.ResultSet;
@@ -7,17 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ChatsExtractor implements Extractor<List<Chat>> {
-    private static ChatsExtractor chatsExtractor;
-    private ChatsExtractor(){
+    public ChatsExtractor() {
 
     }
-    public static ChatsExtractor getInstance(){
-        if(chatsExtractor ==null){
-            chatsExtractor =new ChatsExtractor();
-        }
-        return chatsExtractor;
-    }
+
 
     @Override
     public List<Chat> extract(ResultSet resultSet) throws SQLException {

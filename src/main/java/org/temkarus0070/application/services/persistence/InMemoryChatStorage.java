@@ -2,6 +2,7 @@ package org.temkarus0070.application.services.persistence;
 
 
 import org.temkarus0070.application.domain.chat.Chat;
+import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.Message;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
 import org.temkarus0070.application.services.persistence.interfaces.ChatRepository;
@@ -30,20 +31,7 @@ public class InMemoryChatStorage implements ChatRepository {
 
 
 
-    @Override
-    public Collection<Chat> get() {
-        return chats;
-    }
 
-    @Override
-    public Collection<Chat> getChatsByUser(String username) {
-        return null;
-    }
-
-    @Override
-    public Optional<Chat> getChatByName(String name) {
-        return Optional.empty();
-    }
 
     @Override
     public void removeUserFromChat(String user, Integer chatId) throws ChatAppDatabaseException {
@@ -65,27 +53,38 @@ public class InMemoryChatStorage implements ChatRepository {
 
     }
 
-    @Override
-    public Chat get(Integer integer) {
-        return null;
-    }
-
 
     @Override
     public void update(Chat entity) {
-        Chat chat=get().stream().filter(chat1 -> chat1.getId()==entity.getId()).findFirst().get();
-        if(chat!=null) {
-            chats.remove(chat);
-            chats.add(entity);
-        }
+
 
     }
 
     @Override
-    public void add(Chat chat){
+    public Chat get(Integer id, ChatType chatType) throws ChatAppDatabaseException {
+        return null;
+    }
+
+    @Override
+    public Collection<Chat> getChatsByUser(String username, ChatType chatType) throws ChatAppDatabaseException {
+        return null;
+    }
+
+    @Override
+    public void add(Chat chat) {
         chat.setId(maxId);
         chats.add(chat);
         maxId++;
+    }
+
+    @Override
+    public Collection<Chat> get(ChatType chatType) throws ChatAppDatabaseException {
+        return null;
+    }
+
+    @Override
+    public Optional<Chat> getChatByName(String name, ChatType chatType) throws ChatAppDatabaseException {
+        return Optional.empty();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.temkarus0070.application.services.persistence.implementation;
 
+import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.RoomChat;
 import org.temkarus0070.application.domain.exceptions.ChatAlreadyExistsException;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
@@ -22,14 +23,14 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
     }
 
     public Optional<RoomChat> getChatByName(String name) throws ChatAppDatabaseException {
-        return Optional.of((RoomChat) chatRepository.getChatByName(name).get());
+        return Optional.of((RoomChat) chatRepository.getChatByName(name, ChatType.ROOM).get());
     }
 
 
     @Override
     public Optional<RoomChat> getChat(int id) throws ChatAppDatabaseException {
         try {
-            return Optional.ofNullable((RoomChat) chatRepository.get(id));
+            return Optional.ofNullable((RoomChat) chatRepository.get(id, ChatType.ROOM));
         } catch (ChatAppDatabaseException ex) {
             myLogger.log(Level.SEVERE, String.format("chat not found with id=%d", id));
             throw new ChatAppDatabaseException("chat not found ChatAppDatabaseException");
@@ -39,7 +40,7 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
 
     @Override
     public Collection<RoomChat> get() throws ChatAppDatabaseException {
-        return this.chatRepository.get().stream()
+        return this.chatRepository.get(ChatType.ROOM).stream()
                 .map(chat -> (RoomChat) chat)
                 .collect(Collectors.toSet());
     }
@@ -61,7 +62,7 @@ public class PersistenceRoomChatServiceImpl extends PersistenceChatServiceImpl<R
 
     @Override
     public Collection<RoomChat> getChatsByUserName(String username) throws ChatAppDatabaseException {
-        return this.chatRepository.getChatsByUser(username).stream()
+        return this.chatRepository.getChatsByUser(username, ChatType.ROOM).stream()
                 .map(chat -> (RoomChat) chat)
                 .collect(Collectors.toSet());
     }

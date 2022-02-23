@@ -9,9 +9,9 @@ import org.temkarus0070.application.services.persistence.interfaces.ChatReposito
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceChatService;
 
 public class PersistenceChatServiceFactory {
-    public static PersistenceChatService create(ChatType chatType, ChatRepository chatRepository) throws ClassNotFoundException{
+    public PersistenceChatService create(ChatType chatType, ChatRepository chatRepository) throws ClassNotFoundException {
         PersistenceChatService persistenceChatService;
-        switch ( chatType) {
+        switch (chatType) {
             case PRIVATE:
                 persistenceChatService = new PersistencePrivateChatServiceImpl(chatRepository);
                 break;

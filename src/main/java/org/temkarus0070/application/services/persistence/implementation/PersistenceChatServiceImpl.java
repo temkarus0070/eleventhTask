@@ -1,6 +1,8 @@
 package org.temkarus0070.application.services.persistence.implementation;
 
+import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.chat.Chat;
+import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.Message;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
 import org.temkarus0070.application.domain.exceptions.UserBannedException;
@@ -12,6 +14,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Component
 public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceChatService<T> {
     private final ChatRepository chatRepository;
     private Logger myLogger = Logger.getLogger(this.getClass().getName());
@@ -27,7 +30,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
 
     @Override
     public Collection<T> get() throws ChatAppDatabaseException {
-        return (Collection<T>) chatRepository.get();
+        return (Collection<T>) chatRepository.get(ChatType.ANY);
     }
 
 
@@ -37,7 +40,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
 
     @Override
     public Collection<T> getChatsByUserName(String username) throws ChatAppDatabaseException {
-        return (Collection<T>) chatRepository.getChatsByUser(username);
+        return (Collection<T>) chatRepository.getChatsByUser(username, ChatType.ANY);
     }
 
 
@@ -61,7 +64,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
     }
 
     public Optional<T> getChat(int chatId) throws ChatAppDatabaseException {
-        return (Optional<T>) Optional.of(chatRepository.get(chatId));
+        return (Optional<T>) Optional.of(chatRepository.get(chatId, ChatType.ANY));
     }
 
 
