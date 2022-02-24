@@ -11,9 +11,14 @@ import org.temkarus0070.application.domain.chat.Chat;
 import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.GroupChat;
 import org.temkarus0070.application.domain.exceptions.ChatAppException;
+import org.temkarus0070.application.factories.PersistenceChatServiceFactory;
 import org.temkarus0070.application.services.AuthService;
 import org.temkarus0070.application.services.ChatConverterService;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceChatServiceImpl;
+import org.temkarus0070.application.services.persistence.implementation.PersistenceGroupChatServiceImpl;
+import org.temkarus0070.application.services.persistence.implementation.PersistenceRoomChatServiceImpl;
+import org.temkarus0070.application.services.persistence.interfaces.ChatRepository;
+import org.temkarus0070.application.services.persistence.interfaces.PersistenceChatService;
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceUserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,44 +31,71 @@ import java.util.stream.Collectors;
 @Controller()
 @RequestMapping("/chat")
 public class ChatController {
+    private PersistenceChatServiceFactory persistenceChatServiceFactory;
     private ChatConverterService chatConverterService;
     private final PersistenceChatServiceImpl<Chat> persistenceChatService;
     private final PersistenceUserService persistenceUserService;
     private final AuthService authService;
+    private ChatRepository chatRepository;
 
-    public ChatController(ChatConverterService chatConverterService, PersistenceChatServiceImpl<Chat> persistenceChatService, PersistenceUserService persistenceUserService, AuthService authService) {
+    public ChatController(PersistenceChatServiceFactory persistenceChatServiceFactory, ChatConverterService chatConverterService, PersistenceChatServiceImpl<Chat> persistenceChatService, PersistenceUserService persistenceUserService, AuthService authService, ChatRepository chatRepository) {
+        this.persistenceChatServiceFactory = persistenceChatServiceFactory;
         this.chatConverterService = chatConverterService;
         this.persistenceChatService = persistenceChatService;
         this.persistenceUserService = persistenceUserService;
         this.authService = authService;
+        this.chatRepository = chatRepository;
     }
 
     @GetMapping
-    public String get(Model model, @RequestParam Integer chatId, HttpServletRequest req) {
-        Optional<Chat> optionalChat = persistenceChatService.getChat(chatId);
-        if (optionalChat.isPresent()) {
-            try {
+    public String get(Model model, @RequestParam(required = false) Integer chatId, HttpServletRequest req,@RequestParam(required = false) String chatName,@RequestParam ChatType chatType) {
+        Optional optionalChat=Optional.empty();
+      try {
+
+          if (chatType == ChatType.GROUP) {
+              PersistenceGroupChatServiceImpl persistenceChatService = (PersistenceGroupChatServiceImpl) persistenceChatServiceFactory.create(chatType, chatRepository);
+              if (chatId==null)
+              optionalChat = persistenceChatService.getChatByName(chatName);
+              else optionalChat=persistenceChatService.getChat(chatId);
+          } else if (chatType == ChatType.ROOM) {
+              PersistenceRoomChatServiceImpl persistenceChatService = (PersistenceRoomChatServiceImpl) persistenceChatServiceFactory.create(chatType, chatRepository);
+              if (chatId==null)
+                  optionalChat = persistenceChatService.getChatByName(chatName);
+              else optionalChat=persistenceChatService.getChat(chatId);
+          } else {
+              optionalChat = persistenceChatService.getChat(chatId);
+          }
+
+          if (optionalChat.isPresent()) {
+              try {
 
 
-                Chat chat = optionalChat.get();
-                User currentUser = authService.getCurrentUser(req.getCookies());
-                if (hasPermissions(currentUser, chat)) {
-                    Set<User> bannedUserSet = new HashSet<>(chat.getBannedUsers());
-                    Set<User> currentUsers = new HashSet<>(chat.getUserList());
+                  Chat chat = (Chat) optionalChat.get();
+                  User currentUser = authService.getCurrentUser(req.getCookies());
+                  if (hasPermissions(currentUser, chat)) {
+                      Set<User> bannedUserSet = new HashSet<>(chat.getBannedUsers());
+                      Set<User> currentUsers = new HashSet<>(chat.getUserList());
 
-                    model.addAttribute("chat", chat);
-                    model.addAttribute("users", persistenceUserService.getUsersNotAtThatChat(chat.getId()));
-                    List<User> users = persistenceUserService.get().stream().filter(e -> !bannedUserSet.contains(e) && currentUsers.contains(e)).collect(Collectors.toList());
-                    model.addAttribute("usersToBan", users);
+                      model.addAttribute("chat", chat);
+                      model.addAttribute("users", persistenceUserService.getUsersNotAtThatChat(chat.getId()));
+                      List<User> users = persistenceUserService.get().stream().filter(e -> !bannedUserSet.contains(e) && currentUsers.contains(e)).collect(Collectors.toList());
+                      model.addAttribute("usersToBan", users);
 
-                    return "chat";
-                } else return "You dont have permissions to this chat";
-            } catch (ChatAppException chatAppException) {
-                model.addAttribute("error", chatAppException.getMessage());
-                return "error";
-            }
-        } else return "chat not found";
+                      return "chat";
+                  } else return "You dont have permissions to this chat";
+              } catch (ChatAppException chatAppException) {
+
+              }
+          } else  model.addAttribute("error", "chat not found");
+      }
+      catch (Exception exception){
+          model.addAttribute("error", exception.getMessage());
+      }
+        return "error";
     }
+
+
+
 
     @PostMapping
     public String add(GroupChat anyChat, HttpServletRequest req, Model model, ChatType type) {

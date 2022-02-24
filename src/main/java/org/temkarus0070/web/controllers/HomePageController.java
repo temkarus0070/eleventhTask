@@ -41,7 +41,7 @@ public class HomePageController {
 
         } catch (Exception exception) {
             model.addAttribute("error", exception.getMessage());
-            return "error";
+            return "redirect:/login";
         }
         return "home";
     }

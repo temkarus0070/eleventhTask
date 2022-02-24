@@ -16,7 +16,7 @@
 </head>
 <body>
 <jsp:include page="../WEB-INF/jsp/header.jsp"></jsp:include>
-<form method="get" action="./chat">
+<form method="get" action="../chat">
     <fieldset>
         <select id="chatType" name="chatType">
             <option selected value="PRIVATE">private chat</option>
