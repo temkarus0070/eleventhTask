@@ -10,18 +10,16 @@
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
         </webroots>
         <sourceRoots>
-          <root url="file://$MODULE_DIR$/src/main/java" />
           <root url="file://$MODULE_DIR$/src/main/resources" />
+          <root url="file://$MODULE_DIR$/src/main/java" />
         </sourceRoots>
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
       <configuration>
-        <fileset id="fileset" name="Spring Application Context" removed="false">
-          <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/ApplicationContextConfig.java</file>
-          <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/SpringWebAppInitializer.java</file>
+        <fileset id="fileset2" name="Spring Application Context (2)" removed="false">
           <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/AppConfig.java</file>
-          <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/WebMVCConfig.java</file>
+          <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/WebConfig.java</file>
         </fileset>
       </configuration>
     </facet>

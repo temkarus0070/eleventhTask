@@ -37,9 +37,9 @@ public class MessagesController {
             User currentUser = authService.getCurrentUser(req.getCookies());
             message.setSender(currentUser);
             persistenceChatService.addMessage(message, chatId);
-
-            model.addAttribute("chat", persistenceChatService.getChat(chatId).get());
-            return "redirect:/chat?chatId=" + chatId;
+            Chat chat = persistenceChatService.getChat(chatId).get();
+            model.addAttribute("chat", chat);
+            return String.format("redirect:/chat?chatId=%d&chatType=%s", chatId, chat.getType().toString());
         } catch (ChatAppException e) {
             model.addAttribute("error", e.getMessage());
             return "error";

@@ -13,7 +13,7 @@
 
 <jsp:include page="header.jsp"/>
 
-<form method="get" action="/">
+<form method="get" action="./home">
     <label for="chatType">chat type</label>
     <select name="chatType" id="chatType">
         <option selected value="ANY">ANY</option>
