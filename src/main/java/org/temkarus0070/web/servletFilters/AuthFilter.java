@@ -1,6 +1,7 @@
 package org.temkarus0070.web.servletFilters;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.exceptions.ChatAppException;
 import org.temkarus0070.application.services.AuthService;
 import org.temkarus0070.application.services.AuthServiceImpl;
@@ -9,10 +10,14 @@ import org.temkarus0070.application.services.persistence.UserStorage;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceUserServiceImpl;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+
+@Component
+@WebFilter(urlPatterns = "/*", dispatcherTypes = {DispatcherType.REQUEST})
 public class AuthFilter implements Filter {
 
     @Autowired
@@ -33,7 +38,7 @@ public class AuthFilter implements Filter {
         }
         try {
             if (!authService.isAuthorized(request.getCookies())) {
-                servletRequest.getRequestDispatcher("/jsp/login.jsp").forward(servletRequest, servletResponse);
+                servletRequest.getRequestDispatcher("/login").forward(servletRequest, servletResponse);
                 return;
             } else {
                 servletRequest.setAttribute("isAuthorized", true);
