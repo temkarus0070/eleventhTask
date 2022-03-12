@@ -34,10 +34,13 @@ public class ChatStorage implements ChatRepository {
 
     private final ChatsExtractor chatsExtractor;
 
-    public ChatStorage(JdbcTemplate jdbcTemplate, Extractor<Chat> chatExtractor, ChatsExtractor chatsExtractor) {
+    private final StatementExecutorFactory statementExecutorFactory;
+
+    public ChatStorage(JdbcTemplate jdbcTemplate, Extractor<Chat> chatExtractor, ChatsExtractor chatsExtractor, StatementExecutorFactory statementExecutorFactory) {
         this.jdbcTemplate = jdbcTemplate;
         this.chatExtractor = chatExtractor;
         this.chatsExtractor = chatsExtractor;
+        this.statementExecutorFactory = statementExecutorFactory;
     }
 
     private void setChatType(ChatType chatType) {
@@ -53,7 +56,7 @@ public class ChatStorage implements ChatRepository {
     public Collection<Chat> get(ChatType chatType) throws ChatAppDatabaseException {
         setChatType(chatType);
         try {
-            return jdbcTemplate.execute((PreparedStatementCreator) (connection) -> {
+            return jdbcTemplate.execute((connection) -> {
                 PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text in ? ORDER BY id");
                 statement.setArray(1, array);
                 return statement;
@@ -192,7 +195,7 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void add(Chat entity) throws ChatAppDatabaseException {
-        StatementExecutor statementExecutor = StatementExecutorFactory.getStatementPreparator(entity.getType());
+        StatementExecutor statementExecutor = statementExecutorFactory.getStatementPreparator(entity.getType());
         entity = statementExecutor.executeAdd(entity);
         try {
             Chat finalEntity = entity;
@@ -225,7 +228,7 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void update(Chat entity) throws ChatAppDatabaseException {
-        StatementExecutor statementExecutor = StatementExecutorFactory.getStatementPreparator(entity.getType());
+        StatementExecutor statementExecutor = statementExecutorFactory.getStatementPreparator(entity.getType());
         statementExecutor.executeUpdate(entity);
     }
 }
