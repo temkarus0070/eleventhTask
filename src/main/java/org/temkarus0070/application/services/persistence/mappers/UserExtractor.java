@@ -1,23 +1,13 @@
 package org.temkarus0070.application.services.persistence.mappers;
 
+import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Component
 public class UserExtractor implements Extractor<User> {
-    private static UserExtractor userExtractor;
-
-    private UserExtractor(){
-
-    }
-
-    public static UserExtractor getInstance(){
-        if(userExtractor==null){
-            userExtractor=new UserExtractor();
-        }
-        return userExtractor;
-    }
     @Override
     public User extract(ResultSet resultSet) throws SQLException {
         User user=null;

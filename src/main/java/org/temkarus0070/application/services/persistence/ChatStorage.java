@@ -1,7 +1,10 @@
 package org.temkarus0070.application.services.persistence;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.chat.Chat;
 import org.temkarus0070.application.domain.chat.ChatType;
@@ -13,7 +16,8 @@ import org.temkarus0070.application.services.persistence.mappers.ChatsExtractor;
 import org.temkarus0070.application.services.persistence.mappers.Extractor;
 import org.temkarus0070.application.services.persistence.statementExecutors.StatementExecutor;
 
-import java.sql.*;
+import java.sql.Array;
+import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -48,32 +52,34 @@ public class ChatStorage implements ChatRepository {
     @Override
     public Collection<Chat> get(ChatType chatType) throws ChatAppDatabaseException {
         setChatType(chatType);
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text in ? ORDER BY id");) {
+        try {
+            return jdbcTemplate.execute((PreparedStatementCreator) (connection) -> {
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text in ? ORDER BY id");
+                statement.setArray(1, array);
+                return statement;
+            }, (PreparedStatementCallback<Collection<Chat>>) ps -> chatsExtractor.extract(ps.executeQuery()));
 
-            statement.setArray(1, array);
-            ResultSet resultSet = statement.executeQuery();
-            return chatsExtractor.extract(resultSet);
-        } catch (SQLException sqlException) {
-            myLogger.log(Level.SEVERE, sqlException.getMessage());
-            throw new ChatAppDatabaseException(sqlException);
+        } catch (org.springframework.dao.DataAccessException DataAccessException) {
+            myLogger.log(Level.SEVERE, DataAccessException.getMessage());
+            throw new ChatAppDatabaseException(DataAccessException);
         }
     }
 
     @Override
     public Collection<Chat> getChatsByUser(String username, ChatType chatType) throws ChatAppDatabaseException {
         setChatType(chatType);
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
-                     "INNER JOIN  users_chats uc ON u.username=uc.username " +
-                     "INNER JOIN  Chats c ON c.id=uc.chat_id " +
-                     "WHERE u.username=? and c.chat_type::text  = any(?::text[]) " +
-                     "ORDER BY c.id");) {
-            preparedStatement.setArray(2, array);
-            preparedStatement.setString(1, username);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return chatsExtractor.extract(resultSet);
-        } catch (SQLException throwables) {
+        try {
+            return jdbcTemplate.execute((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users u " +
+                        "INNER JOIN  users_chats uc ON u.username=uc.username " +
+                        "INNER JOIN  Chats c ON c.id=uc.chat_id " +
+                        "WHERE u.username=? and c.chat_type::text  = any(?::text[]) " +
+                        "ORDER BY c.id");
+                preparedStatement.setArray(2, array);
+                preparedStatement.setString(1, username);
+                return preparedStatement;
+            }, (PreparedStatementCallback<Collection<Chat>>) (preparedStatement) -> chatsExtractor.extract(preparedStatement.executeQuery()));
+        } catch (org.springframework.dao.DataAccessException throwables) {
             myLogger.log(Level.SEVERE, throwables.getMessage());
             throw new ChatAppDatabaseException(throwables);
         }
@@ -82,19 +88,20 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public Optional<Chat> getChatByName(String name, ChatType chatType) throws ChatAppDatabaseException {
-
         setChatType(chatType);
         if (chatType == ChatType.PRIVATE)
             throw new UnsupportedOperationException();
-        try (Connection connection = ConnectionManager.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                " on c.id=usChats.chat_id " +
-                "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                " WHERE c.name=? and c.chat_type::text = any(?::text[])");) {
-            preparedStatement.setArray(2, array);
-            preparedStatement.setString(1, name);
-            Chat chat = chatExtractor.extract(preparedStatement.executeQuery());
-            return Optional.ofNullable(chat);
-        } catch (SQLException exception) {
+        try {
+            return Optional.ofNullable(jdbcTemplate.execute((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                        " on c.id=usChats.chat_id " +
+                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                        " WHERE c.name=? and c.chat_type::text = any(?::text[])");
+                preparedStatement.setArray(2, array);
+                preparedStatement.setString(1, name);
+                return preparedStatement;
+            }, (PreparedStatementCallback<Chat>) (preparedStatement) -> chatExtractor.extract(preparedStatement.executeQuery())));
+        } catch (DataAccessException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
@@ -102,13 +109,14 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void removeUserFromChat(String user, Integer chatId) throws ChatAppDatabaseException {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users_chats WHERE (username=? AND chat_id=?)");) {
-
-            preparedStatement.setInt(2, chatId);
-            preparedStatement.setString(1, user);
-            preparedStatement.executeUpdate();
-        } catch (SQLException chatAppDatabaseException) {
+        try {
+            jdbcTemplate.update((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users_chats WHERE (username=? AND chat_id=?)");
+                preparedStatement.setInt(2, chatId);
+                preparedStatement.setString(1, user);
+                return preparedStatement;
+            });
+        } catch (DataAccessException chatAppDatabaseException) {
             myLogger.log(Level.SEVERE, chatAppDatabaseException.getMessage());
             throw new ChatAppDatabaseException(chatAppDatabaseException);
         }
@@ -116,13 +124,14 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void addUserToChat(String user, Integer chatId) throws ChatAppDatabaseException {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users_chats(username,chat_id,has_ban) values(?,?,false)");) {
-
-            preparedStatement.setString(1, user);
-            preparedStatement.setInt(2, chatId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
+        try {
+            jdbcTemplate.update((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users_chats(username,chat_id,has_ban) values(?,?,false)");
+                preparedStatement.setString(1, user);
+                preparedStatement.setInt(2, chatId);
+                return preparedStatement;
+            });
+        } catch (DataAccessException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
@@ -130,15 +139,15 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void banUserInChat(String user, Integer chatId) throws ChatAppDatabaseException {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE users_chats SET has_ban=true " +
-                     "where (username=? AND chat_id=?)");) {
-
-            preparedStatement.setString(1, user);
-            preparedStatement.setInt(2, chatId);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-        } catch (SQLException exception) {
+        try {
+            jdbcTemplate.update((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE users_chats SET has_ban=true " +
+                        "where (username=? AND chat_id=?)");
+                preparedStatement.setString(1, user);
+                preparedStatement.setInt(2, chatId);
+                return preparedStatement;
+            });
+        } catch (DataAccessException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
@@ -146,14 +155,15 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void addMessage(Message message, Integer chatId) throws ChatAppDatabaseException {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO messages(text,sender_name,chat_id) values (?,?,?)");) {
-
-            preparedStatement.setString(1, message.getContent());
-            preparedStatement.setString(2, message.getSender().getUsername());
-            preparedStatement.setInt(3, chatId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
+        try {
+            jdbcTemplate.update((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO messages(text,sender_name,chat_id) values (?,?,?)");
+                preparedStatement.setString(1, message.getContent());
+                preparedStatement.setString(2, message.getSender().getUsername());
+                preparedStatement.setInt(3, chatId);
+                return preparedStatement;
+            });
+        } catch (DataAccessException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
@@ -162,16 +172,19 @@ public class ChatStorage implements ChatRepository {
     @Override
     public Chat get(Integer id, ChatType chatType) throws ChatAppDatabaseException {
         setChatType(chatType);
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
-                     " on c.id=usChats.chat_id " +
-                     "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
-                     " WHERE c.id=? AND c.chat_type::text = any(?::text[])");) {
+        try {
+            return jdbcTemplate.execute((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                        " on c.id=usChats.chat_id " +
+                        "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
+                        " WHERE c.id=? AND c.chat_type::text = any(?::text[])");
+                preparedStatement.setArray(2, array);
+                preparedStatement.setInt(1, id);
+                return preparedStatement;
+            }, (PreparedStatementCallback<Chat>) (preparedStatement) -> chatExtractor.extract(preparedStatement.executeQuery()));
 
-            preparedStatement.setArray(2, array);
-            preparedStatement.setInt(1, id);
-            return chatExtractor.extract(preparedStatement.executeQuery());
-        } catch (SQLException exception) {
+
+        } catch (DataAccessException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
@@ -181,13 +194,15 @@ public class ChatStorage implements ChatRepository {
     public void add(Chat entity) throws ChatAppDatabaseException {
         StatementExecutor statementExecutor = StatementExecutorFactory.getStatementPreparator(entity.getType());
         entity = statementExecutor.executeAdd(entity);
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement1 = connection.prepareStatement("INSERT INTO users_chats VALUES (?,?,false)");) {
-
-            preparedStatement1.setString(1, entity.getChatOwner().getUsername());
-            preparedStatement1.setInt(2, entity.getId());
-            preparedStatement1.executeUpdate();
-        } catch (SQLException exception) {
+        try {
+            Chat finalEntity = entity;
+            jdbcTemplate.update((connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users_chats VALUES (?,?,false)");
+                preparedStatement.setString(1, finalEntity.getChatOwner().getUsername());
+                preparedStatement.setInt(2, finalEntity.getId());
+                return preparedStatement;
+            });
+        } catch (DataAccessException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
@@ -196,11 +211,13 @@ public class ChatStorage implements ChatRepository {
 
     @Override
     public void delete(Integer id) throws ChatAppDatabaseException {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM chats where id=?");) {
-            preparedStatement.setInt(1, id);
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
+        try {
+            jdbcTemplate.update((PreparedStatementCreator) (connection) -> {
+                PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM chats where id=?");
+                preparedStatement.setInt(1, id);
+                return preparedStatement;
+            });
+        } catch (DataAccessException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);
         }
