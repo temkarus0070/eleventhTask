@@ -14,7 +14,7 @@
     <title>Title</title>
 </head>
 <body>
-<jsp:include page="../WEB-INF/jsp/header.jsp"></jsp:include>
+<jsp:include page="../../../../web/WEB-INF/jsp/header.jsp"></jsp:include>
 <form method="post" action="../chat">
     <fieldset>
         <select id="type" name="type">
