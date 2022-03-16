@@ -40,9 +40,7 @@ public class UserStorage implements UserRepository {
     @Override
     public Collection<User> get() throws ChatAppDatabaseException {
         try {
-            List<User> list = jdbcTemplate.query("SELECT * FROM users", rs -> {
-                return usersExtractor.extract(rs);
-            });
+            List<User> list = jdbcTemplate.query("SELECT * FROM users", usersExtractor::extract);
             return list;
         } catch (org.springframework.dao.DataAccessException | ChatAppDatabaseException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());

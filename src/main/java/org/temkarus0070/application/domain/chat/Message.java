@@ -2,6 +2,7 @@ package org.temkarus0070.application.domain.chat;
 
 import org.temkarus0070.application.domain.User;
 
+
 public class Message {
     private String content;
     private User sender;
