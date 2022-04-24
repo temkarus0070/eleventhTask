@@ -10,7 +10,8 @@ CREATE table Chats(
 
 CREATE table Users(
                       username varchar(255) primary key not null,
-                      password varchar(255) not null
+                      password varchar(255)             not null,
+                      roles    varchar(255)
 );
 
 CREATE table Users_chats(

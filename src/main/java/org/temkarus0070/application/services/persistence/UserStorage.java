@@ -68,11 +68,12 @@ public class UserStorage implements UserRepository {
     public void add(User entity) throws ChatAppDatabaseException {
         try {
             jdbcTemplate.execute(con -> {
-                PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO users(username,password) VALUES (?,?)");
+                PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO users(username,password,roles) VALUES (?,?,?)");
                 preparedStatement.setString(1, entity.getUsername());
                 preparedStatement.setString(2, entity.getPassword());
+                preparedStatement.setString(3, entity.getRoles());
                 return preparedStatement;
-            }, (PreparedStatementCallback<Object>) ps -> ps.executeUpdate());
+            }, (PreparedStatementCallback<Object>) PreparedStatement::executeUpdate);
         } catch (org.springframework.dao.DataAccessException | ChatAppDatabaseException exception) {
             myLogger.log(Level.SEVERE, exception.getMessage());
             throw new ChatAppDatabaseException(exception);

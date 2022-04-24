@@ -1,10 +1,34 @@
 package org.temkarus0070.application.domain;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class User {
     private String username;
     private String password;
+    private String roles;
+
+    public User(UserDetails userDetails) {
+        this.username = userDetails.getUsername();
+        this.password = userDetails.getPassword();
+        if (userDetails.getAuthorities() != null) {
+            String collect = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" "));
+            this.roles = collect;
+        }
+    }
+
+    public User(String username, String password, String roles) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
 
     public String getPassword() {
         return password;
@@ -17,6 +41,10 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
     }
 
     public User() {

@@ -15,6 +15,7 @@ public class UserExtractor implements Extractor<User> {
             user = new User();
             user.setUsername(resultSet.getString("username"));
             user.setPassword(resultSet.getString("password"));
+            user.setRoles(resultSet.getString("roles"));
 
         }
         return user;

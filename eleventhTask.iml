@@ -7,8 +7,8 @@
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
         </webroots>
         <sourceRoots>
-          <root url="file://$MODULE_DIR$/src/main/resources" />
           <root url="file://$MODULE_DIR$/src/main/java" />
+          <root url="file://$MODULE_DIR$/src/main/resources" />
         </sourceRoots>
       </configuration>
     </facet>
@@ -17,6 +17,9 @@
         <fileset id="fileset" name="Spring Application Context" removed="false">
           <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/AppConfig.java</file>
           <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/WebConfig.java</file>
+        </fileset>
+        <fileset id="fileset2" name="Spring Application Context (2)" removed="false">
+          <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/application/security/WebSecuriyConfig.java</file>
         </fileset>
       </configuration>
     </facet>
@@ -39,16 +42,20 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.3.16" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:5.3.16" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.32" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.3.16" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.16" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.3.16" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-core:5.3.16" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.3.16" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.3.16" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.6.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.6.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.6.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:5.6.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.18" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.3.18" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.3.18" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:5.3.18" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.3.18" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.3.18" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:5.3.18" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:javax.servlet-api:4.0.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: javax.servlet:jstl:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.postgresql:postgresql:42.2.24" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.checkerframework:checker-qual:3.5.0" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:5.3.16" level="project" />
   </component>
 </module>
