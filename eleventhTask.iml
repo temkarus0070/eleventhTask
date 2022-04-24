@@ -21,6 +21,7 @@
         <fileset id="fileset2" name="Spring Application Context (2)" removed="false">
           <file>file://$MODULE_DIR$/src/main/java/org/temkarus0070/application/security/WebSecuriyConfig.java</file>
         </fileset>
+        <fileset id="initializer org.temkarus0070.application.security.AppServletInitializer root context" name="MVC appServlet initializer root context" removed="true" />
       </configuration>
     </facet>
   </component>
