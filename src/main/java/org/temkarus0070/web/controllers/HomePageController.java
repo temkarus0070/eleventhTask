@@ -43,6 +43,6 @@ public class HomePageController {
             model.addAttribute("error", exception.getMessage());
             return "redirect:/login";
         }
-        return "home";
+        return "index";
     }
 }
