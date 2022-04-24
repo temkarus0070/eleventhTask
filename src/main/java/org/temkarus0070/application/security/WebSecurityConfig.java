@@ -21,6 +21,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthProvider authenticationProvider;
 
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().mvcMatchers("/register/**");
@@ -38,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin(withDefaults());
         http.authenticationProvider(authenticationProvider);
 
-        http.rememberMe().key(someSecret).tokenValiditySeconds(30000000);
+        http.rememberMe(withDefaults());
     }
 
     @Bean

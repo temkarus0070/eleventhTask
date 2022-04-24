@@ -21,6 +21,7 @@ pageEncoding="UTF-8"%>
         <h2>${chat.getName()}</h2></div>
 </c:if>
 <form action="./messages" method="post">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
     <input type="hidden" value="${chat.getType()}" name="chatType" id="chatType"/>
     <input type="hidden" value="${chat.getId()}" name="chatId" id="chatId"/>
     <label for="content">text</label>

@@ -8,14 +8,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-<link rel="stylesheet" href="../css/style.css"/>
+    <link rel="stylesheet" href="../css/style.css"/>
     <script type="text/javascript" src="./../js/jquery-3.6.0.js"></script>
-    <script type="text/javascript" src="./../js/createChat.js" ></script>
+    <script type="text/javascript" src="./../js/createChat.js"></script>
     <title>Title</title>
 </head>
 <body>
 <jsp:include page="../WEB-INF/jsp/header.jsp"></jsp:include>
 <form method="post" action="../chat">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
     <fieldset>
         <select id="type" name="type">
             <option selected value="PRIVATE">private chat</option>

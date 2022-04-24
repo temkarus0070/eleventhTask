@@ -14,6 +14,7 @@ import org.temkarus0070.application.services.persistence.interfaces.PersistenceC
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
 
 @Controller
 public class HomePageController {
@@ -29,9 +30,9 @@ public class HomePageController {
     }
 
     @GetMapping("/home")
-    public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType, HttpServletResponse resp) throws IOException {
+    public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType, HttpServletResponse resp, Principal principal) throws IOException {
         try {
-            User currentUser = authService.getCurrentUser(req.getCookies());
+            User currentUser = new User(principal.getName());
             if (chatType == null) {
                 chatType = ChatType.ANY;
             }

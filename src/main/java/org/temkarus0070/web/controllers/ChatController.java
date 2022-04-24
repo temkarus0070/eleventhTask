@@ -10,7 +10,6 @@ import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.Chat;
 import org.temkarus0070.application.domain.chat.ChatType;
 import org.temkarus0070.application.domain.chat.GroupChat;
-import org.temkarus0070.application.domain.exceptions.ChatAppException;
 import org.temkarus0070.application.factories.PersistenceChatServiceFactory;
 import org.temkarus0070.application.services.AuthService;
 import org.temkarus0070.application.services.ChatConverterService;
@@ -18,10 +17,10 @@ import org.temkarus0070.application.services.persistence.implementation.Persiste
 import org.temkarus0070.application.services.persistence.implementation.PersistenceGroupChatServiceImpl;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceRoomChatServiceImpl;
 import org.temkarus0070.application.services.persistence.interfaces.ChatRepository;
-import org.temkarus0070.application.services.persistence.interfaces.PersistenceChatService;
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceUserService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -48,17 +47,17 @@ public class ChatController {
     }
 
     @GetMapping
-    public String get(Model model, @RequestParam(required = false) Integer chatId, HttpServletRequest req,@RequestParam(required = false) String chatName,@RequestParam ChatType chatType) {
-        Optional optionalChat=Optional.empty();
-      try {
+    public String get(Model model, @RequestParam(required = false) Integer chatId, HttpServletRequest req, @RequestParam(required = false) String chatName, @RequestParam ChatType chatType, Principal principal) {
+        Optional optionalChat = Optional.empty();
+        try {
 
-          if (chatType == ChatType.GROUP) {
-              PersistenceGroupChatServiceImpl persistenceChatService = (PersistenceGroupChatServiceImpl) persistenceChatServiceFactory.create(chatType, chatRepository);
-              if (chatId==null)
-              optionalChat = persistenceChatService.getChatByName(chatName);
-              else optionalChat=persistenceChatService.getChat(chatId);
-          } else if (chatType == ChatType.ROOM) {
-              PersistenceRoomChatServiceImpl persistenceChatService = (PersistenceRoomChatServiceImpl) persistenceChatServiceFactory.create(chatType, chatRepository);
+            if (chatType == ChatType.GROUP) {
+                PersistenceGroupChatServiceImpl persistenceChatService = (PersistenceGroupChatServiceImpl) persistenceChatServiceFactory.create(chatType, chatRepository);
+                if (chatId == null)
+                    optionalChat = persistenceChatService.getChatByName(chatName);
+                else optionalChat = persistenceChatService.getChat(chatId);
+            } else if (chatType == ChatType.ROOM) {
+                PersistenceRoomChatServiceImpl persistenceChatService = (PersistenceRoomChatServiceImpl) persistenceChatServiceFactory.create(chatType, chatRepository);
               if (chatId==null)
                   optionalChat = persistenceChatService.getChatByName(chatName);
               else optionalChat=persistenceChatService.getChat(chatId);
@@ -67,11 +66,8 @@ public class ChatController {
           }
 
           if (optionalChat.isPresent()) {
-              try {
-
-
-                  Chat chat = (Chat) optionalChat.get();
-                  User currentUser = authService.getCurrentUser(req.getCookies());
+              Chat chat = (Chat) optionalChat.get();
+              User currentUser = new User(principal.getName());
                   if (hasPermissions(currentUser, chat)) {
                       Set<User> bannedUserSet = new HashSet<>(chat.getBannedUsers());
                       Set<User> currentUsers = new HashSet<>(chat.getUserList());
@@ -83,9 +79,7 @@ public class ChatController {
 
                       return "chat";
                   } else return "You dont have permissions to this chat";
-              } catch (ChatAppException chatAppException) {
 
-              }
           } else  model.addAttribute("error", "chat not found");
       }
       catch (Exception exception){
@@ -95,14 +89,12 @@ public class ChatController {
     }
 
 
-
-
     @PostMapping
-    public String add(GroupChat anyChat, HttpServletRequest req, Model model, ChatType type) {
+    public String add(GroupChat anyChat, HttpServletRequest req, Model model, ChatType type, Principal principal) {
         try {
             anyChat.setType(type);
             Chat chat = chatConverterService.convert(anyChat);
-            User currentUser = authService.getCurrentUser(req.getCookies());
+            User currentUser = new User(principal.getName());
             chat.setChatOwner(currentUser);
             persistenceChatService.addChat(chat);
             model.addAttribute("chat", chat);
@@ -118,42 +110,33 @@ public class ChatController {
 
 
     @PostMapping("/addUser")
-    public String addUser(Model model, HttpServletRequest req, User user, Integer id) {
-        try {
-            User currentUser = authService.getCurrentUser(req.getCookies());
-            Chat chat = persistenceChatService.getChat(id).get();
-            if (chat == null) {
-                return "chat not found";
-            } else if (!chat.getUserList().contains(currentUser)) {
-                return "you cant add user";
-            } else {
-                persistenceChatService.addUser(user.getUsername(), chat.getId());
-                model.addAttribute("chat", chat);
-                return "redirect:/chat?chatId=" + chat.getId();
-            }
-        } catch (ChatAppException exception) {
-            model.addAttribute("error", exception.getMessage());
-            return "error";
+    public String addUser(Model model, HttpServletRequest req, User user, Integer id, Principal principal) {
+        User currentUser = new User(principal.getName());
+        Chat chat = persistenceChatService.getChat(id).get();
+        if (chat == null) {
+            return "chat not found";
+        } else if (!chat.getUserList().contains(currentUser)) {
+            return "you cant add user";
+        } else {
+            persistenceChatService.addUser(user.getUsername(), chat.getId());
+            model.addAttribute("chat", chat);
+            return "redirect:/chat?chatId=" + chat.getId();
         }
+
     }
 
     @PostMapping("/ban")
-    public String banUser(Model model, Integer id, User user, HttpServletRequest req) {
-        try {
-            User currentUser = authService.getCurrentUser(req.getCookies());
-            Chat chat = persistenceChatService.getChat(id).get();
-            if (chat == null) {
-                return "chat not found";
-            } else if (!chat.getUserList().contains(currentUser)) {
-                return "you cant ban user";
-            } else {
-                persistenceChatService.banUserInChat(user.getUsername(), chat.getId());
-                model.addAttribute("chat", chat);
-                return "redirect:/chat?chatId=" + chat.getId();
-            }
-        } catch (ChatAppException exception) {
-            model.addAttribute("error", exception.getMessage());
-            return "error";
+    public String banUser(Model model, Integer id, User user, HttpServletRequest req, Principal principal) {
+        User currentUser = new User(principal.getName());
+        Chat chat = persistenceChatService.getChat(id).get();
+        if (chat == null) {
+            return "chat not found";
+        } else if (!chat.getUserList().contains(currentUser)) {
+            return "you cant ban user";
+        } else {
+            persistenceChatService.banUserInChat(user.getUsername(), chat.getId());
+            model.addAttribute("chat", chat);
+            return "redirect:/chat?chatId=" + chat.getId();
         }
     }
 

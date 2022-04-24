@@ -34,11 +34,11 @@ public class AuthController {
     public String register(User user, HttpServletResponse resp, Model model) throws IOException {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRoles("ROLE_USER");
             persistenceUserService.addUser(user);
-            resp.sendRedirect("/");
             return "redirect:/login";
 
-        } catch (ChatAppDatabaseException | IOException e) {
+        } catch (ChatAppDatabaseException e) {
             model.addAttribute("error", e.getMessage());
             return "error";
         }
