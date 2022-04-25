@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -41,19 +40,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class TestSecurity {
     @Autowired
-    private GenericApplicationContext applicationContext;
-    @Autowired
     private GenericWebApplicationContext context;
     private MockMvc mvc;
 
 
     private UserStorage userStorage = Mockito.mock(UserStorage.class);
-    private User newUser = new User("art", "1234", "USER");
+    private User newUser = null;
 
 
     @BeforeEach
     public void setup() {
-        AutowireCapableBeanFactory bf = applicationContext.getAutowireCapableBeanFactory();
+        AutowireCapableBeanFactory bf = context.getAutowireCapableBeanFactory();
         MyUserDetailsManager bean2 = bf.getBean(MyUserDetailsManager.class);
         bean2.setUserStorage(userStorage);
         PersistenceUserServiceImpl bean = bf.getBean(PersistenceUserServiceImpl.class);
@@ -64,6 +61,7 @@ public class TestSecurity {
         User user = new User("artyomsin007", "$2a$10$s6gL0T0u4.c6lkNN5HD9K.mFdpX85.BiVrY57jX/MiUPuZAT8H/Oa", "ROLE_ADMIN");
         Mockito.when(userStorage.get("artyomsin007"))
                 .thenReturn(user);
+        User newUser1 = new User("art", "1234", "USER");
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -71,7 +69,7 @@ public class TestSecurity {
                 newUser = (User) argument;
                 return null;
             }
-        }).when(userStorage).add(newUser);
+        }).when(userStorage).add(newUser1);
         Mockito.when(userStorage.get("artyom")).thenReturn(null);
         Mockito.when(userStorage.get("art")).thenReturn(null);
     }
