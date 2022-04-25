@@ -40,11 +40,8 @@ public class TestSecurity {
     @Autowired
     private GenericWebApplicationContext context;
     private MockMvc mvc;
-
-
     private UserStorage userStorage = Mockito.mock(UserStorage.class);
     private User newUser = null;
-
 
     @BeforeEach
     public void setup() {
@@ -84,8 +81,6 @@ public class TestSecurity {
         mvc
                 .perform(MockMvcRequestBuilders.get("/index"))
                 .andExpect(status().isOk());
-
-
     }
 
     @Test
