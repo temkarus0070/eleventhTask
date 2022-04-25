@@ -57,7 +57,7 @@ public class ChatStorage implements ChatRepository {
         setChatType(chatType);
         try {
             return jdbcTemplate.execute((connection) -> {
-                PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHATS where chat_type::text in ? ORDER BY id");
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM CHATS c where c.chat_type::text  = any(?::text[])ORDER BY c.id");
                 statement.setArray(1, array);
                 return statement;
             }, (PreparedStatementCallback<Collection<Chat>>) ps -> chatsExtractor.extract(ps.executeQuery()));
@@ -177,7 +177,7 @@ public class ChatStorage implements ChatRepository {
         setChatType(chatType);
         try {
             return jdbcTemplate.execute((connection) -> {
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats as c INNER JOIN users_chats as usChats" +
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM chats c INNER JOIN users_chats as usChats" +
                         " on c.id=usChats.chat_id " +
                         "LEFT JOIN  messages as m on (m.chat_id=c.id and m.sender_name=usChats.username) " +
                         " WHERE c.id=? AND c.chat_type::text = any(?::text[])");

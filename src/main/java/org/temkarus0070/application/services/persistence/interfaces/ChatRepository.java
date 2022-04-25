@@ -15,6 +15,7 @@ public interface ChatRepository {
 
     Collection<Chat> get(ChatType chatType) throws ChatAppDatabaseException;
 
+
     public Optional<Chat> getChatByName(String name, ChatType chatType) throws ChatAppDatabaseException;
 
     public void removeUserFromChat(String user, Integer chatId) throws ChatAppDatabaseException;

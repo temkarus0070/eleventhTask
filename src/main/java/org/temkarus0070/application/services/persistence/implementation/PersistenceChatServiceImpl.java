@@ -63,6 +63,7 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
         chatRepository.removeUserFromChat(username, chatId);
     }
 
+
     public Optional<T> getChat(int chatId) throws ChatAppDatabaseException {
         return (Optional<T>) Optional.of(chatRepository.get(chatId, ChatType.ANY));
     }

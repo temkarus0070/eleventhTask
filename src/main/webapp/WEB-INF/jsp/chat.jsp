@@ -31,6 +31,7 @@ pageEncoding="UTF-8"%>
 </form>
 
 <form action="./chat/addUser" method="post">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
     <input type="hidden" value="${chat.getType()}" name="type"/>
     <input type="hidden" value="${chat.getId()}" name="id">
     <select name="username">
@@ -42,6 +43,7 @@ pageEncoding="UTF-8"%>
 </form>
 
 <form action="./chat/ban" method="post">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
     <input type="hidden" value="${chat.getType()}" name="chatType"/>
     <input type="hidden" value="${chat.getId()}" name="id">
     <select name="username">

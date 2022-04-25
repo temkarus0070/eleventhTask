@@ -1,5 +1,6 @@
 package org.temkarus0070.web.controllers;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +31,17 @@ public class HomePageController {
     }
 
     @GetMapping("/home")
-    public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType, HttpServletResponse resp, Principal principal) throws IOException {
+    public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType, HttpServletResponse resp, Principal principal, Authentication authentication) throws IOException {
         try {
             User currentUser = new User(principal.getName());
             if (chatType == null) {
                 chatType = ChatType.ANY;
             }
             PersistenceChatService persistenceChatService = persistenceChatServiceFactory.create(chatType, chatRepository);
-            model.addAttribute("chats", persistenceChatService.getChatsByUserName(currentUser.getUsername()));
+            if (authentication.getAuthorities().stream().anyMatch(e -> e.getAuthority().contains("ADMIN"))) {
+                model.addAttribute("chats", persistenceChatService.get());
+            } else
+                model.addAttribute("chats", persistenceChatService.getChatsByUserName(currentUser.getUsername()));
             model.addAttribute("chatType", chatType);
 
         } catch (Exception exception) {
