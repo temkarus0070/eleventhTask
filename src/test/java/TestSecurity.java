@@ -2,7 +2,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -11,11 +17,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.temkarus0070.AppConfig;
 import org.temkarus0070.WebConfig;
+import org.temkarus0070.application.domain.User;
+import org.temkarus0070.application.security.MyUserDetailsManager;
 import org.temkarus0070.application.security.WebSecurityConfig;
+import org.temkarus0070.application.services.persistence.UserStorage;
+import org.temkarus0070.application.services.persistence.implementation.PersistenceUserServiceImpl;
 
+import static org.mockito.Mockito.doAnswer;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
@@ -23,19 +36,44 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ContextConfiguration(classes = {WebConfig.class, AppConfig.class, WebSecurityConfig.class})
 @WebAppConfiguration
 public class TestSecurity {
+    @Autowired
+    private GenericApplicationContext applicationContext;
+    @Autowired
+    private GenericWebApplicationContext context;
     private MockMvc mvc;
 
-    @Autowired
-    private WebApplicationContext homePageController;
+
+    private UserStorage userStorage = Mockito.mock(UserStorage.class);
+    private User newUser = new User("art", "1234", "USER");
+
 
     @BeforeEach
     public void setup() {
-        mvc = MockMvcBuilders.webAppContextSetup(homePageController).apply(springSecurity())
+        AutowireCapableBeanFactory bf = applicationContext.getAutowireCapableBeanFactory();
+        MyUserDetailsManager bean2 = bf.getBean(MyUserDetailsManager.class);
+        bean2.setUserStorage(userStorage);
+        PersistenceUserServiceImpl bean = bf.getBean(PersistenceUserServiceImpl.class);
+        bean.setUserRepository(userStorage);
+        mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
                 .build();
+
+        User user = new User("artyomsin007", "$2a$10$s6gL0T0u4.c6lkNN5HD9K.mFdpX85.BiVrY57jX/MiUPuZAT8H/Oa", "ROLE_ADMIN");
+        Mockito.when(userStorage.get("artyomsin007"))
+                .thenReturn(user);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object argument = invocationOnMock.getArgument(0);
+                newUser = (User) argument;
+                return null;
+            }
+        }).when(userStorage).add(newUser);
+        Mockito.when(userStorage.get("artyom")).thenReturn(null);
+        Mockito.when(userStorage.get("art")).thenReturn(null);
     }
 
     @Test
@@ -59,7 +97,18 @@ public class TestSecurity {
 
     @Test
     void testAuthenticationErrorWithInvalidLoginPassword() throws Exception {
-        mvc.perform(formLogin().user("art").password("1234")).andExpect(unauthenticated());
+        mvc.perform(formLogin().user("artyom").password("1234")).andExpect(unauthenticated());
+    }
+
+    @Test
+    void testRegistrationAndLoginSuccess() throws Exception {
+        MultiValueMap map = new LinkedMultiValueMap();
+        map.add("username", "art");
+        map.add("password", "1234");
+        mvc.perform(formLogin().user("art").password("1234")).andExpect(unauthenticated()).andReturn();
+        MvcResult mvcResult1 = mvc.perform(MockMvcRequestBuilders.post("/register").params(map)).andReturn();
+        Mockito.when(userStorage.get("art")).thenReturn(newUser);
+        mvc.perform(formLogin().user("art").password("1234")).andExpect(authenticated().withUsername("art")).andReturn();
     }
 
 }

@@ -1,5 +1,6 @@
 package org.temkarus0070.application.services.persistence.implementation;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
@@ -17,9 +18,12 @@ public class PersistenceUserServiceImpl implements PersistenceUserService {
     private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private UserRepository userRepository;
 
-    public PersistenceUserServiceImpl(UserRepository userRepository) {
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
 
     @Override
     public void addUser(User user) throws ChatAppDatabaseException {

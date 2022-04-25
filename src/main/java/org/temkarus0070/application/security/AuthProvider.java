@@ -20,6 +20,7 @@ public class AuthProvider implements AuthenticationProvider {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UserDetails userDetails = userDetailsManager.loadUserByUsername(authentication.getName());

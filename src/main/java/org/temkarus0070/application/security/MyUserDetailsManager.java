@@ -11,8 +11,12 @@ import org.temkarus0070.application.services.persistence.UserStorage;
 
 @Component
 public class MyUserDetailsManager implements UserDetailsManager {
-    @Autowired
     private UserStorage userStorage;
+
+    @Autowired
+    public void setUserStorage(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @Override
     public void createUser(UserDetails user) {
