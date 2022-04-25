@@ -3,7 +3,7 @@ package org.temkarus0070;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -21,7 +21,7 @@ public class AppConfig {
             dataSource = (DataSource) initialContext.lookup("java:/comp/env/jdbc/chatDB");
         } catch (
                 NamingException ex) {
-            throw new ChatAppDatabaseException(ex);
+            dataSource = new SingleConnectionDataSource("jdbc:postgresql://localhost:5432/chat", "postgres", "postgres", true);
         }
         return dataSource;
     }

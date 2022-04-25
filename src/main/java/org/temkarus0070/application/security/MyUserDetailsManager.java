@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.services.persistence.UserStorage;
 
+
 @Component
 public class MyUserDetailsManager implements UserDetailsManager {
     @Autowired

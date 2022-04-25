@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -20,6 +19,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private String someSecret = "abcdedfghjkl;";
     @Autowired
     private AuthProvider authenticationProvider;
+
+    @Autowired
+    private UserDetailsManager userDetailsManager;
 
 
     @Override
@@ -50,13 +52,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsManager userDetailsManager() {
-        return new MyUserDetailsManager();
-    }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return userDetailsManager();
-    }
 }
