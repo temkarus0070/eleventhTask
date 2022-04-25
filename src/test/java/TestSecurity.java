@@ -3,9 +3,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -62,13 +60,10 @@ public class TestSecurity {
         Mockito.when(userStorage.get("artyomsin007"))
                 .thenReturn(user);
         User newUser1 = new User("art", "1234", "USER");
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                Object argument = invocationOnMock.getArgument(0);
-                newUser = (User) argument;
-                return null;
-            }
+        doAnswer(invocationOnMock -> {
+            Object argument = invocationOnMock.getArgument(0);
+            newUser = (User) argument;
+            return null;
         }).when(userStorage).add(newUser1);
         Mockito.when(userStorage.get("artyom")).thenReturn(null);
         Mockito.when(userStorage.get("art")).thenReturn(null);
