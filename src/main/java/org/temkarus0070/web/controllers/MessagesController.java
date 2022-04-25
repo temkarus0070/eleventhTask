@@ -34,10 +34,13 @@ public class MessagesController {
     public String add(Message message, Model model, HttpServletRequest req, int chatId, Principal principal) {
         User currentUser = new User(principal.getName());
         message.setSender(currentUser);
-        persistenceChatService.addMessage(message, chatId);
         Chat chat = persistenceChatService.getChat(chatId).get();
-        model.addAttribute("chat", chat);
-        return String.format("redirect:/chat?chatId=%d&chatType=%s", chatId, chat.getType().toString());
+        if (chat.getUserList().stream().anyMatch(e -> e.getUsername().equals(principal.getName()))) {
+            persistenceChatService.addMessage(message, chatId);
 
+            model.addAttribute("chat", chat);
+            return String.format("redirect:/chat?chatId=%d&chatType=%s", chatId, chat.getType().toString());
+        } else model.addAttribute("error", "you cant write at this chat");
+        return "error";
     }
 }

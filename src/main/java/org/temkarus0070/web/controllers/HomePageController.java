@@ -30,7 +30,7 @@ public class HomePageController {
         this.chatRepository = chatRepository;
     }
 
-    @GetMapping("/home")
+    @GetMapping("/index")
     public String home(Model model, HttpServletRequest req, @RequestParam(required = false) ChatType chatType, HttpServletResponse resp, Principal principal, Authentication authentication) throws IOException {
         try {
             User currentUser = new User(principal.getName());

@@ -81,7 +81,7 @@ public class ChatController {
                   model.addAttribute("usersToBan", users);
 
                   return "chat";
-              } else return "You dont have permissions to this chat";
+              } else model.addAttribute("error", "You dont have permissions to this chat");
 
           } else  model.addAttribute("error", "chat not found");
       }
@@ -123,7 +123,7 @@ public class ChatController {
         } else {
             persistenceChatService.addUser(user.getUsername(), chat.getId());
             model.addAttribute("chat", chat);
-            return "redirect:/chat?chatId=" + chat.getId();
+            return "redirect:/chat?chatId=" + chat.getId() + "&&chatType=" + chat.getType();
         }
 
     }
@@ -139,7 +139,7 @@ public class ChatController {
         } else {
             persistenceChatService.banUserInChat(user.getUsername(), chat.getId());
             model.addAttribute("chat", chat);
-            return "redirect:/chat?chatId=" + chat.getId();
+            return "redirect:/chat?chatId=" + chat.getId() + "&&chatType=" + chat.getType();
         }
     }
 

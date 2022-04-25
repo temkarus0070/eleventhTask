@@ -36,7 +36,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
         http
-                .formLogin(withDefaults());
+                .formLogin()
+                .loginPage("/login")
+                .defaultSuccessUrl("/index")
+                .permitAll();
         http.authenticationProvider(authenticationProvider);
 
         http.rememberMe(withDefaults());
