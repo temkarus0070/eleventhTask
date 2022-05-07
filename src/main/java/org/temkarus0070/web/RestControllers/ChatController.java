@@ -2,7 +2,6 @@ package org.temkarus0070.web.RestControllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.temkarus0070.application.domain.User;
@@ -19,7 +18,6 @@ import org.temkarus0070.application.services.persistence.interfaces.ChatReposito
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceChatService;
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceUserService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -78,7 +76,7 @@ public class ChatController {
 
 
     @PostMapping
-    public void add(GroupChat anyChat, ChatType type, Principal principal) {
+    public void add(@RequestBody GroupChat anyChat, @RequestParam ChatType type, Principal principal) {
         try {
             anyChat.setType(type);
             Chat chat = chatConverterService.convert(anyChat);
@@ -92,9 +90,9 @@ public class ChatController {
 
 
     @PostMapping("/addUser")
-    public void addUser(User user, Integer id, Principal principal) {
+    public void addUser(@RequestBody User user, @RequestParam Integer chatId, Principal principal) {
         User currentUser = new User(principal.getName());
-        Chat chat = persistenceChatService.getChat(id).get();
+        Chat chat = persistenceChatService.getChat(chatId).get();
         if (chat == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "chat not found");
         } else if (!chat.getUserList().contains(currentUser)) {
@@ -106,17 +104,15 @@ public class ChatController {
     }
 
     @PostMapping("/ban")
-    public String banUser(Model model, Integer id, User user, HttpServletRequest req, Principal principal) {
+    public void banUser(@RequestParam Integer chatId, @RequestBody User user, Principal principal) {
         User currentUser = new User(principal.getName());
-        Chat chat = persistenceChatService.getChat(id).get();
+        Chat chat = persistenceChatService.getChat(chatId).get();
         if (chat == null) {
-            return "chat not found";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "chat not found");
         } else if (!chat.getUserList().contains(currentUser)) {
-            return "you cant ban user";
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "you cant ban user");
         } else {
             persistenceChatService.banUserInChat(user.getUsername(), chat.getId());
-            model.addAttribute("chat", chat);
-            return "redirect:/chat?chatId=" + chat.getId() + "&&chatType=" + chat.getType();
         }
     }
 
