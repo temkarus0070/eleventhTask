@@ -1,4 +1,4 @@
-package org.temkarus0070.application.security;
+package org.temkarus0070.application.security.persistence;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

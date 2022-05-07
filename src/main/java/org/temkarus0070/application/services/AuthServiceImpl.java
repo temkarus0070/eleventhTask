@@ -1,9 +1,13 @@
 package org.temkarus0070.application.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.temkarus0070.application.domain.User;
-import org.temkarus0070.application.domain.exceptions.*;
+import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
+import org.temkarus0070.application.domain.exceptions.ChatAppException;
+import org.temkarus0070.application.domain.exceptions.InvalidAuthDataException;
+import org.temkarus0070.application.domain.exceptions.UserNotExistsException;
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceUserService;
 
 import javax.servlet.http.Cookie;
@@ -17,7 +21,8 @@ public class AuthServiceImpl implements AuthService {
 
     private PersistenceUserService persistenceUserService;
 
-    private PasswordEncoder passwordEncoder;
+
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     private Logger myLogger = Logger.getLogger(AuthServiceImpl.class.getName());
 
@@ -51,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
         User user = null;
         Optional<User> userOptional = persistenceUserService.getUser(username);
         if (userOptional.isPresent()) {
-            String hashPassword = passwordEncoder.getHashFromPassword(password);
+            String hashPassword = passwordEncoder.encode(password);
             if (!(userOptional.get().getPassword().equals(hashPassword) ||
                     userOptional.get().getPassword().equals(password))) {
                 myLogger.log(Level.SEVERE, new InvalidAuthDataException().getMessage());
@@ -64,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean register(String username, String password) throws ChatAppException {
-        String hashPassword = passwordEncoder.getHashFromPassword(password);
+        String hashPassword = passwordEncoder.encode(password);
         User user = new User(username, hashPassword);
         try {
             persistenceUserService.addUser(user);

@@ -17,7 +17,7 @@
     <a href="${pageContext.request.contextPath}/logout">logout</a>
     <b>
         <sec:authentication property="principal"/>
-        <b sec:authorize="hasAuthority('ROLE_ADMIN')">ADMIN.</b>
+
     </b>
 
 </nav>

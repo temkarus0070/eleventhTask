@@ -20,8 +20,8 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.temkarus0070.AppConfig;
 import org.temkarus0070.WebConfig;
 import org.temkarus0070.application.domain.User;
-import org.temkarus0070.application.security.MyUserDetailsManager;
 import org.temkarus0070.application.security.WebSecurityConfig;
+import org.temkarus0070.application.security.persistence.MyUserDetailsManager;
 import org.temkarus0070.application.services.persistence.UserStorage;
 import org.temkarus0070.application.services.persistence.implementation.PersistenceUserServiceImpl;
 
