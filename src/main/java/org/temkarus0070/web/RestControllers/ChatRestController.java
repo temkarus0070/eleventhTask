@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/chat")
-public class ChatController {
+public class ChatRestController {
     private final PersistenceChatServiceImpl<Chat> persistenceChatService;
     private final PersistenceUserService persistenceUserService;
     private final AuthService authService;
@@ -31,7 +31,7 @@ public class ChatController {
     private ChatConverterService chatConverterService;
     private ChatRepository chatRepository;
 
-    public ChatController(PersistenceChatServiceFactory persistenceChatServiceFactory, ChatConverterService chatConverterService, PersistenceChatServiceImpl<Chat> persistenceChatService, PersistenceUserService persistenceUserService, AuthService authService, ChatRepository chatRepository) {
+    public ChatRestController(PersistenceChatServiceFactory persistenceChatServiceFactory, ChatConverterService chatConverterService, PersistenceChatServiceImpl<Chat> persistenceChatService, PersistenceUserService persistenceUserService, AuthService authService, ChatRepository chatRepository) {
         this.persistenceChatServiceFactory = persistenceChatServiceFactory;
         this.chatConverterService = chatConverterService;
         this.persistenceChatService = persistenceChatService;
