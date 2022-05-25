@@ -19,6 +19,7 @@ import org.temkarus0070.application.services.persistence.interfaces.PersistenceC
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceUserService;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Optional;
 
 @RestController
@@ -40,7 +41,8 @@ public class ChatRestController {
         this.chatRepository = chatRepository;
     }
 
-    @GetMapping
+
+    @GetMapping("/getChat")
     public Chat get(@RequestParam(required = false) Integer chatId, @RequestParam(required = false) String chatName, @RequestParam ChatType chatType, Principal principal, Authentication authentication) {
         Optional optionalChat = Optional.empty();
         try {
@@ -71,6 +73,24 @@ public class ChatRestController {
             } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "chat not found");
         } catch (Exception exception) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        }
+    }
+
+    @GetMapping("/getAllChatsOfCurrentUser")
+    public Collection<Chat> getAllChatsOfCurrentUser(Principal principal, @RequestParam(required = false) ChatType chatType, Authentication authentication) {
+        try {
+            User currentUser = new User(principal.getName());
+            if (chatType == null) {
+                chatType = ChatType.ANY;
+            }
+            PersistenceChatService persistenceChatService = persistenceChatServiceFactory.create(chatType, chatRepository);
+            if (authentication.getAuthorities().stream().anyMatch(e -> e.getAuthority().contains("ADMIN"))) {
+                return persistenceChatService.get();
+            } else
+                return persistenceChatService.getChatsByUserName(currentUser.getUsername());
+
+        } catch (Exception exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage());
         }
     }
 

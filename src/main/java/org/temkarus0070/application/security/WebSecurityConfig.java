@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -26,17 +31,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().mvcMatchers("/register/**", "/api/**");
+        web.ignoring().mvcMatchers("/register/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+        http.csrf().disable().cors().configurationSource(request -> {
+            var cors = new CorsConfiguration();
+            cors.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:80", "http://example.com"));
+            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            cors.setAllowedHeaders(List.of("*"));
+            return cors;
+        });
         http.authorizeRequests()
+                .mvcMatchers(("/api/auth/**")).permitAll()
                 .mvcMatchers("/**").authenticated()
                 .and()
                 .logout(withDefaults());
         http
+                .httpBasic()
+                .and()
                 .formLogin()
                 .loginPage("/login")
                 .defaultSuccessUrl("/index")
@@ -44,6 +58,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authenticationProvider(authenticationProvider);
 
         http.rememberMe(withDefaults());
+    }
+
+    @Bean
+    public CorsConfiguration corsConfiguration() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedMethods(List.of("*"));
+        corsConfiguration.setAllowedOrigins(List.of("*"));
+        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return corsConfiguration;
     }
 
     @Bean
