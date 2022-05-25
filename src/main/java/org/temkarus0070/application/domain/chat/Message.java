@@ -12,6 +12,9 @@ public class Message {
         this.sender = sender;
     }
 
+    public Message() {
+    }
+
     public String getContent() {
         return content;
     }

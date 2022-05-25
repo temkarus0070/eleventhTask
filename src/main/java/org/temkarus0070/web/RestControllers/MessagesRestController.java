@@ -1,10 +1,7 @@
 package org.temkarus0070.web.RestControllers;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.chat.Chat;
@@ -32,12 +29,13 @@ public class MessagesRestController {
     }
 
     @PostMapping
-    public void add(@RequestBody Message message, int chatId, Principal principal) {
+    public String add(@RequestBody Message message, @RequestParam int chatId, Principal principal) {
         User currentUser = new User(principal.getName());
         message.setSender(currentUser);
         Chat chat = persistenceChatService.getChat(chatId).get();
         if (chat.getUserList().stream().anyMatch(e -> e.getUsername().equals(principal.getName()))) {
             persistenceChatService.addMessage(message, chatId);
+            return currentUser.getUsername();
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "you cant write at this chat");
     }
 }

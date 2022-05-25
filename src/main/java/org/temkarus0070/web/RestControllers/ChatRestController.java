@@ -95,14 +95,15 @@ public class ChatRestController {
     }
 
 
-    @PostMapping
-    public void add(@RequestBody GroupChat anyChat, @RequestParam ChatType type, Principal principal) {
+    @PostMapping("/create")
+    public int add(@RequestBody GroupChat anyChat, @RequestParam ChatType type, Principal principal) {
         try {
             anyChat.setType(type);
             Chat chat = chatConverterService.convert(anyChat);
             User currentUser = new User(principal.getName());
             chat.setChatOwner(currentUser);
             persistenceChatService.addChat(chat);
+            return chat.getId();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
