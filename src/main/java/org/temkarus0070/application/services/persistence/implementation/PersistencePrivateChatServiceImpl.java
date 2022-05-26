@@ -13,13 +13,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImpl<PrivateChat>  implements PersistenceChatService<PrivateChat>{
+public class PersistencePrivateChatServiceImpl extends PersistenceChatServiceImpl<PrivateChat> implements PersistenceChatService<PrivateChat> {
     private Logger myLogger = Logger.getLogger(this.getClass().getName());
     private ChatRepository chatRepository;
 
     public PersistencePrivateChatServiceImpl(ChatRepository repository) {
         super(repository);
         this.chatRepository = repository;
+    }
+
+    @Override
+    public Optional<PrivateChat> getChatByName(String name) throws ChatAppDatabaseException {
+        throw new ChatAppDatabaseException("operation not supported");
     }
 
     @Override

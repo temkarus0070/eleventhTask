@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface PersistenceChatService<T extends Chat> {
 
 
+    public Optional<T> getChatByName(String name) throws ChatAppDatabaseException;
+
     public Optional<T> getChat(int id) throws ChatAppDatabaseException;
 
     public void removeChat(int id) throws ChatAppDatabaseException;
