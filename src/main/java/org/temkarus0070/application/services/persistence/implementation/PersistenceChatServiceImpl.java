@@ -64,6 +64,11 @@ public class PersistenceChatServiceImpl<T extends Chat> implements PersistenceCh
     }
 
 
+    @Override
+    public Optional<T> getChatByName(String name) throws ChatAppDatabaseException {
+        throw new ChatAppDatabaseException("operation not  supported");
+    }
+
     public Optional<T> getChat(int chatId) throws ChatAppDatabaseException {
         return (Optional<T>) Optional.of(chatRepository.get(chatId, ChatType.ANY));
     }

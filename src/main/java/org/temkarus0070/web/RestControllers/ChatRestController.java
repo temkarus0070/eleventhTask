@@ -40,7 +40,7 @@ public class ChatRestController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping()
     public int add(@RequestBody GroupChat anyChat, @RequestParam ChatType type) {
         try {
             return chatFacade.add(anyChat, type);
@@ -50,7 +50,7 @@ public class ChatRestController {
     }
 
 
-    @PostMapping("/addUser")
+    @PostMapping("/newUser")
     public void addUser(@RequestBody User user, @RequestParam Integer chatId) {
         try {
             chatFacade.banUser(chatId, user);

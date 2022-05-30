@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.temkarus0070.application.domain.User;
 import org.temkarus0070.application.domain.exceptions.ChatAppDatabaseException;
+import org.temkarus0070.application.facades.AuthFacade;
 import org.temkarus0070.application.services.AuthService;
 import org.temkarus0070.application.services.persistence.interfaces.PersistenceUserService;
 
@@ -15,14 +16,10 @@ import java.io.IOException;
 
 @Controller
 public class AuthController {
-    private AuthService authService;
-    private PersistenceUserService persistenceUserService;
-    private PasswordEncoder passwordEncoder;
+    private AuthFacade authFacade;
 
-    public AuthController(AuthService authService, PersistenceUserService persistenceUserService, PasswordEncoder passwordEncoder) {
-        this.authService = authService;
-        this.persistenceUserService = persistenceUserService;
-        this.passwordEncoder = passwordEncoder;
+    public AuthController(AuthFacade authFacade) {
+        this.authFacade = authFacade;
     }
 
     @GetMapping("/register")
@@ -31,11 +28,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(User user, HttpServletResponse resp, Model model) throws IOException {
+    public String register(User user,  Model model) throws IOException {
         try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setRoles("ROLE_USER");
-            persistenceUserService.addUser(user);
+            authFacade.register(user);
             return "redirect:/login";
 
         } catch (ChatAppDatabaseException e) {

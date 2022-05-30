@@ -13,19 +13,19 @@ public class MessageFacade {
     private PersistenceChatServiceImpl<Chat> persistenceChatService;
     private PersistenceUserService persistenceUserService;
     private ChatRepository repository;
-    private AuthFacade authFacade;
+    private UserFacade userFacade;
 
-    public MessageFacade(PersistenceChatServiceImpl<Chat> persistenceChatService, PersistenceUserService persistenceUserService, ChatRepository repository, AuthFacade authFacade) {
+    public MessageFacade(PersistenceChatServiceImpl<Chat> persistenceChatService, PersistenceUserService persistenceUserService, ChatRepository repository, UserFacade userFacade) {
         this.persistenceChatService = persistenceChatService;
         this.persistenceUserService = persistenceUserService;
         this.repository = repository;
-        this.authFacade = authFacade;
+        this.userFacade = userFacade;
     }
 
 
     public String add(Message message, int chatId) throws Exception {
 
-        User currentUser = authFacade.getCurrentAppUser();
+        User currentUser = userFacade.getCurrentAppUser();
         message.setSender(currentUser);
         Chat chat = persistenceChatService.getChat(chatId).get();
         if (chat.getUserList().stream().anyMatch(e -> e.getUsername().equals(currentUser.getUsername()))) {

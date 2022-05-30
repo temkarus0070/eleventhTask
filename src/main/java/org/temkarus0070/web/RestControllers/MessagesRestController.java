@@ -15,7 +15,6 @@ public class MessagesRestController {
         this.messageFacade = messageFacade;
     }
 
-    //запихать principal в message
     @PostMapping
     public String add(@RequestBody Message message, @RequestParam int chatId) {
         try {
